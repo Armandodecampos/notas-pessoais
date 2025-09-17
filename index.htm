@@ -59,6 +59,12 @@
 
         <!-- Formulário de Nova Senha (inicialmente escondido) -->
         <div id="new-password-container" class="hidden space-y-6">
+            <button id="back-button-new-password" class="w-full flex items-center justify-center px-4 py-2 bg-gray-200 text-gray-800 font-semibold rounded-md shadow-sm hover:bg-gray-300 focus:outline-none transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+                Voltar
+            </button>
             <p class="text-center font-semibold text-gray-700 text-lg">Defina sua nova senha</p>
             <div class="relative">
                 <label for="new-password" class="block text-sm font-medium text-gray-700">Nova Senha</label>
@@ -125,6 +131,7 @@
         const newPasswordInput = document.getElementById('new-password');
         const confirmPasswordInput = document.getElementById('confirm-password');
         const updatePasswordButton = document.getElementById('update-password-button');
+        const backButtonNewPassword = document.getElementById('back-button-new-password');
         
         let selectedEmail = ''; // Variável para armazenar o email selecionado
 
@@ -225,7 +232,7 @@
         resetPasswordButton.addEventListener('click', async () => {
             const email = selectedEmail;
             // Define o URL de redirecionamento para o seu próprio site
-            const redirectToUrl = `${window.location.origin}${window.location.pathname}#redefinir-senha`;
+            const redirectToUrl = `${window.location.origin}${window.location.pathname}`;
 
             showMessage('Enviando email de redefinição...', false);
 
@@ -250,6 +257,15 @@
             showMessage('', false); // Limpa a mensagem
         });
 
+        // Evento para o novo botão de Voltar
+        backButtonNewPassword.addEventListener('click', () => {
+            toggleUI(false, 'user-list');
+            newPasswordInput.value = ''; // Limpa os campos
+            confirmPasswordInput.value = '';
+            showMessage('', false); // Limpa a mensagem
+        });
+
+
         // Evento para atualizar a senha
         updatePasswordButton.addEventListener('click', async () => {
             const newPassword = newPasswordInput.value;
@@ -272,10 +288,12 @@
                 console.error(error);
                 showMessage(error.message, true);
             } else {
-                showMessage('Senha atualizada com sucesso! Você já está logado.', false);
-                // A UI será atualizada pelo listener de autenticação
+                showMessage('Senha atualizada com sucesso!', false);
                 newPasswordInput.value = '';
                 confirmPasswordInput.value = '';
+                setTimeout(() => {
+                    window.location.href = window.location.origin + window.location.pathname;
+                }, 1000);
             }
         });
 
@@ -303,20 +321,29 @@
         // Listener que reage a mudanças no estado de autenticação
         supabase.auth.onAuthStateChange((event, session) => {
             console.log('Auth state change:', event, session);
-            if (session) {
-                // Usuário logado
-                userEmailDisplay.textContent = session.user.email;
-                toggleUI(true);
-            } else {
-                // Usuário deslogado
-                const urlHash = window.location.hash.substring(1);
-                if (urlHash === 'redefinir-senha') {
-                    // Se o hash for 'redefinir-senha', mostra a tela de nova senha
-                    toggleUI(false, 'new-password');
-                } else {
+            switch (event) {
+                case 'SIGNED_IN':
+                    userEmailDisplay.textContent = session.user.email;
+                    toggleUI(true);
+                    showMessage('Login bem-sucedido!', false);
+                    break;
+                case 'SIGNED_OUT':
                     toggleUI(false, 'user-list');
-                }
-                passwordInput.value = ''; // Limpa o campo de senha
+                    passwordInput.value = '';
+                    break;
+                case 'PASSWORD_RECOVERY':
+                    toggleUI(false, 'new-password');
+                    showMessage('Por favor, defina sua nova senha.', false);
+                    break;
+                default:
+                    // Verifica o estado inicial da URL
+                    const params = new URLSearchParams(window.location.hash.substring(1));
+                    if (params.get('type') === 'recovery') {
+                        toggleUI(false, 'new-password');
+                    } else if (!session) {
+                        toggleUI(false, 'user-list');
+                    }
+                    break;
             }
         });
         
