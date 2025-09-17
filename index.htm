@@ -10,87 +10,147 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
-            @apply bg-gray-100 flex items-center justify-center min-h-screen p-4;
+            @apply bg-gray-100;
         }
         .user-card {
-            @apply flex flex-col items-center p-4 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 cursor-pointer;
+            @apply flex flex-col items-center justify-center text-center p-4 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 cursor-pointer w-40 h-40;
         }
         .user-avatar {
-            @apply w-16 h-16 rounded-full object-cover mb-2;
+            /* Definindo o tamanho exato da imagem para garantir que ela não seja muito grande */
+            width: 64px;
+            height: 64px;
+            @apply rounded-full object-cover mb-2;
         }
         .user-email {
-            @apply text-sm text-gray-700 font-medium;
+            @apply text-sm text-gray-700 font-medium truncate;
         }
     </style>
 </head>
 <body>
+    <!-- Novo container principal para centralizar todos os elementos -->
+    <div id="main-container" class="flex items-center justify-center min-h-screen p-4">
+        <!-- Conteúdo do Login -->
+        <div id="app" class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md space-y-6">
+            <h1 id="main-title" class="text-3xl font-bold text-center text-gray-800">Login</h1>
 
-    <div id="app" class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md space-y-6">
-        <h1 id="main-title" class="text-3xl font-bold text-center text-gray-800">Login</h1>
-
-        <!-- Lista de Usuários -->
-        <div id="user-list-container" class="grid grid-cols-2 gap-4">
-            <!-- Usuários serão injetados aqui via JavaScript -->
-        </div>
-
-        <!-- Formulário de Login (inicialmente escondido) -->
-        <div id="login-form-container" class="hidden space-y-6">
-            <button id="back-button" class="w-full flex items-center justify-center px-4 py-2 bg-gray-200 text-gray-800 font-semibold rounded-md shadow-sm hover:bg-gray-300 focus:outline-none transition-all">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-                </svg>
-                Voltar
-            </button>
-            <p id="selected-email-display" class="text-center font-semibold text-gray-700 text-lg"></p>
-            <div class="relative">
-                <label for="password" class="block text-sm font-medium text-gray-700">Senha</label>
-                <input type="password" id="password" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+            <!-- Lista de Usuários -->
+            <div id="user-list-container" class="flex flex-col items-center gap-4">
+                <!-- Usuários serão injetados aqui via JavaScript -->
             </div>
+
+            <!-- Formulário de Login (inicialmente escondido) -->
+            <div id="login-form-container" class="hidden space-y-6">
+                <button id="back-button" class="w-full flex items-center justify-center px-4 py-2 bg-gray-200 text-gray-800 font-semibold rounded-md shadow-sm hover:bg-gray-300 focus:outline-none transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                    Voltar
+                </button>
+                <p id="selected-email-display" class="text-center font-semibold text-gray-700 text-lg"></p>
+                <div class="relative">
+                    <label for="password" class="block text-sm font-medium text-gray-700">Senha</label>
+                    <input type="password" id="password" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                
+                <div class="flex flex-col space-y-3">
+                    <button id="login-button" class="w-full px-4 py-2 bg-indigo-600 text-white font-semibold rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all">
+                        Entrar
+                    </button>
+                    <button id="reset-password-button" class="w-full px-4 py-2 bg-yellow-500 text-white font-semibold rounded-md shadow-sm hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400 transition-all">
+                        Redefinir Senha
+                    </button>
+                </div>
+            </div>
+
+            <!-- Formulário de Nova Senha (inicialmente escondido) -->
+            <div id="new-password-container" class="hidden space-y-6">
+                <button id="back-button-new-password" class="w-full flex items-center justify-center px-4 py-2 bg-gray-200 text-gray-800 font-semibold rounded-md shadow-sm hover:bg-gray-300 focus:outline-none transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                    Voltar
+                </button>
+                <p class="text-center font-semibold text-gray-700 text-lg">Defina sua nova senha</p>
+                <div class="relative">
+                    <label for="new-password" class="block text-sm font-medium text-gray-700">Nova Senha</label>
+                    <input type="password" id="new-password" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <div class="relative">
+                    <label for="confirm-password" class="block text-sm font-medium text-gray-700">Confirme a Senha</label>
+                    <input type="password" id="confirm-password" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <button id="update-password-button" class="w-full px-4 py-2 bg-indigo-600 text-white font-semibold rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all">
+                    Confirmar
+                </button>
+            </div>
+            <!-- Área de Mensagens -->
+            <div id="message-container" class="text-sm font-medium p-3 rounded-lg text-center" style="display: none;"></div>
+        </div>
+    </div>
+    
+    <!-- Nova tela do usuário logado -->
+    <div id="logged-in-app" class="hidden bg-white min-h-screen p-8">
+        <!-- Container fixo no canto superior esquerdo -->
+        <div id="user-profile-fixed-container" class="fixed top-4 left-4 z-50">
+            <!-- Container do perfil para ser clicável -->
+            <button id="profile-button" class="flex items-center space-x-4 p-2 rounded-full hover:bg-gray-200 transition-colors duration-200 focus:outline-none">
+                <img id="user-avatar-logged-in" src="https://placehold.co/100x100/A0A0A0/FFFFFF?text=P" alt="Profile" class="w-16 h-16 rounded-full object-cover">
+                <p id="user-email-display" class="text-xl text-gray-800 font-bold"></p>
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal para opções do perfil -->
+    <div id="profile-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-sm w-full text-center space-y-4">
+            <div class="flex justify-end">
+                <button id="close-profile-modal" class="text-gray-500 hover:text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-800">Opções do Perfil</h3>
+            <button id="edit-profile-button" class="w-full px-4 py-3 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300 transition-colors">
+                Editar Perfil
+            </button>
+            <button id="change-password-button" class="w-full px-4 py-3 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300 transition-colors">
+                Trocar Senha
+            </button>
+            <button id="logout-button" class="w-full px-4 py-3 bg-red-500 text-white font-semibold rounded-md hover:bg-red-600 transition-colors">
+                Sair
+            </button>
+        </div>
+    </div>
+    
+    <!-- Novo Modal para editar perfil -->
+    <div id="edit-profile-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-sm w-full text-center space-y-4">
+            <div class="flex justify-end">
+                <button id="close-edit-profile-modal" class="text-gray-500 hover:text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-800">Editar Perfil</h3>
             
-            <div class="flex flex-col space-y-3">
-                <button id="login-button" class="w-full px-4 py-2 bg-indigo-600 text-white font-semibold rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all">
-                    Entrar
-                </button>
-                <button id="reset-password-button" class="w-full px-4 py-2 bg-yellow-500 text-white font-semibold rounded-md shadow-sm hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400 transition-all">
-                    Redefinir Senha
-                </button>
-            </div>
-        </div>
-
-        <!-- Formulário de Nova Senha (inicialmente escondido) -->
-        <div id="new-password-container" class="hidden space-y-6">
-            <button id="back-button-new-password" class="w-full flex items-center justify-center px-4 py-2 bg-gray-200 text-gray-800 font-semibold rounded-md shadow-sm hover:bg-gray-300 focus:outline-none transition-all">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-                </svg>
-                Voltar
-            </button>
-            <p class="text-center font-semibold text-gray-700 text-lg">Defina sua nova senha</p>
+            <!-- Novo campo para o nome do perfil -->
             <div class="relative">
-                <label for="new-password" class="block text-sm font-medium text-gray-700">Nova Senha</label>
-                <input type="password" id="new-password" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                <label for="profile-name" class="block text-sm font-medium text-gray-700 text-left">Nome do Perfil</label>
+                <input type="text" id="profile-name-input" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
             </div>
-            <div class="relative">
-                <label for="confirm-password" class="block text-sm font-medium text-gray-700">Confirme a Senha</label>
-                <input type="password" id="confirm-password" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-            </div>
-            <button id="update-password-button" class="w-full px-4 py-2 bg-indigo-600 text-white font-semibold rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all">
-                Confirmar
+            <button id="update-profile-button" class="w-full px-4 py-3 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 transition-colors">
+                Salvar Nome do Perfil
             </button>
-        </div>
 
-        <!-- Área do Usuário Logado -->
-        <div id="user-info-container" class="hidden space-y-4 text-center">
-            <h2 class="text-2xl font-bold text-gray-800">Bem-vindo(a)!</h2>
-            <p id="user-email-display" class="text-lg text-gray-600 font-medium"></p>
-            <button id="logout-button" class="w-full px-4 py-2 bg-red-500 text-white font-semibold rounded-md shadow-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-400 transition-all">
-                    Sair
-                </button>
+            <label for="avatar-upload" class="block text-sm font-medium text-gray-700 text-left">Trocar Foto</label>
+            <input type="file" id="avatar-upload" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"/>
+            <button id="upload-avatar-button" class="w-full px-4 py-3 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 transition-colors">
+                Fazer Upload da Foto
+            </button>
+            <p id="upload-message" class="text-sm font-medium p-2 rounded-lg" style="display: none;"></p>
         </div>
-
-        <!-- Área de Mensagens -->
-        <div id="message-container" class="text-sm font-medium p-3 rounded-lg text-center" style="display: none;"></div>
-        
     </div>
     
     <!-- Modal para confirmação de redefinição de senha -->
@@ -102,27 +162,38 @@
         </div>
     </div>
 
+    <!-- Novo Modal de Mensagem de Espera -->
+    <div id="wait-message-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-sm w-full text-center space-y-4">
+            <h3 class="text-xl font-bold text-gray-800">Aguarde</h3>
+            <p class="text-gray-600">É necessário aguardar para enviar outro e-mail. Por favor, aguarde <span id="wait-time" class="font-semibold text-indigo-600"></span> segundos.</p>
+            <button id="close-wait-modal" class="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700">OK</button>
+        </div>
+    </div>
+
+
     <script type="module">
         // --- CONFIGURAÇÃO DO SUPABASE ---
         // ATENÇÃO: SUBSTITUA COM AS SUAS CHAVES DO SUPABASE
-        const SUPABASE_URL = 'https://hkkhidgrwazwjdoipetn.supabase.co'; // Substitua com o seu URL do projeto
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhra2hpZGdyd2F6d2pkb2lwZXRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxMDgwMzksImV4cCI6MjA3MzY4NDAzOX0.cv93OY0kENNuVyQbLWXjdVvRI_OzytIpy-i_H4JJtXs'; // Substitua com a sua chave anon
+        const SUPABASE_URL = 'https://jtwybbvfbcwitbumsxno.supabase.co'; // Substitua com o seu URL do projeto
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0d3liYnZmYmN3aXRidW1zeG5vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxMTc4NTUsImV4cCI6MjA3MzY5Mzg1NX0.Q9ro0O3dSSGEPMukNHz-wqoHBUMdEVPKKPoCVH_1epQ'; // Substitua com a sua chave anon
 
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // --- REFERÊNCIAS DE ELEMENTOS HTML ---
+        const mainContainer = document.getElementById('main-container');
+        const app = document.getElementById('app');
+        const loggedInAppContainer = document.getElementById('logged-in-app');
         const userListContainer = document.getElementById('user-list-container');
         const loginFormContainer = document.getElementById('login-form-container');
-        const userInfoContainer = document.getElementById('user-info-container');
         const userEmailDisplay = document.getElementById('user-email-display');
         const selectedEmailDisplay = document.getElementById('selected-email-display');
         const messageContainer = document.getElementById('message-container');
         const passwordInput = document.getElementById('password');
         const loginButton = document.getElementById('login-button');
         const resetPasswordButton = document.getElementById('reset-password-button');
-        const logoutButton = document.getElementById('logout-button');
         const backButton = document.getElementById('back-button');
         const resetPasswordModal = document.getElementById('reset-password-modal');
         const resetEmailDisplay = document.getElementById('reset-email-display');
@@ -132,6 +203,28 @@
         const confirmPasswordInput = document.getElementById('confirm-password');
         const updatePasswordButton = document.getElementById('update-password-button');
         const backButtonNewPassword = document.getElementById('back-button-new-password');
+        const userInitialsLoggedIn = document.getElementById('user-initials-logged-in');
+
+        // Novas referências
+        const profileButton = document.getElementById('profile-button');
+        const profileModal = document.getElementById('profile-modal');
+        const closeProfileModalButton = document.getElementById('close-profile-modal');
+        const editProfileButton = document.getElementById('edit-profile-button');
+        const changePasswordButton = document.getElementById('change-password-button');
+        const logoutButtonModal = document.getElementById('logout-button');
+        const editProfileModal = document.getElementById('edit-profile-modal');
+        const closeEditProfileModalButton = document.getElementById('close-edit-profile-modal');
+        const avatarUploadInput = document.getElementById('avatar-upload');
+        const uploadAvatarButton = document.getElementById('upload-avatar-button');
+        const uploadMessage = document.getElementById('upload-message');
+        const userAvatarLoggedIn = document.getElementById('user-avatar-logged-in');
+        const profileNameInput = document.getElementById('profile-name-input');
+        const updateProfileButton = document.getElementById('update-profile-button');
+        
+        // Referências do novo modal de espera
+        const waitMessageModal = document.getElementById('wait-message-modal');
+        const waitTimeSpan = document.getElementById('wait-time');
+        const closeWaitModalButton = document.getElementById('close-wait-modal');
         
         let selectedEmail = ''; // Variável para armazenar o email selecionado
 
@@ -141,7 +234,7 @@
         async function fetchUsers() {
             const { data, error } = await supabase
                 .from('profiles')
-                .select('username'); // Assume que a coluna de email se chama 'username' na tabela 'profiles'
+                .select('username, avatar_url, profile_name'); // Adiciona profile_name na busca
 
             if (error) {
                 console.error('Erro ao buscar usuários:', error);
@@ -155,12 +248,34 @@
                     const userCard = document.createElement('button');
                     userCard.className = 'user-card';
                     userCard.dataset.email = user.username;
+                    // Força o tamanho da imagem na tela inicial para ser 64x64px, igual à da área logada
+                    const avatarSrc = user.avatar_url || `https://placehold.co/64x64/A0A0A0/FFFFFF?text=${(user.profile_name || user.username).charAt(0).toUpperCase()}`;
                     userCard.innerHTML = `
-                        <img src="https://placehold.co/100x100/A0A0A0/FFFFFF?text=${user.username.charAt(0).toUpperCase()}" alt="Profile" class="user-avatar">
-                        <p class="user-email">${user.username}</p>
+                        <img src="${avatarSrc}" alt="Profile" class="user-avatar w-16 h-16 rounded-full">
+                        <p class="user-email">${user.profile_name || user.username}</p>
                     `;
                     userListContainer.appendChild(userCard);
                 });
+            }
+        }
+
+        // Função para carregar os dados do perfil logado
+        async function loadUserProfile(user) {
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('avatar_url, profile_name')
+                .eq('id', user.id)
+                .single();
+            
+            if (!error && data) {
+                userAvatarLoggedIn.src = data.avatar_url || `https://placehold.co/100x100/A0A0A0/FFFFFF?text=${(data.profile_name || user.email).charAt(0).toUpperCase()}`;
+                userEmailDisplay.textContent = data.profile_name || user.email; // Exibe o nome do perfil
+                profileNameInput.value = data.profile_name || ''; // Preenche o campo de edição
+            } else {
+                const initial = user.email.charAt(0).toUpperCase();
+                userAvatarLoggedIn.src = `https://placehold.co/100x100/A0A0A0/FFFFFF?text=${initial}`;
+                userEmailDisplay.textContent = user.email;
+                profileNameInput.value = '';
             }
         }
         
@@ -179,22 +294,59 @@
 
         // Função para alternar a visibilidade das áreas
         function toggleUI(isLoggedIn, view) {
+            // Oculta o container de mensagens para garantir que ele não apareça em transições de tela
+            messageContainer.style.display = 'none';
+
+            // Esconde todas as seções primeiro
+            app.classList.add('hidden');
+            loggedInAppContainer.classList.add('hidden');
             userListContainer.classList.add('hidden');
             loginFormContainer.classList.add('hidden');
-            userInfoContainer.classList.add('hidden');
             newPasswordContainer.classList.add('hidden');
+            profileModal.classList.add('hidden');
+            waitMessageModal.classList.add('hidden');
+            editProfileModal.classList.add('hidden');
 
             if (isLoggedIn) {
-                userInfoContainer.classList.remove('hidden');
-            } else if (view === 'login') {
-                loginFormContainer.classList.remove('hidden');
-            } else if (view === 'new-password') {
-                newPasswordContainer.classList.remove('hidden');
+                loggedInAppContainer.classList.remove('hidden');
+                mainContainer.classList.remove('flex', 'items-center', 'justify-center');
+                document.body.classList.remove('bg-gray-100');
+                document.body.classList.add('bg-white');
             } else {
-                userListContainer.classList.remove('hidden');
+                // Se não estiver logado, exibe o container principal e o conteúdo específico
+                app.classList.remove('hidden');
+                document.body.classList.remove('bg-white');
+                document.body.classList.add('bg-gray-100');
+                mainContainer.classList.add('flex', 'items-center', 'justify-center');
+
+                if (view === 'login') {
+                    loginFormContainer.classList.remove('hidden');
+                } else if (view === 'new-password') {
+                    newPasswordContainer.classList.remove('hidden');
+                } else { // default
+                    userListContainer.classList.remove('hidden');
+                }
             }
         }
 
+        // Função para exibir o modal de espera com a contagem regressiva
+        function showWaitModal(seconds) {
+            let timeLeft = seconds;
+            waitTimeSpan.textContent = timeLeft;
+            waitMessageModal.classList.remove('hidden');
+            waitMessageModal.classList.add('flex');
+
+            const timer = setInterval(() => {
+                timeLeft--;
+                waitTimeSpan.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    waitMessageModal.classList.add('hidden');
+                    waitMessageModal.classList.remove('flex');
+                }
+            }, 1000);
+        }
+        
         // --- EVENT LISTENERS ---
         // Delegação de evento para os botões de usuário
         userListContainer.addEventListener('click', (e) => {
@@ -242,7 +394,15 @@
 
             if (error) {
                 console.error(error);
-                showMessage(error.message, true);
+                // O Supabase tem um limite de tempo. O erro 429 é o "Too Many Requests".
+                if (error.status === 429) {
+                     // Extrai o tempo restante da mensagem de erro
+                    const waitTimeMatch = error.message.match(/after (\d+) seconds/);
+                    const waitTime = waitTimeMatch ? parseInt(waitTimeMatch[1]) : 60;
+                    showWaitModal(waitTime);
+                } else {
+                     showMessage(error.message, true);
+                }
             } else {
                 resetEmailDisplay.textContent = email;
                 resetPasswordModal.classList.remove('hidden');
@@ -304,8 +464,94 @@
             showMessage('', false); // Limpa a mensagem
         });
 
-        // Evento para o botão de Sair
-        logoutButton.addEventListener('click', async () => {
+        // Fecha o modal de espera
+        closeWaitModalButton.addEventListener('click', () => {
+            waitMessageModal.classList.add('hidden');
+            waitMessageModal.classList.remove('flex');
+        });
+        
+        // --- NOVOS EVENTOS PARA O MODAL DO PERFIL ---
+        
+        // Abre o modal do perfil
+        profileButton.addEventListener('click', async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                profileModal.classList.remove('hidden');
+                profileModal.classList.add('flex');
+            } else {
+                // Caso não haja sessão, o modal não é aberto.
+                // A UI já deve estar no estado de login, então não há necessidade de toggleUI.
+            }
+        });
+        
+        // Fecha o modal do perfil
+        closeProfileModalButton.addEventListener('click', () => {
+            profileModal.classList.add('hidden');
+            profileModal.classList.remove('flex');
+        });
+        
+        // Ação para o botão "Editar Perfil"
+        editProfileButton.addEventListener('click', async () => {
+            profileModal.classList.add('hidden');
+            profileModal.classList.remove('flex');
+            editProfileModal.classList.remove('hidden');
+            editProfileModal.classList.add('flex');
+            const { data, error } = await supabase.from('profiles').select('profile_name').eq('id', (await supabase.auth.getSession()).data.session.user.id).single();
+            if (!error && data?.profile_name) {
+                profileNameInput.value = data.profile_name;
+            }
+        });
+
+        // Fecha o modal de editar perfil e volta para o modal de opções
+        closeEditProfileModalButton.addEventListener('click', () => {
+            editProfileModal.classList.add('hidden');
+            editProfileModal.classList.remove('flex');
+            profileModal.classList.remove('hidden');
+            profileModal.classList.add('flex');
+            uploadMessage.style.display = 'none';
+        });
+
+        // Ação para o botão "Trocar Senha" (dispara o fluxo de redefinição de senha)
+        changePasswordButton.addEventListener('click', async () => {
+            profileModal.classList.add('hidden');
+            profileModal.classList.remove('flex');
+            const { data: { session } } = await supabase.auth.getSession();
+            const user = session?.user;
+
+            if (user && user.email) {
+                const redirectToUrl = `${window.location.origin}${window.location.pathname}`;
+                
+                try {
+                    const { error } = await supabase.auth.resetPasswordForEmail(user.email, { redirectTo: redirectToUrl });
+
+                    if (error) {
+                         // O Supabase tem um limite de tempo. O erro 429 é o "Too Many Requests".
+                         if (error.status === 429) {
+                            // Extrai o tempo restante da mensagem de erro e exibe o modal
+                            const waitTimeMatch = error.message.match(/after (\d+) seconds/);
+                            const waitTime = waitTimeMatch ? parseInt(waitTimeMatch[1]) : 60;
+                            showWaitModal(waitTime);
+                         } else {
+                            showMessage(error.message, true);
+                         }
+                         console.error(error);
+                    } else {
+                        resetEmailDisplay.textContent = user.email;
+                        resetPasswordModal.classList.remove('hidden');
+                        resetPasswordModal.classList.add('flex');
+                    }
+                } catch (err) {
+                     // Caso haja um erro de rede ou outro erro não relacionado à API.
+                     console.error(err);
+                     showMessage("Ocorreu um erro ao tentar enviar o e-mail. Tente novamente.", true);
+                }
+            } else {
+                showMessage('Erro: Nenhum usuário logado.', true);
+            }
+        });
+        
+        // Ação para o botão "Sair" (dentro do modal)
+        logoutButtonModal.addEventListener('click', async () => {
             const { error } = await supabase.auth.signOut();
             if (error) {
                 console.error(error);
@@ -313,7 +559,112 @@
             } else {
                 showMessage('Sessão encerrada.', false);
                 toggleUI(false, 'user-list');
-                passwordInput.value = ''; // Limpa o campo de senha
+                passwordInput.value = '';
+            }
+        });
+
+        // Ação de upload da nova foto
+        uploadAvatarButton.addEventListener('click', async () => {
+            const { data: { session } = {} } = await supabase.auth.getSession();
+            const user = session?.user;
+
+            if (!user) {
+                uploadMessage.textContent = 'Erro: Nenhum usuário logado.';
+                uploadMessage.style.display = 'block';
+                return;
+            }
+
+            const file = avatarUploadInput.files[0];
+            if (!file) {
+                uploadMessage.textContent = 'Por favor, selecione um arquivo.';
+                uploadMessage.style.display = 'block';
+                return;
+            }
+
+            uploadMessage.textContent = 'Carregando...';
+            uploadMessage.style.display = 'block';
+            uploadMessage.classList.remove('text-red-700', 'text-green-700');
+            uploadMessage.classList.add('text-gray-700');
+
+            const filePath = `${user.id}/${file.name}`;
+            const { error: uploadError } = await supabase.storage
+                .from('avatars')
+                .upload(filePath, file, {
+                    cacheControl: '3600',
+                    upsert: true
+                });
+
+            if (uploadError) {
+                console.error(uploadError);
+                uploadMessage.textContent = `Erro ao fazer upload: ${uploadError.message}`;
+                uploadMessage.classList.add('text-red-700');
+            } else {
+                const { data: { publicUrl }, error: urlError } = supabase.storage
+                    .from('avatars')
+                    .getPublicUrl(filePath);
+
+                if (urlError) {
+                    console.error(urlError);
+                    uploadMessage.textContent = 'Erro ao obter o URL da imagem.';
+                    uploadMessage.classList.add('text-red-700');
+                    return;
+                }
+
+                const { error: updateError } = await supabase
+                    .from('profiles')
+                    .update({ avatar_url: publicUrl })
+                    .eq('id', user.id);
+
+                if (updateError) {
+                    console.error(updateError);
+                    uploadMessage.textContent = `Erro ao atualizar perfil: ${updateError.message}`;
+                    uploadMessage.classList.add('text-red-700');
+                } else {
+                    userAvatarLoggedIn.src = publicUrl; // Atualiza a foto na UI
+                    uploadMessage.textContent = 'Upload bem-sucedido!';
+                    uploadMessage.classList.add('text-green-700');
+                    avatarUploadInput.value = null; // Limpa o input
+                    // Recarrega a lista de usuários para atualizar a foto
+                    fetchUsers();
+                }
+            }
+        });
+
+        // Evento para o botão de atualização do nome do perfil
+        updateProfileButton.addEventListener('click', async () => {
+            const { data: { session } = {} } = await supabase.auth.getSession();
+            const user = session?.user;
+            if (!user) {
+                uploadMessage.textContent = 'Erro: Nenhum usuário logado.';
+                uploadMessage.style.display = 'block';
+                return;
+            }
+            const newProfileName = profileNameInput.value;
+            if (!newProfileName) {
+                uploadMessage.textContent = 'O nome do perfil não pode ser vazio.';
+                uploadMessage.style.display = 'block';
+                return;
+            }
+
+            uploadMessage.textContent = 'Atualizando nome do perfil...';
+            uploadMessage.style.display = 'block';
+            uploadMessage.classList.remove('text-red-700', 'text-green-700');
+            uploadMessage.classList.add('text-gray-700');
+
+            const { error: updateError } = await supabase
+                .from('profiles')
+                .update({ profile_name: newProfileName })
+                .eq('id', user.id);
+
+            if (updateError) {
+                console.error(updateError);
+                uploadMessage.textContent = `Erro ao atualizar nome do perfil: ${updateError.message}`;
+                uploadMessage.classList.add('text-red-700');
+            } else {
+                userEmailDisplay.textContent = newProfileName;
+                uploadMessage.textContent = 'Nome do perfil atualizado com sucesso!';
+                uploadMessage.classList.add('text-green-700');
+                fetchUsers(); // Recarrega a lista para mostrar a mudança
             }
         });
 
@@ -323,7 +674,7 @@
             console.log('Auth state change:', event, session);
             switch (event) {
                 case 'SIGNED_IN':
-                    userEmailDisplay.textContent = session.user.email;
+                    loadUserProfile(session.user);
                     toggleUI(true);
                     showMessage('Login bem-sucedido!', false);
                     break;
