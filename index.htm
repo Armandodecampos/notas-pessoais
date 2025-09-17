@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acesso Restrito</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1a202c;
+            color: #e2e8f0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+        .card {
+            background-color: #2d3748;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .input-field {
+            background-color: #4a5568;
+            border: 1px solid #718096;
+            color: #e2e8f0;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            width: 100%;
+        }
+        .btn {
+            background-color: #63b3ed;
+            color: #1a202c;
+            font-weight: 700;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #4299e1;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Container de Login -->
+    <div id="login-container" class="card p-8 w-full max-w-sm text-center">
+        <h1 class="text-3xl font-bold mb-6 text-white">Acesso Restrito</h1>
+        <p class="text-sm mb-4">Por favor, insira a senha para continuar.</p>
+        <form id="login-form">
+            <input type="password" id="password-input" placeholder="Digite a senha" class="input-field mb-4 focus:outline-none focus:ring focus:ring-blue-500">
+            <button type="submit" id="login-btn" class="btn w-full">Entrar</button>
+        </form>
+        <p id="error-message" class="text-red-400 mt-4 text-sm hidden">Senha incorreta. Tente novamente.</p>
+        <p id="loading-message" class="text-blue-300 mt-4 text-sm hidden">Verificando a senha...</p>
+    </div>
+
+    <!-- Container da Página Inicial (inicialmente oculto) -->
+    <div id="home-container" class="card p-10 w-full max-w-4xl text-center hidden flex-col">
+        <h1 class="text-4xl font-bold text-white mb-4">Bem-vindo!</h1>
+        <p class="text-lg">Esta é a sua página inicial.</p>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+        const SUPABASE_URL = 'https://xomxrdbdxbzuarionesm.supabase.co'; // Substitua pela sua URL
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbXhyZGJkeGJ6dWFyaW9uZXNtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxMDM2OTQsImV4cCI6MjA3MzY3OTY5NH0._PMb-xalFk7xOvUqMwRMvsWqLUz1om1scHWG-7mnSJM'; // Substitua pela sua chave 'anon'
+
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const loginForm = document.getElementById('login-form');
+        const passwordInput = document.getElementById('password-input');
+        const errorMessage = document.getElementById('error-message');
+        const loadingMessage = document.getElementById('loading-message');
+        const loginContainer = document.getElementById('login-container');
+        const homeContainer = document.getElementById('home-container');
+        const loginBtn = document.getElementById('login-btn');
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const enteredPassword = passwordInput.value;
+
+            // Mostra a mensagem de carregamento e desabilita o botão
+            loadingMessage.classList.remove('hidden');
+            errorMessage.classList.add('hidden');
+            loginBtn.disabled = true;
+
+            try {
+                // Consulta o banco de dados para buscar a senha
+                const { data, error } = await supabase
+                    .from('config') // Nome da sua tabela
+                    .select('value')
+                    .eq('key', 'password') // Procura a linha onde a chave é 'password'
+                    .single();
+
+                if (error) {
+                    console.error('Erro ao buscar a senha do Supabase:', error);
+                    errorMessage.textContent = 'Erro de conexão. Tente novamente mais tarde.';
+                    errorMessage.classList.remove('hidden');
+                } else if (data && data.value === enteredPassword) {
+                    // Senha correta, exibe a página inicial
+                    loginContainer.classList.add('hidden');
+                    homeContainer.classList.remove('hidden');
+                } else {
+                    // Senha incorreta
+                    errorMessage.textContent = 'Senha incorreta. Tente novamente.';
+                    errorMessage.classList.remove('hidden');
+                    passwordInput.value = '';
+                    passwordInput.focus();
+                }
+            } catch (err) {
+                console.error('Erro inesperado:', err);
+                errorMessage.textContent = 'Ocorreu um erro. Tente novamente.';
+                errorMessage.classList.remove('hidden');
+            } finally {
+                // Esconde a mensagem de carregamento e reabilita o botão
+                loadingMessage.classList.add('hidden');
+                loginBtn.disabled = false;
+            }
+        });
+    </script>
+
+</body>
+</html>
