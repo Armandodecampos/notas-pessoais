@@ -67,39 +67,73 @@
         .grid-item-label {
             @apply text-center font-semibold text-gray-700 text-sm mt-2;
         }
+        /* Estilos para as Notas */
+        .note-item {
+            background-color: #FDE68A; /* Amarelo um pouco mais forte (Tailwind yellow-200) */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15); /* Sombra mais visível */
+            padding: 15px;
+            @apply rounded-lg h-48 flex flex-col justify-between transition-transform duration-200;
+        }
+        .note-item:hover {
+            @apply scale-105;
+        }
+        .note-content {
+            min-width: 0; /* Essencial para forçar a quebra de texto */
+            word-wrap: break-word; /* Garante a quebra de palavras muito longas */
+            @apply text-gray-800 flex-grow whitespace-pre-wrap text-left;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+        }
+        .note-actions {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            align-items: center;
+            padding-top: 0.5rem; /* Equivalente a pt-2 */
+        }
+        .note-button {
+            @apply cursor-pointer;
+        }
     </style>
 </head>
 <body>
     <!-- Novo container principal para centralizar todos os elementos -->
-    <div id="main-container" class="flex items-center justify-center min-h-screen p-4">
+    <div id="main-container" class="flex items-start sm:items-center justify-center min-h-screen p-4 pt-20 sm:pt-4">
         <!-- Conteúdo do Login -->
-        <div id="app" class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md space-y-6">
-            <h1 id="main-title" class="text-3xl font-bold text-center text-gray-800">Login</h1>
+        <div id="app" class="bg-white w-full max-w-md space-y-6">
+            <div id="initial-login-view" class="text-center">
+                 <button id="show-profiles-button" class="w-full mt-6 px-4 py-3 bg-indigo-600 text-white font-semibold rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all text-lg">
+                    Login
+                </button>
+            </div>
 
-            <!-- Lista de Usuários -->
-            <div id="user-list-container" class="flex flex-wrap justify-center gap-4">
+            <!-- Lista de Usuários (inicialmente escondida) -->
+            <div id="user-list-container" class="hidden flex-wrap justify-center gap-4">
                 <!-- Usuários serão injetados aqui via JavaScript -->
             </div>
 
             <!-- Formulário de Login (inicialmente escondido) -->
-            <div id="login-form-container" class="hidden space-y-6">
-                <button id="back-button" class="w-full flex items-center justify-center px-4 py-2 bg-gray-200 text-gray-800 font-semibold rounded-md shadow-sm hover:bg-gray-300 focus:outline-none transition-all">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-                    </svg>
-                    Voltar
-                </button>
-                <p id="selected-email-display" class="text-center font-semibold text-gray-700 text-lg"></p>
-                <div class="relative">
-                    <label for="password" class="block text-sm font-medium text-gray-700">Senha</label>
-                    <input type="password" id="password" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+            <div id="login-form-container" class="hidden flex flex-col items-center space-y-4 p-4">
+                <!-- Campo da Senha -->
+                <div class="w-full">
+                    <label for="password" class="block text-lg font-medium text-gray-700 text-center mb-2">Senha</label>
+                    <input type="password" id="password" class="block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-center text-lg">
                 </div>
+
+                <!-- Botão de Entrar -->
+                <button id="login-button" class="w-full px-4 py-3 bg-green-500 text-white font-semibold rounded-md shadow-sm hover:bg-green-600 focus:outline-none transition-all text-lg">
+                    Entrar
+                </button>
                 
-                <div class="flex flex-col space-y-3">
-                    <button id="login-button" class="w-full px-4 py-2 bg-indigo-600 text-white font-semibold rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all">
-                        Entrar
+                <!-- Botões secundários -->
+                <div class="flex justify-between w-full pt-4">
+                    <button id="back-button" class="px-6 py-2 bg-red-500 text-white font-semibold rounded-md shadow-sm hover:bg-red-600 focus:outline-none transition-all flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                          <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                        </svg>
+                        Voltar
                     </button>
-                    <button id="reset-password-button" class="w-full px-4 py-2 bg-yellow-500 text-white font-semibold rounded-md shadow-sm hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400 transition-all">
+                    <button id="reset-password-button" class="px-6 py-2 bg-orange-500 text-white font-semibold rounded-md shadow-sm hover:bg-orange-600 focus:outline-none transition-all">
                         Redefinir Senha
                     </button>
                 </div>
@@ -126,15 +160,13 @@
                     Confirmar
                 </button>
             </div>
-            <!-- Área de Mensagens -->
-            <div id="message-container" class="text-sm font-medium p-3 rounded-lg text-center" style="display: none;"></div>
         </div>
     </div>
     
     <!-- Nova tela do usuário logado -->
-    <div id="logged-in-app" class="hidden bg-white min-h-screen">
+    <div id="logged-in-app" class="hidden h-screen overflow-hidden">
         <!-- Container fixo no canto superior esquerdo -->
-        <div class="fixed top-0 left-0 right-0 bg-white p-4 shadow-md z-40 h-24 flex items-center">
+        <div id="main-header" class="fixed top-0 left-0 right-0 bg-white p-4 shadow-md z-40 h-24 flex items-center">
             <button id="profile-button" class="flex items-center space-x-4 p-2 rounded-full hover:bg-gray-200 transition-colors duration-200 focus:outline-none">
                 <img id="user-avatar-logged-in" src="https://placehold.co/100x100/A0A0A0/FFFFFF?text=P" alt="Profile" class="w-12 h-12 rounded-full object-cover">
                 <p id="user-email-display" class="text-xl text-gray-800 font-bold"></p>
@@ -142,13 +174,20 @@
         </div>
         
         <!-- Grade de botões arrastáveis -->
-        <div id="button-grid-container" class="absolute top-24 inset-x-0 bottom-0 p-4 grid [grid-template-columns:repeat(auto-fill,minmax(100px,1fr))] gap-4 overflow-y-auto justify-items-center">
+        <div id="button-grid-container" class="fixed top-24 inset-x-0 bottom-0 p-4 grid [grid-template-columns:repeat(auto-fill,minmax(100px,1fr))] gap-4 overflow-y-auto justify-items-center">
             <!-- Item 1: Lista de Compras -->
             <div class="app-container" draggable="true" id="shopping-list-item-grid">
                 <div class="grid-item">
                     <i class="fas fa-shopping-cart grid-item-icon"></i>
                 </div>
                 <span class="grid-item-label">Compras</span>
+            </div>
+            <!-- Item 2: Notas Pessoais -->
+            <div class="app-container" draggable="true" id="notes-app-item-grid">
+                <div class="grid-item">
+                    <i class="fas fa-sticky-note grid-item-icon"></i>
+                </div>
+                <span class="grid-item-label">Notas</span>
             </div>
         </div>
     </div>
@@ -169,6 +208,9 @@
             </button>
             <button id="change-password-button" class="w-full px-4 py-3 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300 transition-colors">
                 Trocar Senha
+            </button>
+            <button id="settings-button" class="w-full px-4 py-3 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300 transition-colors">
+                Configurações
             </button>
             <button id="logout-button" class="w-full px-4 py-3 bg-red-500 text-white font-semibold rounded-md hover:bg-red-600 transition-colors">
                 Sair
@@ -339,11 +381,80 @@
         </div>
     </div>
 
+    <!-- Modal para Configurações de Papel de Parede -->
+    <div id="settings-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-sm w-full text-center space-y-4">
+            <div class="flex justify-end">
+                <button id="close-settings-modal" class="text-gray-500 hover:text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-800">Personalizar Papel de Parede</h3>
+            
+            <div class="relative">
+                <label for="wallpaper-color-input" class="block text-sm font-medium text-gray-700 text-left">Escolher uma cor de fundo</label>
+                <input type="color" id="wallpaper-color-input" class="mt-1 block w-full h-10 px-1 py-1 border border-gray-300 rounded-md shadow-sm">
+            </div>
+    
+            <div>
+                <label for="wallpaper-upload" class="block text-sm font-medium text-gray-700 text-left">Carregar uma imagem</label>
+                <input type="file" id="wallpaper-upload" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 mt-1"/>
+                <p id="wallpaper-upload-message" class="text-sm font-medium p-2 rounded-lg" style="display: none;"></p>
+            </div>
+            
+            <button id="remove-wallpaper-button" class="w-full px-4 py-3 bg-red-500 text-white font-semibold rounded-md hover:bg-red-600 transition-colors">
+                Remover Papel de Parede
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal de Notas Pessoais -->
+    <div id="notes-modal" class="fixed inset-0 bg-gray-100 hidden flex-col z-50">
+        <header class="flex items-center justify-between p-4 bg-white shadow-md">
+            <h2 class="text-2xl font-bold text-gray-800">Notas</h2>
+            <button id="close-notes-modal-button" class="text-gray-500 hover:text-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </header>
+        <div id="notes-container" class="flex-grow overflow-y-auto p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 items-start">
+            <!-- As notas serão inseridas aqui -->
+        </div>
+        <footer class="p-4 bg-white shadow-lg">
+            <div class="flex gap-2">
+                <textarea id="new-note-input" rows="1" class="w-full p-2 border rounded-md resize-none" placeholder="Escreva a sua nota..."></textarea>
+                <button id="add-note-button" class="px-6 py-2 bg-yellow-400 text-yellow-900 font-semibold rounded-md hover:bg-yellow-500 transition-colors">Adicionar</button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Modal para Editar Nota -->
+    <div id="edit-note-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-[60]">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-md w-full space-y-4">
+             <div class="flex justify-between items-center">
+                 <h3 class="text-2xl font-bold text-gray-800">Editar Nota</h3>
+                 <button id="close-edit-note-modal-button" class="text-gray-500 hover:text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <textarea id="edit-note-input" rows="6" class="w-full p-2 border rounded-md resize-y"></textarea>
+            <div class="flex justify-end space-x-4">
+                <button id="cancel-note-edit-button" class="px-6 py-2 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300">Cancelar</button>
+                <button id="save-note-edit-button" class="px-6 py-2 bg-yellow-400 text-yellow-900 font-semibold rounded-md hover:bg-yellow-500">Salvar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal para confirmação de exclusão -->
-    <div id="delete-confirm-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-50">
+    <div id="delete-confirm-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-[60]">
         <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-sm w-full text-center space-y-4">
             <h3 class="text-xl font-bold text-gray-800">Confirmar Exclusão</h3>
-            <p class="text-gray-600">Tem certeza que deseja excluir este item da lista?</p>
+            <p id="delete-confirm-message" class="text-gray-600">Tem certeza que deseja excluir este item da lista?</p>
             <div class="flex justify-center space-x-4">
                 <button id="cancel-delete-button" class="px-6 py-2 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300">Cancelar</button>
                 <button id="confirm-delete-button" class="px-6 py-2 bg-red-500 text-white font-semibold rounded-md hover:bg-red-600">Excluir</button>
@@ -352,7 +463,7 @@
     </div>
 
     <!-- Modal para confirmação de mover item -->
-    <div id="move-item-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-50">
+    <div id="move-item-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-[60]">
         <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-sm w-full text-center space-y-4">
             <h3 class="text-xl font-bold text-gray-800">Confirmar Ação</h3>
             <p id="move-item-confirm-message" class="text-gray-600"></p>
@@ -366,9 +477,14 @@
 
     <script type="module">
         // --- CONFIGURAÇÃO DO SUPABASE ---
-        // ATENÇÃO: SUBSTITUA COM AS SUAS CHAVES DO SUPABASE
+        // !!! ERRO DE API KEY !!!
+        // O erro "Invalid API key" significa que os valores abaixo estão incorretos.
+        // Por favor, substitua 'SUA_SUPABASE_URL' e 'SUA_SUPABASE_ANON_KEY' pelas chaves
+        // corretas do seu projeto no painel do Supabase.
+
         const SUPABASE_URL = 'https://jtwybbvfbcwitbumsxno.supabase.co'; // Substitua com o seu URL do projeto
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0d3liYnZmYmN3aXRidW1zeG5vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxMTc4NTUsImV4cCI6MjA3MzY5Mzg1NX0.Q9ro0O3dSSGEPMukNHz-wqoHBUMdEVPKKPoCVH_1epQ'; // Substitua com a sua chave anon
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0d3liYnZmYmN3aXRidW1zeG5vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxMTc4NTUsImV4cCI6MjA3MzY5Mzg1NX0.Q9ro0O3dSSGEPMukNHz-wqoHBUMdEVPKKPoCVH_1epQ'; // Substitua com a sua chave anon (pública)
+
 
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
@@ -386,8 +502,6 @@
         const userListContainer = document.getElementById('user-list-container');
         const loginFormContainer = document.getElementById('login-form-container');
         const userEmailDisplay = document.getElementById('user-email-display');
-        const selectedEmailDisplay = document.getElementById('selected-email-display');
-        const messageContainer = document.getElementById('message-container');
         const passwordInput = document.getElementById('password');
         const loginButton = document.getElementById('login-button');
         const resetPasswordButton = document.getElementById('reset-password-button');
@@ -462,11 +576,41 @@
         const confirmMoveButton = document.getElementById('confirm-move-button');
         const cancelMoveButton = document.getElementById('cancel-move-button');
 
+        // Referências do modal de configurações
+        const settingsButton = document.getElementById('settings-button');
+        const settingsModal = document.getElementById('settings-modal');
+        const closeSettingsModalButton = document.getElementById('close-settings-modal');
+        const wallpaperColorInput = document.getElementById('wallpaper-color-input');
+        const wallpaperUploadInput = document.getElementById('wallpaper-upload');
+        const wallpaperUploadMessage = document.getElementById('wallpaper-upload-message');
+        const removeWallpaperButton = document.getElementById('remove-wallpaper-button');
+        const buttonGridContainer = document.getElementById('button-grid-container');
+        const mainHeader = document.getElementById('main-header');
+
+        // Referências do App de Notas
+        const notesAppIcon = document.getElementById('notes-app-item-grid');
+        const notesModal = document.getElementById('notes-modal');
+        const closeNotesModalButton = document.getElementById('close-notes-modal-button');
+        const notesContainer = document.getElementById('notes-container');
+        const newNoteInput = document.getElementById('new-note-input');
+        const addNoteButton = document.getElementById('add-note-button');
+        const editNoteModal = document.getElementById('edit-note-modal');
+        const closeEditNoteModalButton = document.getElementById('close-edit-note-modal-button');
+        const editNoteInput = document.getElementById('edit-note-input');
+        const saveNoteEditButton = document.getElementById('save-note-edit-button');
+        const cancelNoteEditButton = document.getElementById('cancel-note-edit-button');
+
+        // Referências da vista de login
+        const initialLoginView = document.getElementById('initial-login-view');
+        const showProfilesButton = document.getElementById('show-profiles-button');
+
         let selectedEmail = ''; // Variável para armazenar o email selecionado
         let editingItemId = null; // Variável para armazenar o ID do item sendo editado
+        let editingNoteId = null; // Variável para armazenar o ID da nota sendo editada
         let currentFilter = 'all'; // Estado do filtro atual
-        let itemToDeleteId = null; // Variável para armazenar o ID do item a ser excluído
+        let itemToDeleteInfo = null; // {id: string, type: string}
         let itemToMove = null; // { id: string, newStatus: boolean }
+        let notesSubscription = null; // Para guardar a subscrição das notas
 
         // --- FUNÇÕES DE INICIALIZAÇÃO E UI ---
 
@@ -478,8 +622,6 @@
 
             if (error) {
                 console.error('Erro ao buscar usuários:', error);
-                showMessage('Erro ao carregar a lista de usuários. Verifique as permissões de leitura no Supabase.', true);
-                userListContainer.innerHTML = '<p class="text-center text-gray-500">Erro ao carregar...</p>';
             } else if (data.length === 0) {
                  userListContainer.innerHTML = '<p class="text-center text-gray-500">Nenhum usuário encontrado. Adicione usuários na tabela `profiles` do Supabase.</p>';
             } else {
@@ -519,56 +661,52 @@
             }
         }
         
-        // Função para mostrar mensagens de status
-        function showMessage(message, isError = false) {
-            messageContainer.textContent = message;
-            messageContainer.style.display = 'block';
-            if (isError) {
-                messageContainer.classList.add('bg-red-200', 'text-red-700');
-                messageContainer.classList.remove('bg-green-200', 'text-green-700');
-            } else {
-                messageContainer.classList.add('bg-green-200', 'text-green-700');
-                messageContainer.classList.remove('bg-red-200', 'text-red-700');
-            }
-        }
-
         // Função para alternar a visibilidade das áreas
         function toggleUI(isLoggedIn, view) {
-            // Oculta o container de mensagens para garantir que ele não apareça em transições de tela
-            messageContainer.style.display = 'none';
-
-            // Esconde todas as seções primeiro
-            app.classList.add('hidden');
-            loggedInAppContainer.classList.add('hidden');
-            userListContainer.classList.add('hidden');
-            loginFormContainer.classList.add('hidden');
-            newPasswordContainer.classList.add('hidden');
+            // Esconde todos os modais primeiro
             profileModal.classList.add('hidden');
             waitMessageModal.classList.add('hidden');
             editProfileModal.classList.add('hidden');
+            settingsModal.classList.add('hidden');
             shoppingListModal.classList.add('hidden');
             deleteConfirmModal.classList.add('hidden');
             addItemModal.classList.add('hidden');
             moveItemModal.classList.add('hidden');
+            notesModal.classList.add('hidden');
+            editNoteModal.classList.add('hidden');
 
             if (isLoggedIn) {
+                // Mostra a App e esconde o contentor do Login
                 loggedInAppContainer.classList.remove('hidden');
-                mainContainer.classList.remove('flex', 'items-center', 'justify-center');
+                mainContainer.classList.add('hidden');
+                
+                // Ajusta o estilo do body para a app
                 document.body.classList.remove('bg-gray-100');
-                document.body.classList.add('bg-white');
-            } else {
-                // Se não estiver logado, exibe o container principal e o conteúdo específico
-                app.classList.remove('hidden');
-                document.body.classList.remove('bg-white');
-                document.body.classList.add('bg-gray-100');
-                mainContainer.classList.add('flex', 'items-center', 'justify-center');
 
-                if (view === 'login') {
+            } else {
+                // Mostra o contentor do Login e esconde a App
+                mainContainer.classList.remove('hidden');
+                loggedInAppContainer.classList.add('hidden');
+                
+                // Restaura o estilo do body para o login
+                document.body.classList.add('bg-gray-100');
+                
+                // Esconde todas as vistas dentro do ecrã de login
+                initialLoginView.classList.add('hidden');
+                userListContainer.classList.add('hidden');
+                loginFormContainer.classList.add('hidden');
+                newPasswordContainer.classList.add('hidden');
+
+                // Mostra a vista de login correta
+                if (view === 'user-list') {
+                    userListContainer.classList.remove('hidden');
+                    userListContainer.classList.add('flex');
+                } else if (view === 'login') {
                     loginFormContainer.classList.remove('hidden');
                 } else if (view === 'new-password') {
                     newPasswordContainer.classList.remove('hidden');
-                } else { // default
-                    userListContainer.classList.remove('hidden');
+                } else { // A vista padrão é a inicial com o botão de login
+                    initialLoginView.classList.remove('hidden');
                 }
             }
         }
@@ -589,6 +727,171 @@
                     waitMessageModal.classList.remove('flex');
                 }
             }, 1000);
+        }
+
+        // --- FUNÇÕES DE PAPEL DE PAREDE ---
+        
+        // Aplica o papel de parede salvo
+        function applyWallpaper(preferences) {
+            // Estilos padrão se não houver preferências
+            const defaultStyles = {
+                backgroundImage: 'none',
+                backgroundColor: '', // Reverte para o padrão do CSS
+                backgroundSize: '',
+                backgroundPosition: '',
+                backgroundRepeat: ''
+            };
+
+            const stylesToApply = { ...defaultStyles };
+
+            if (preferences) {
+                if (preferences.type === 'color') {
+                    stylesToApply.backgroundColor = preferences.value;
+                } else if (preferences.type === 'image') {
+                    stylesToApply.backgroundImage = `url(${preferences.value})`;
+                    stylesToApply.backgroundSize = 'cover';
+                    stylesToApply.backgroundPosition = 'center';
+                    stylesToApply.backgroundRepeat = 'no-repeat';
+                }
+            }
+
+            // Aplica todos os estilos de uma vez para evitar problemas de renderização
+            Object.assign(loggedInAppContainer.style, stylesToApply);
+        }
+
+        // Salva as preferências do usuário no Supabase
+        async function saveUserPreferences(preferences) {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return;
+
+            const { error } = await supabase
+                .from('profiles')
+                .update({ preferences: preferences })
+                .eq('id', user.id);
+
+            if (error) {
+                console.error('Erro ao salvar preferências:', error);
+            }
+        }
+        
+        // Carrega as preferências do usuário ao logar
+        async function loadUserPreferences() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return;
+
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('preferences')
+                .eq('id', user.id)
+                .single();
+            
+            if (error && error.code !== 'PGRST116') { // Ignora erro se não encontrar a linha
+                console.error('Erro ao carregar preferências:', error);
+            } else if (data && data.preferences) {
+                applyWallpaper(data.preferences);
+            } else {
+                applyWallpaper(null); // Garante que o fundo padrão seja aplicado se não houver preferências
+            }
+        }
+
+        // --- FUNÇÕES DO APP DE NOTAS ---
+
+        // Busca e renderiza as notas do usuário
+        async function fetchNotes() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return;
+
+            const { data: notes, error } = await supabase
+                .from('notes')
+                .select('id, content')
+                .eq('user_id', user.id)
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Erro ao buscar notas:', error);
+                notesContainer.innerHTML = '<p class="text-red-500">Não foi possível carregar as notas.</p>';
+                return;
+            }
+
+            renderNotes(notes);
+        }
+
+        // Renderiza as notas na tela
+        function renderNotes(notes) {
+            notesContainer.innerHTML = ''; // Limpa antes de renderizar
+            if (notes.length === 0) {
+                notesContainer.innerHTML = '<p class="text-gray-500 col-span-full text-center">Ainda não tem notas. Adicione uma abaixo!</p>';
+                return;
+            }
+            notes.forEach(note => {
+                const noteEl = document.createElement('div');
+                noteEl.className = 'note-item';
+                noteEl.dataset.id = note.id;
+                noteEl.innerHTML = `
+                    <p class="note-content">${note.content}</p>
+                    <div class="note-actions">
+                         <i class="fas fa-edit note-button text-blue-500 hover:text-blue-700 note-edit-button"></i>
+                         <i class="fas fa-trash-alt note-button text-red-500 hover:text-red-700 note-delete-button"></i>
+                    </div>
+                `;
+                notesContainer.appendChild(noteEl);
+            });
+        }
+
+        // Adiciona uma nova nota
+        async function addNote() {
+            const content = newNoteInput.value.trim();
+            if (!content) return;
+
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return;
+
+            const { error } = await supabase
+                .from('notes')
+                .insert({ content: content, user_id: user.id });
+
+            if (error) {
+                console.error('Erro ao adicionar nota:', error);
+            } else {
+                newNoteInput.value = ''; // Limpa o campo
+            }
+        }
+
+        // Apaga uma nota
+        async function deleteNote(noteId) {
+            const { error } = await supabase
+                .from('notes')
+                .delete()
+                .eq('id', noteId);
+
+            if (error) {
+                console.error('Erro ao apagar nota:', error);
+            }
+        }
+
+        // Atualiza uma nota
+        async function updateNote(noteId, content) {
+            const { error } = await supabase
+                .from('notes')
+                .update({ content: content })
+                .eq('id', noteId);
+            if (error) {
+                console.error('Erro ao atualizar nota:', error);
+            }
+        }
+
+        function showEditNoteModal(id, content) {
+            editingNoteId = id;
+            editNoteInput.value = content;
+            editNoteModal.classList.remove('hidden');
+            editNoteModal.classList.add('flex');
+            editNoteInput.focus();
+        }
+
+        function closeEditNoteModal() {
+            editingNoteId = null;
+            editNoteModal.classList.add('hidden');
+            editNoteModal.classList.remove('flex');
         }
 
         // --- FUNÇÕES DA LISTA DE COMPRAS ---
@@ -818,7 +1121,6 @@
             const userCard = e.target.closest('.user-card');
             if (userCard) {
                 selectedEmail = userCard.dataset.email;
-                selectedEmailDisplay.textContent = selectedEmail;
                 toggleUI(false, 'login');
             }
         });
@@ -827,21 +1129,11 @@
         loginButton.addEventListener('click', async () => {
             const email = selectedEmail;
             const password = passwordInput.value;
-            showMessage('Entrando...', false);
 
             const { error } = await supabase.auth.signInWithPassword({ email, password });
 
             if (error) {
                 console.error(error);
-                // Adiciona uma mensagem de erro mais útil para o usuário
-                if (error.message.includes('Invalid login credentials')) {
-                    showMessage('Credenciais inválidas. Verifique sua senha.', true);
-                } else {
-                    showMessage(error.message, true);
-                }
-            } else {
-                showMessage('Login bem-sucedido!', false);
-                // A UI será atualizada pelo listener de autenticação
             }
         });
 
@@ -850,8 +1142,6 @@
             const email = selectedEmail;
             // Define o URL de redirecionamento para o seu próprio site
             const redirectToUrl = `${window.location.origin}${window.location.pathname}`;
-
-            showMessage('Enviando email de redefinição...', false);
 
             const { error } = await supabase.auth.resetPasswordForEmail(email, {
                 redirectTo: redirectToUrl
@@ -865,8 +1155,6 @@
                     const waitTimeMatch = error.message.match(/after (\d+) seconds/);
                     const waitTime = waitTimeMatch ? parseInt(waitTimeMatch[1]) : 60;
                     showWaitModal(waitTime);
-                } else {
-                     showMessage(error.message, true);
                 }
             } else {
                 resetEmailDisplay.textContent = email;
@@ -877,17 +1165,15 @@
 
         // Evento para o botão de Voltar
         backButton.addEventListener('click', () => {
-            toggleUI(false, 'user-list');
+            toggleUI(false, 'initial');
             passwordInput.value = ''; // Limpa a senha
-            showMessage('', false); // Limpa a mensagem
         });
 
         // Evento para o novo botão de Voltar
         backButtonNewPassword.addEventListener('click', () => {
-            toggleUI(false, 'user-list');
+            toggleUI(false, 'initial');
             newPasswordInput.value = ''; // Limpa os campos
             confirmPasswordInput.value = '';
-            showMessage('', false); // Limpa a mensagem
         });
 
 
@@ -897,23 +1183,19 @@
             const confirmPassword = confirmPasswordInput.value;
 
             if (newPassword !== confirmPassword) {
-                showMessage('As senhas não coincidem.', true);
+                alert('As senhas não coincidem.');
                 return;
             }
             if (newPassword.length < 6) {
-                showMessage('A senha deve ter pelo menos 6 caracteres.', true);
+                alert('A senha deve ter pelo menos 6 caracteres.');
                 return;
             }
-
-            showMessage('Atualizando sua senha...', false);
 
             const { error } = await supabase.auth.updateUser({ password: newPassword });
 
             if (error) {
                 console.error(error);
-                showMessage(error.message, true);
             } else {
-                showMessage('Senha atualizada com sucesso!', false);
                 newPasswordInput.value = '';
                 confirmPasswordInput.value = '';
                 setTimeout(() => {
@@ -926,7 +1208,6 @@
         closeModalButton.addEventListener('click', () => {
             resetPasswordModal.classList.add('hidden');
             resetPasswordModal.classList.remove('flex');
-            showMessage('', false); // Limpa a mensagem
         });
 
         // Fecha o modal de espera
@@ -991,8 +1272,6 @@
                             const waitTimeMatch = error.message.match(/after (\d+) seconds/);
                             const waitTime = waitTimeMatch ? parseInt(waitTimeMatch[1]) : 60;
                             showWaitModal(waitTime);
-                         } else {
-                            showMessage(error.message, true);
                          }
                          console.error(error);
                     } else {
@@ -1002,10 +1281,7 @@
                     }
                 } catch (err) {
                      console.error(err);
-                     showMessage("Ocorreu um erro ao tentar enviar o e-mail. Tente novamente.", true);
                 }
-            } else {
-                showMessage('Erro: Nenhum usuário logado.', true);
             }
         });
         
@@ -1014,9 +1290,8 @@
             const { error } = await supabase.auth.signOut();
             if (error) {
                 console.error('Erro ao sair:', error);
-                showMessage('Erro ao sair.', true);
             } else {
-                toggleUI(false, 'user-list');
+                toggleUI(false, 'initial');
                 passwordInput.value = '';
             }
         });
@@ -1147,7 +1422,7 @@
             if (deleteButton) {
                 const itemDiv = deleteButton.closest('.shopping-list-item');
                 const itemId = itemDiv.dataset.id;
-                showDeleteConfirmationModal(itemId);
+                showDeleteConfirmationModal(itemId, 'shopping_item');
             }
         });
         
@@ -1199,21 +1474,45 @@
         addItemConfirmButton.addEventListener('click', addItem);
 
         // Eventos para o modal de CONFIRMAÇÃO DE EXCLUSÃO
-        function showDeleteConfirmationModal(itemId) {
-            itemToDeleteId = itemId;
+        function showDeleteConfirmationModal(id, type) {
+            itemToDeleteInfo = { id, type };
+            const messageEl = document.getElementById('delete-confirm-message');
+            
+            // Esconde o header principal para evitar sobreposição
+            mainHeader.classList.add('hidden');
+
+            if (type === 'note') {
+                messageEl.textContent = 'Tem a certeza que quer apagar esta nota?';
+                // Força o modal de notas a ficar para trás
+                notesModal.style.zIndex = '30';
+            } else {
+                messageEl.textContent = 'Tem certeza que deseja excluir este item da lista?';
+                 // Força o modal da lista de compras a ficar para trás
+                shoppingListModal.style.zIndex = '30';
+            }
             deleteConfirmModal.classList.remove('hidden');
             deleteConfirmModal.classList.add('flex');
         }
 
         function hideDeleteConfirmationModal() {
-            itemToDeleteId = null;
+            itemToDeleteInfo = null;
             deleteConfirmModal.classList.add('hidden');
             deleteConfirmModal.classList.remove('flex');
+            // Restaura a prioridade dos modais para o valor padrão definido no CSS
+            notesModal.style.zIndex = '';
+            shoppingListModal.style.zIndex = '';
+            // Mostra o header principal novamente
+            mainHeader.classList.remove('hidden');
         }
 
-        confirmDeleteButton.addEventListener('click', () => {
-            if (itemToDeleteId) {
-                deleteItem(itemToDeleteId);
+        confirmDeleteButton.addEventListener('click', async () => {
+            if (itemToDeleteInfo) {
+                if (itemToDeleteInfo.type === 'note') {
+                    await deleteNote(itemToDeleteInfo.id);
+                    fetchNotes(); // Atualiza a lista de notas manualmente
+                } else {
+                    await deleteItem(itemToDeleteInfo.id);
+                }
             }
             hideDeleteConfirmationModal();
         });
@@ -1251,9 +1550,143 @@
             hideMoveItemConfirmationModal();
         });
 
+        // --- EVENTOS DO MODAL DE CONFIGURAÇÕES ---
+
+        settingsButton.addEventListener('click', () => {
+            profileModal.classList.add('hidden');
+            profileModal.classList.remove('flex');
+            settingsModal.classList.remove('hidden');
+            settingsModal.classList.add('flex');
+        });
+
+        closeSettingsModalButton.addEventListener('click', () => {
+            settingsModal.classList.add('hidden');
+            settingsModal.classList.remove('flex');
+        });
+
+        wallpaperColorInput.addEventListener('input', async (e) => {
+            const color = e.target.value;
+            const preferences = { type: 'color', value: color };
+            applyWallpaper(preferences);
+            await saveUserPreferences(preferences);
+        });
+
+        wallpaperUploadInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) {
+                wallpaperUploadMessage.textContent = 'Usuário não encontrado.';
+                wallpaperUploadMessage.style.display = 'block';
+                return;
+            }
+
+            wallpaperUploadMessage.textContent = 'Carregando imagem...';
+            wallpaperUploadMessage.style.display = 'block';
+            wallpaperUploadMessage.classList.remove('text-red-700', 'text-green-700');
+
+            // ATENÇÃO: Crie um bucket PÚBLICO no Supabase chamado 'wallpapers' para que isso funcione.
+            const filePath = `${user.id}/${file.name}`;
+
+            const { error: uploadError } = await supabase.storage
+                .from('wallpapers')
+                .upload(filePath, file, {
+                    cacheControl: '3600',
+                    upsert: true // Sobrescreve a imagem anterior
+                });
+
+            if (uploadError) {
+                wallpaperUploadMessage.textContent = `Erro no upload: ${uploadError.message}`;
+                wallpaperUploadMessage.classList.add('text-red-700');
+                console.error(uploadError);
+                return;
+            }
+
+            const { data } = supabase.storage
+                .from('wallpapers')
+                .getPublicUrl(filePath);
+            
+            // Adiciona um timestamp para evitar problemas de cache do navegador
+            const publicUrl = `${data.publicUrl}?t=${new Date().getTime()}`;
+
+            const preferences = { type: 'image', value: publicUrl };
+            applyWallpaper(preferences);
+            await saveUserPreferences(preferences);
+
+            wallpaperUploadMessage.textContent = 'Papel de parede atualizado!';
+            wallpaperUploadMessage.classList.add('text-green-700');
+            wallpaperUploadInput.value = ''; // Limpa o input
+        });
+
+        removeWallpaperButton.addEventListener('click', async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return;
+            
+            // Primeiro, remove a preferência do banco de dados para evitar que a imagem reapareça
+            await saveUserPreferences(null);
+            applyWallpaper(null); // Remove o papel de parede da UI
+
+            // Opcional: Tenta remover o ficheiro do storage
+            // Busca a preferência antiga para saber o nome do ficheiro
+            const { data: profileData } = await supabase.from('profiles').select('preferences').eq('id', user.id).single();
+            if (profileData && profileData.preferences && profileData.preferences.type === 'image') {
+                try {
+                    // Extrai o caminho do ficheiro do URL público
+                    const url = new URL(profileData.preferences.value);
+                    const filePath = url.pathname.split('/wallpapers/')[1];
+                    if(filePath) {
+                        await supabase.storage.from('wallpapers').remove([filePath]);
+                    }
+                } catch(e) {
+                    console.error("Não foi possível remover o ficheiro de papel de parede antigo:", e);
+                }
+            }
+        });
+        
+        // --- EVENTOS DO APP DE NOTAS ---
+        notesAppIcon.addEventListener('click', () => {
+            notesModal.classList.remove('hidden');
+            notesModal.classList.add('flex');
+            fetchNotes();
+        });
+
+        closeNotesModalButton.addEventListener('click', () => {
+            notesModal.classList.add('hidden');
+            notesModal.classList.remove('flex');
+        });
+
+        addNoteButton.addEventListener('click', addNote);
+
+        notesContainer.addEventListener('click', (e) => {
+            const target = e.target;
+            const noteEl = target.closest('.note-item');
+            if (!noteEl) return;
+
+            const noteId = noteEl.dataset.id;
+
+            if (target.classList.contains('note-delete-button')) {
+                showDeleteConfirmationModal(noteId, 'note');
+            } else if (target.classList.contains('note-edit-button')) {
+                const content = noteEl.querySelector('.note-content').textContent;
+                showEditNoteModal(noteId, content);
+            }
+        });
+        
+        // Eventos do modal de edição de nota
+        closeEditNoteModalButton.addEventListener('click', closeEditNoteModal);
+        cancelNoteEditButton.addEventListener('click', closeEditNoteModal);
+        saveNoteEditButton.addEventListener('click', async () => {
+            if (editingNoteId) {
+                const newContent = editNoteInput.value.trim();
+                await updateNote(editingNoteId, newContent);
+                closeEditNoteModal();
+            }
+        });
+
 
         // --- LÓGICA DE ARRASTAR E SOLTAR (DRAG AND DROP) ---
-        const gridContainer = document.getElementById('button-grid-container');
+        
 
         function initializeDragAndDrop() {
             const currentDraggables = document.querySelectorAll('.app-container');
@@ -1268,15 +1701,15 @@
             });
         }
         
-        gridContainer.addEventListener('dragover', e => {
+        buttonGridContainer.addEventListener('dragover', e => {
             e.preventDefault();
-            const afterElement = getDragAfterElement(gridContainer, e.clientX, e.clientY);
+            const afterElement = getDragAfterElement(buttonGridContainer, e.clientX, e.clientY);
             const dragging = document.querySelector('.app-container.dragging');
             if (dragging) {
                  if (afterElement == null) {
-                    gridContainer.appendChild(dragging);
+                    buttonGridContainer.appendChild(dragging);
                 } else {
-                    gridContainer.insertBefore(dragging, afterElement);
+                    buttonGridContainer.insertBefore(dragging, afterElement);
                 }
             }
         });
@@ -1303,29 +1736,43 @@
         supabase.auth.onAuthStateChange((event, session) => {
             if (session) {
                 loadUserProfile(session.user);
+                loadUserPreferences();
                 toggleUI(true);
                 initializeDragAndDrop();
-                if (event === 'SIGNED_IN') {
-                    showMessage('Login bem-sucedido!', false);
+
+                // Inicia a subscrição em tempo real para as notas
+                if (!notesSubscription) {
+                    notesSubscription = supabase.channel('public:notes')
+                        .on('postgres_changes', { event: '*', schema: 'public', table: 'notes', filter: `user_id=eq.${session.user.id}` }, payload => {
+                            fetchNotes();
+                        })
+                        .subscribe();
                 }
             } else {
                 const params = new URLSearchParams(window.location.hash.substring(1));
                 if (params.get('type') === 'recovery') {
                     toggleUI(false, 'new-password');
-                    showMessage('Por favor, defina sua nova senha.', false);
                 } else {
-                    toggleUI(false, 'user-list');
+                    toggleUI(false, 'initial');
                 }
                 if (event === 'SIGNED_OUT') {
-                    showMessage('Sessão encerrada.', false);
+                    // Remove a subscrição ao sair
+                    if (notesSubscription) {
+                        supabase.removeChannel(notesSubscription);
+                        notesSubscription = null;
+                    }
                 }
             }
         });
         
         // Chamada inicial para carregar os usuários
         fetchUsers();
+
+        // Novo: Evento para mostrar os perfis
+        showProfilesButton.addEventListener('click', () => {
+            toggleUI(false, 'user-list');
+        });
     </script>
 </body>
 </html>
-
 
