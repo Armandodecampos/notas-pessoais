@@ -69,18 +69,26 @@
         }
         /* Estilos para as Notas */
         .note-item {
-            background-color: #FDE68A; /* Amarelo um pouco mais forte (Tailwind yellow-200) */
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15); /* Sombra mais visível */
+            background-color: #FEF3C7;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
             padding: 15px;
-            @apply rounded-lg h-48 flex flex-col justify-between transition-transform duration-200;
+            @apply rounded-lg aspect-square flex flex-col justify-between transition-transform duration-200 cursor-pointer;
         }
         .note-item:hover {
             @apply scale-105;
         }
-        .note-content {
-            min-width: 0; /* Essencial para forçar a quebra de texto */
-            word-wrap: break-word; /* Garante a quebra de palavras muito longas */
-            @apply text-gray-800 flex-grow whitespace-pre-wrap text-left;
+        .note-title {
+             @apply font-bold text-lg truncate mb-2 text-gray-800;
+        }
+        .note-content-preview {
+            min-width: 0;
+            word-wrap: break-word;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 5; /* Limita o texto a 5 linhas */
+            -webkit-box-orient: vertical;
+            text-overflow: ellipsis;
+            @apply text-gray-700 flex-grow text-left;
             font-family: 'Inter', sans-serif;
             font-size: 1rem;
         }
@@ -89,7 +97,7 @@
             justify-content: space-between;
             width: 100%;
             align-items: center;
-            padding-top: 0.5rem; /* Equivalente a pt-2 */
+            padding-top: 0.5rem;
         }
         .note-button {
             @apply cursor-pointer;
@@ -424,25 +432,43 @@
             <!-- As notas serão inseridas aqui -->
         </div>
         <footer class="p-4 bg-white shadow-lg">
-            <div class="flex gap-2">
-                <textarea id="new-note-input" rows="1" class="w-full p-2 border rounded-md resize-none" placeholder="Escreva a sua nota..."></textarea>
-                <button id="add-note-button" class="px-6 py-2 bg-yellow-400 text-yellow-900 font-semibold rounded-md hover:bg-yellow-500 transition-colors">Adicionar</button>
-            </div>
+            <button id="show-add-note-modal-button" class="w-full px-4 py-3 bg-yellow-400 text-yellow-900 font-semibold rounded-md hover:bg-yellow-500 transition-colors">
+                Criar Nova Nota
+            </button>
         </footer>
     </div>
 
-    <!-- Modal para Editar Nota -->
+     <!-- Modal para Ver Nota -->
+    <div id="view-note-modal" class="fixed inset-0 bg-white hidden flex-col z-[70]">
+        <header class="flex items-center justify-between p-4 border-b flex-shrink-0">
+            <h2 id="view-note-title" class="text-2xl font-bold text-gray-800 truncate"></h2>
+            <button id="close-view-note-modal-button" class="text-gray-500 hover:text-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </header>
+        <!-- Container de scroll -->
+        <div class="flex-grow overflow-y-auto">
+            <div class="p-6">
+                <p id="view-note-content" class="text-gray-800 whitespace-pre-wrap break-words"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Adicionar/Editar Nota -->
     <div id="edit-note-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-[60]">
         <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-md w-full space-y-4">
              <div class="flex justify-between items-center">
-                 <h3 class="text-2xl font-bold text-gray-800">Editar Nota</h3>
+                 <h3 id="note-modal-title" class="text-2xl font-bold text-gray-800"></h3>
                  <button id="close-edit-note-modal-button" class="text-gray-500 hover:text-gray-700">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
-            <textarea id="edit-note-input" rows="6" class="w-full p-2 border rounded-md resize-y"></textarea>
+            <input type="text" id="edit-note-title" class="w-full p-2 border rounded-md" placeholder="Título...">
+            <textarea id="edit-note-input" rows="6" class="w-full p-2 border rounded-md resize-y" placeholder="Escreva a sua nota..."></textarea>
             <div class="flex justify-end space-x-4">
                 <button id="cancel-note-edit-button" class="px-6 py-2 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300">Cancelar</button>
                 <button id="save-note-edit-button" class="px-6 py-2 bg-yellow-400 text-yellow-900 font-semibold rounded-md hover:bg-yellow-500">Salvar</button>
@@ -592,13 +618,23 @@
         const notesModal = document.getElementById('notes-modal');
         const closeNotesModalButton = document.getElementById('close-notes-modal-button');
         const notesContainer = document.getElementById('notes-container');
-        const newNoteInput = document.getElementById('new-note-input');
-        const addNoteButton = document.getElementById('add-note-button');
+        const showAddNoteModalButton = document.getElementById('show-add-note-modal-button');
+        
+        // Referências do Modal de Edição de Nota (usado para Adicionar e Editar)
         const editNoteModal = document.getElementById('edit-note-modal');
+        const noteModalTitle = document.getElementById('note-modal-title');
         const closeEditNoteModalButton = document.getElementById('close-edit-note-modal-button');
+        const editNoteTitleInput = document.getElementById('edit-note-title');
         const editNoteInput = document.getElementById('edit-note-input');
         const saveNoteEditButton = document.getElementById('save-note-edit-button');
         const cancelNoteEditButton = document.getElementById('cancel-note-edit-button');
+
+        // Referências do Modal de Visualização de Nota
+        const viewNoteModal = document.getElementById('view-note-modal');
+        const viewNoteTitle = document.getElementById('view-note-title');
+        const viewNoteContent = document.getElementById('view-note-content');
+        const closeViewNoteModalButton = document.getElementById('close-view-note-modal-button');
+
 
         // Referências da vista de login
         const initialLoginView = document.getElementById('initial-login-view');
@@ -674,6 +710,7 @@
             moveItemModal.classList.add('hidden');
             notesModal.classList.add('hidden');
             editNoteModal.classList.add('hidden');
+            viewNoteModal.classList.add('hidden');
 
             if (isLoggedIn) {
                 // Mostra a App e esconde o contentor do Login
@@ -803,7 +840,7 @@
 
             const { data: notes, error } = await supabase
                 .from('notes')
-                .select('id, content')
+                .select('id, title, content')
                 .eq('user_id', user.id)
                 .order('created_at', { ascending: false });
 
@@ -827,8 +864,14 @@
                 const noteEl = document.createElement('div');
                 noteEl.className = 'note-item';
                 noteEl.dataset.id = note.id;
+                noteEl.dataset.title = note.title || '';
+                noteEl.dataset.content = note.content;
+
                 noteEl.innerHTML = `
-                    <p class="note-content">${note.content}</p>
+                    <div class="flex-grow overflow-hidden">
+                        <h4 class="note-title">${note.title || 'Sem Título'}</h4>
+                        <p class="note-content-preview">${note.content}</p>
+                    </div>
                     <div class="note-actions">
                          <i class="fas fa-edit note-button text-blue-500 hover:text-blue-700 note-edit-button"></i>
                          <i class="fas fa-trash-alt note-button text-red-500 hover:text-red-700 note-delete-button"></i>
@@ -839,21 +882,20 @@
         }
 
         // Adiciona uma nova nota
-        async function addNote() {
-            const content = newNoteInput.value.trim();
-            if (!content) return;
+        async function addNote(title, content) {
+            if (!content && !title) return;
 
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) return;
 
             const { error } = await supabase
                 .from('notes')
-                .insert({ content: content, user_id: user.id });
+                .insert({ title: title, content: content, user_id: user.id });
 
             if (error) {
                 console.error('Erro ao adicionar nota:', error);
             } else {
-                newNoteInput.value = ''; // Limpa o campo
+                closeEditNoteModal();
             }
         }
 
@@ -870,22 +912,42 @@
         }
 
         // Atualiza uma nota
-        async function updateNote(noteId, content) {
+        async function updateNote(noteId, title, content) {
             const { error } = await supabase
                 .from('notes')
-                .update({ content: content })
+                .update({ title: title, content: content })
                 .eq('id', noteId);
             if (error) {
                 console.error('Erro ao atualizar nota:', error);
             }
         }
 
-        function showEditNoteModal(id, content) {
+        function showViewNoteModal(title, content) {
+            viewNoteTitle.textContent = title || 'Sem Título';
+            viewNoteContent.textContent = content;
+            viewNoteModal.classList.remove('hidden');
+            viewNoteModal.classList.add('flex');
+        }
+
+        function closeViewNoteModal() {
+            viewNoteModal.classList.add('hidden');
+            viewNoteModal.classList.remove('flex');
+        }
+
+        function showEditNoteModal(id, title, content) {
             editingNoteId = id;
-            editNoteInput.value = content;
+            if (id) { // Modo de edição
+                noteModalTitle.textContent = 'Editar Nota';
+                editNoteTitleInput.value = title;
+                editNoteInput.value = content;
+            } else { // Modo de adição
+                noteModalTitle.textContent = 'Adicionar Nova Nota';
+                editNoteTitleInput.value = '';
+                editNoteInput.value = '';
+            }
             editNoteModal.classList.remove('hidden');
             editNoteModal.classList.add('flex');
-            editNoteInput.focus();
+            editNoteTitleInput.focus();
         }
 
         function closeEditNoteModal() {
@@ -1656,7 +1718,9 @@
             notesModal.classList.remove('flex');
         });
 
-        addNoteButton.addEventListener('click', addNote);
+        showAddNoteModalButton.addEventListener('click', () => {
+            showEditNoteModal(null, '', ''); // Abre o modal em modo de adição
+        });
 
         notesContainer.addEventListener('click', (e) => {
             const target = e.target;
@@ -1664,12 +1728,17 @@
             if (!noteEl) return;
 
             const noteId = noteEl.dataset.id;
+            const title = noteEl.dataset.title;
+            const content = noteEl.dataset.content;
 
-            if (target.classList.contains('note-delete-button')) {
-                showDeleteConfirmationModal(noteId, 'note');
-            } else if (target.classList.contains('note-edit-button')) {
-                const content = noteEl.querySelector('.note-content').textContent;
-                showEditNoteModal(noteId, content);
+            if (target.closest('.note-button')) {
+                if (target.classList.contains('note-delete-button')) {
+                    showDeleteConfirmationModal(noteId, 'note');
+                } else if (target.classList.contains('note-edit-button')) {
+                    showEditNoteModal(noteId, title, content);
+                }
+            } else { 
+                showViewNoteModal(title, content);
             }
         });
         
@@ -1677,12 +1746,19 @@
         closeEditNoteModalButton.addEventListener('click', closeEditNoteModal);
         cancelNoteEditButton.addEventListener('click', closeEditNoteModal);
         saveNoteEditButton.addEventListener('click', async () => {
-            if (editingNoteId) {
-                const newContent = editNoteInput.value.trim();
-                await updateNote(editingNoteId, newContent);
-                closeEditNoteModal();
+            const newTitle = editNoteTitleInput.value.trim();
+            const newContent = editNoteInput.value.trim();
+
+            if (editingNoteId) { // Editando uma nota existente
+                await updateNote(editingNoteId, newTitle, newContent);
+            } else { // Adicionando uma nova nota
+                await addNote(newTitle, newContent);
             }
+            closeEditNoteModal();
         });
+
+        // Eventos do modal de visualização de nota
+        closeViewNoteModalButton.addEventListener('click', closeViewNoteModal);
 
 
         // --- LÓGICA DE ARRASTAR E SOLTAR (DRAG AND DROP) ---
