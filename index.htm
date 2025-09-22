@@ -57,15 +57,15 @@
             background-color: #1f2937; /* bg-gray-800 */
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1); /* shadow-lg */
         }
-        .app-container.dragging {
-            @apply opacity-50;
-        }
         .grid-item-icon {
             font-size: 2.25rem; /* Equivalente a text-4xl */
             color: white;
         }
         .grid-item-label {
             @apply text-center font-semibold text-gray-700 text-sm mt-2;
+        }
+        .app-container.dragging {
+            @apply opacity-50;
         }
         /* Estilos para as Notas */
         .note-item {
@@ -179,10 +179,17 @@
                 <img id="user-avatar-logged-in" src="https://placehold.co/100x100/A0A0A0/FFFFFF?text=P" alt="Profile" class="w-12 h-12 rounded-full object-cover">
                 <p id="user-email-display" class="text-xl text-gray-800 font-bold"></p>
             </button>
+            <!-- Novo botão para adicionar aplicativos -->
+            <div class="absolute right-4 top-1/2 -translate-y-1/2">
+                <button id="add-app-button" class="bg-indigo-600 text-white p-3 rounded-full shadow-lg hover:bg-indigo-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
         </div>
         
         <!-- Grade de botões arrastáveis -->
         <div id="button-grid-container" class="fixed top-24 inset-x-0 bottom-0 p-4 grid [grid-template-columns:repeat(auto-fill,minmax(100px,1fr))] gap-4 overflow-y-auto justify-items-center">
+            <!-- Itens de aplicativos fixos -->
             <!-- Item 1: Lista de Compras -->
             <div class="app-container" draggable="true" id="shopping-list-item-grid">
                 <div class="grid-item">
@@ -197,6 +204,7 @@
                 </div>
                 <span class="grid-item-label">Notas</span>
             </div>
+            <!-- Aplicativos personalizados serão injetados aqui -->
         </div>
     </div>
 
@@ -308,16 +316,16 @@
     </div>
     
     <!-- Novo Modal para Adicionar Itens -->
-    <div id="add-item-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-50">
-        <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-sm w-full space-y-4">
-            <div class="flex justify-between items-center">
-                 <h3 class="text-2xl font-bold text-gray-800">Adicionar Item</h3>
-                 <button id="close-add-item-modal" class="text-gray-500 hover:text-gray-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
+    <div id="add-item-modal" class="fixed inset-0 bg-gray-100 hidden flex-col z-50">
+        <header class="flex items-center justify-between p-4 bg-white shadow-md">
+            <h2 class="text-2xl font-bold text-gray-800">Adicionar Item</h2>
+            <button id="close-add-item-modal" class="text-gray-500 hover:text-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </header>
+        <div class="flex flex-col p-4 bg-gray-100 flex-grow space-y-4">
             <div class="relative">
                 <label for="add-item-name-input" class="block text-sm font-medium text-gray-700 text-left">Nome do Item</label>
                 <input type="text" id="add-item-name-input" placeholder="Ex: Maçãs" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
@@ -425,10 +433,10 @@
             <button id="close-notes-modal-button" class="text-gray-500 hover:text-gray-700">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-        </header>
-        <div id="notes-container" class="flex-grow overflow-y-auto p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 items-start">
+                    </svg>
+                </button>
+            </header>
+            <div id="notes-container" class="flex-grow overflow-y-auto p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 items-start">
             <!-- As notas serão inseridas aqui -->
         </div>
         <footer class="p-4 bg-white shadow-lg">
@@ -457,16 +465,16 @@
     </div>
 
     <!-- Modal para Adicionar/Editar Nota -->
-    <div id="edit-note-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-[60]">
-        <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-md w-full space-y-4">
-             <div class="flex justify-between items-center">
-                 <h3 id="note-modal-title" class="text-2xl font-bold text-gray-800"></h3>
-                 <button id="close-edit-note-modal-button" class="text-gray-500 hover:text-gray-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
+    <div id="edit-note-modal" class="fixed inset-0 bg-gray-100 hidden flex-col z-[60]">
+        <header class="flex items-center justify-between p-4 bg-white shadow-md">
+            <h2 id="note-modal-title" class="text-2xl font-bold text-gray-800"></h2>
+            <button id="close-edit-note-modal-button" class="text-gray-500 hover:text-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </header>
+        <div class="flex flex-col p-4 bg-gray-100 flex-grow space-y-4">
             <input type="text" id="edit-note-title" class="w-full p-2 border rounded-md" placeholder="Título...">
             <textarea id="edit-note-input" rows="6" class="w-full p-2 border rounded-md resize-y" placeholder="Escreva a sua nota..."></textarea>
             <div class="flex justify-end space-x-4">
@@ -494,9 +502,65 @@
             <h3 class="text-xl font-bold text-gray-800">Confirmar Ação</h3>
             <p id="move-item-confirm-message" class="text-gray-600"></p>
             <div class="flex justify-center space-x-4">
-                <button id="cancel-move-button" class="px-6 py-2 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300">Cancelar</button>
+                <button id="cancel-move-button" class="px-6 py-2 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300 transition-colors">Cancelar</button>
                 <button id="confirm-move-button" class="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700">Confirmar</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Novo Modal para adicionar aplicativos personalizados -->
+    <div id="add-app-modal" class="fixed inset-0 bg-gray-100 hidden flex-col z-50">
+        <header class="flex items-center justify-between p-4 bg-white shadow-md">
+            <h2 id="add-app-title" class="text-2xl font-bold text-gray-800 truncate">Adicionar Aplicativo</h2>
+            <button id="close-add-app-modal" class="text-gray-500 hover:text-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </header>
+        <div class="flex flex-col p-4 bg-gray-100 flex-grow space-y-4">
+            <div class="relative">
+                <label for="app-title-input" class="block text-sm font-medium text-gray-700 text-left">Título</label>
+                <input type="text" id="app-title-input" placeholder="Ex: Google" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            <div class="relative">
+                <label for="app-url-input" class="block text-sm font-medium text-gray-700 text-left">URL</label>
+                <input type="url" id="app-url-input" placeholder="Ex: https://google.com" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            <div class="flex justify-between space-x-4">
+                <button id="save-app-button" class="w-full px-4 py-3 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 transition-colors">
+                    Salvar
+                </button>
+                <button id="cancel-add-app-button" class="w-full px-4 py-3 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300 transition-colors">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Novo Modal de Opções do Aplicativo -->
+    <div id="app-options-modal" class="fixed inset-0 bg-gray-100 hidden flex-col z-50">
+        <header class="flex items-center justify-between p-4 bg-white shadow-md">
+            <h2 id="app-options-title" class="text-2xl font-bold text-gray-800 truncate"></h2>
+            <button id="close-app-options-button" class="text-gray-500 hover:text-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </header>
+        <div class="flex flex-col p-4 bg-gray-100 flex-grow space-y-4">
+            <button id="open-app-button" class="w-full px-4 py-3 bg-indigo-600 text-white font-semibold rounded-md shadow-sm hover:bg-indigo-700 transition-colors text-lg">
+                Abrir
+            </button>
+            <button id="edit-app-button" class="w-full px-4 py-3 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300 transition-colors text-lg">
+                Editar
+            </button>
+            <button id="delete-app-button" class="w-full px-4 py-3 bg-red-500 text-white font-semibold rounded-md hover:bg-red-600 transition-colors text-lg">
+                Deletar
+            </button>
+            <button id="close-app-modal-button" class="w-full px-4 py-3 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300 transition-colors text-lg">
+                Fechar
+            </button>
         </div>
     </div>
 
@@ -580,7 +644,7 @@
         const addItemQuantityInput = document.getElementById('add-item-quantity-input');
         const addItemUnitInput = document.getElementById('add-item-unit-input');
         const addItemConfirmButton = document.getElementById('add-item-confirm-button');
-        const addItemCancelButton = document.getElementById('add-item-cancel-button');
+        const addItemCancelButton = document.getElementById('cancel-add-app-button');
 
         // Referências do novo modal de edição
         const editItemModal = document.getElementById('edit-item-modal');
@@ -635,6 +699,23 @@
         const viewNoteContent = document.getElementById('view-note-content');
         const closeViewNoteModalButton = document.getElementById('close-view-note-modal-button');
 
+        // Referências do novo modal para adicionar aplicativos
+        const addAppButton = document.getElementById('add-app-button');
+        const addAppModal = document.getElementById('add-app-modal');
+        const closeAddAppModalButton = document.getElementById('close-add-app-modal');
+        const appTitleInput = document.getElementById('app-title-input');
+        const appUrlInput = document.getElementById('app-url-input');
+        const saveAppButton = document.getElementById('save-app-button');
+        const cancelAddAppButton = document.getElementById('cancel-add-app-button');
+
+        // Referências do novo modal de opções do aplicativo
+        const appOptionsModal = document.getElementById('app-options-modal');
+        const appOptionsTitle = document.getElementById('app-options-title');
+        const openAppButton = document.getElementById('open-app-button');
+        const editAppButton = document.getElementById('edit-app-button');
+        const deleteAppButton = document.getElementById('delete-app-button');
+        const closeAppOptionsButton = document.getElementById('close-app-options-button');
+        const closeAppModalButton = document.getElementById('close-app-modal-button');
 
         // Referências da vista de login
         const initialLoginView = document.getElementById('initial-login-view');
@@ -647,6 +728,8 @@
         let itemToDeleteInfo = null; // {id: string, type: string}
         let itemToMove = null; // { id: string, newStatus: boolean }
         let notesSubscription = null; // Para guardar a subscrição das notas
+        let customAppsSubscription = null; // Para guardar a subscrição de apps personalizados
+        let currentAppToManage = null; // Para guardar o aplicativo selecionado
 
         // --- FUNÇÕES DE INICIALIZAÇÃO E UI ---
 
@@ -679,22 +762,24 @@
 
         // Função para carregar os dados do perfil logado
         async function loadUserProfile(user) {
-            const { data, error } = await supabase
+            const { data: profileData, error } = await supabase
                 .from('profiles')
                 .select('avatar_url, profile_name')
                 .eq('id', user.id)
                 .single();
             
-            if (!error && data) {
-                userAvatarLoggedIn.src = data.avatar_url || `https://placehold.co/100x100/A0A0A0/FFFFFF?text=${(data.profile_name || user.email).charAt(0).toUpperCase()}`;
-                userEmailDisplay.textContent = data.profile_name || user.email; // Exibe o nome do perfil
-                profileNameInput.value = data.profile_name || ''; // Preenche o campo de edição
+            if (!error && profileData) {
+                userAvatarLoggedIn.src = profileData.avatar_url || `https://placehold.co/100x100/A0A0A0/FFFFFF?text=${(profileData.profile_name || user.email).charAt(0).toUpperCase()}`;
+                userEmailDisplay.textContent = profileData.profile_name || user.email;
+                profileNameInput.value = profileData.profile_name || '';
             } else {
                 const initial = user.email.charAt(0).toUpperCase();
                 userAvatarLoggedIn.src = `https://placehold.co/100x100/A0A0A0/FFFFFF?text=${initial}`;
                 userEmailDisplay.textContent = user.email;
                 profileNameInput.value = '';
             }
+            // Chama renderCustomApps após o perfil ser carregado
+            await renderCustomApps(user.id);
         }
         
         // Função para alternar a visibilidade das áreas
@@ -711,6 +796,9 @@
             notesModal.classList.add('hidden');
             editNoteModal.classList.add('hidden');
             viewNoteModal.classList.add('hidden');
+            addAppModal.classList.add('hidden');
+            appOptionsModal.classList.add('hidden');
+
 
             if (isLoggedIn) {
                 // Mostra a App e esconde o contentor do Login
@@ -835,7 +923,7 @@
 
         // Busca e renderiza as notas do usuário
         async function fetchNotes() {
-            const { data: { user } } = await supabase.auth.getUser();
+            const { data: { user } = {} } = await supabase.auth.getUser();
             if (!user) return;
 
             const { data: notes, error } = await supabase
@@ -850,7 +938,9 @@
                 return;
             }
 
-            renderNotes(notes);
+            if (notes) {
+                renderNotes(notes);
+            }
         }
 
         // Renderiza as notas na tela
@@ -960,6 +1050,12 @@
 
         // Função para buscar e renderizar a lista de compras
         async function fetchShoppingList() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) {
+                console.error('Usuário não autenticado.');
+                return;
+            }
+
             let query = supabase.from('shopping_list').select('*');
 
             if (currentFilter === 'to-buy') {
@@ -1107,8 +1203,9 @@
             const newItemName = addItemNameInput.value.trim();
             const newQuantity = parseFloat(addItemQuantityInput.value) || null;
             const newUnit = addItemUnitInput.value;
+            const { data: { user } } = await supabase.auth.getUser();
 
-            if (!newItemName) {
+            if (!newItemName || !user) {
                 return;
             }
             
@@ -1245,11 +1342,13 @@
             const confirmPassword = confirmPasswordInput.value;
 
             if (newPassword !== confirmPassword) {
-                alert('As senhas não coincidem.');
+                // Use a custom modal instead of alert
+                // alert('As senhas não coincidem.');
                 return;
             }
             if (newPassword.length < 6) {
-                alert('A senha deve ter pelo menos 6 caracteres.');
+                // Use a custom modal instead of alert
+                // alert('A senha deve ter pelo menos 6 caracteres.');
                 return;
             }
 
@@ -1386,7 +1485,7 @@
                 .from('avatars')
                 .upload(filePath, file, {
                     cacheControl: '3600',
-                    upsert: true
+                    upsert: true // Sobrescreve a imagem anterior
                 });
 
             if (uploadError) {
@@ -1547,7 +1646,11 @@
                 messageEl.textContent = 'Tem a certeza que quer apagar esta nota?';
                 // Força o modal de notas a ficar para trás
                 notesModal.style.zIndex = '30';
-            } else {
+            } else if (type === 'custom_app') {
+                messageEl.textContent = 'Tem certeza que deseja excluir este aplicativo?';
+                appOptionsModal.style.zIndex = '30';
+            }
+            else {
                 messageEl.textContent = 'Tem certeza que deseja excluir este item da lista?';
                  // Força o modal da lista de compras a ficar para trás
                 shoppingListModal.style.zIndex = '30';
@@ -1563,6 +1666,7 @@
             // Restaura a prioridade dos modais para o valor padrão definido no CSS
             notesModal.style.zIndex = '';
             shoppingListModal.style.zIndex = '';
+            appOptionsModal.style.zIndex = '';
             // Mostra o header principal novamente
             mainHeader.classList.remove('hidden');
         }
@@ -1572,6 +1676,9 @@
                 if (itemToDeleteInfo.type === 'note') {
                     await deleteNote(itemToDeleteInfo.id);
                     fetchNotes(); // Atualiza a lista de notas manualmente
+                } else if (itemToDeleteInfo.type === 'custom_app') {
+                    await deleteCustomApp(itemToDeleteInfo.id);
+                    hideAppOptionsModal();
                 } else {
                     await deleteItem(itemToDeleteInfo.id);
                 }
@@ -1760,6 +1867,152 @@
         // Eventos do modal de visualização de nota
         closeViewNoteModalButton.addEventListener('click', closeViewNoteModal);
 
+        // --- LÓGICA DE APLICATIVOS PERSONALIZADOS ---
+
+        // Função que renderiza os aplicativos personalizados
+        async function renderCustomApps(userId) {
+            if (!userId) {
+                console.error('Usuário não autenticado.');
+                return;
+            }
+
+             const { data: apps, error: fetchError } = await supabase
+                .from('custom_apps')
+                .select('*')
+                .eq('user_id', userId)
+                .order('created_at', { ascending: true });
+            
+            if (fetchError) {
+                console.error('Erro ao buscar apps existentes:', fetchError);
+                return;
+            }
+
+            document.querySelectorAll('.custom-app-item').forEach(el => el.remove());
+            
+            apps.forEach(app => {
+                const appContainer = document.createElement('div');
+                appContainer.className = 'app-container custom-app-item';
+                appContainer.draggable = true;
+                appContainer.dataset.id = app.id;
+                appContainer.dataset.title = app.title;
+                appContainer.dataset.url = app.url;
+
+                appContainer.innerHTML = `
+                    <div class="grid-item">
+                        <i class="fas fa-link grid-item-icon"></i>
+                    </div>
+                    <span class="grid-item-label">${app.title}</span>
+                `;
+                
+                appContainer.addEventListener('click', () => {
+                    showAppOptionsModal(app);
+                });
+
+                buttonGridContainer.appendChild(appContainer);
+            });
+        }
+        
+        // Função para mostrar o modal de opções do aplicativo
+        function showAppOptionsModal(app) {
+            appOptionsModal.dataset.editId = app.id;
+            appOptionsModal.dataset.title = app.title;
+            appOptionsModal.dataset.url = app.url;
+            appOptionsTitle.textContent = app.title;
+            appOptionsModal.classList.remove('hidden');
+            appOptionsModal.classList.add('flex');
+        }
+
+        // Função para fechar o modal de opções do aplicativo
+        function hideAppOptionsModal() {
+            appOptionsModal.classList.add('hidden');
+            appOptionsModal.classList.remove('flex');
+            appOptionsModal.removeAttribute('data-edit-id');
+            appOptionsModal.removeAttribute('data-title');
+            appOptionsModal.removeAttribute('data-url');
+        }
+
+        // Função que abre o modal de adicionar/editar
+        function showAddAppModal(appData = null) {
+            if (appData) { // Modo de edição
+                addAppModal.dataset.editId = appData.id;
+                document.getElementById('add-app-title').textContent = 'Editar Aplicativo';
+                appTitleInput.value = appData.title;
+                appUrlInput.value = appData.url;
+            } else { // Modo de adição
+                addAppModal.removeAttribute('data-edit-id');
+                document.getElementById('add-app-title').textContent = 'Adicionar Aplicativo';
+                appTitleInput.value = '';
+                appUrlInput.value = '';
+            }
+            addAppModal.classList.remove('hidden');
+            addAppModal.classList.add('flex');
+            appTitleInput.focus();
+        }
+
+        // Função que esconde o modal de adicionar/editar
+        function hideAddAppModal() {
+            addAppModal.classList.add('hidden');
+            addAppModal.classList.remove('flex');
+            addAppModal.removeAttribute('data-edit-id');
+            appTitleInput.value = '';
+            appUrlInput.value = '';
+        }
+
+        // Função para salvar (criar ou editar) um aplicativo personalizado
+        async function saveCustomApp() {
+            const title = appTitleInput.value.trim();
+            const url = appUrlInput.value.trim();
+            const user = (await supabase.auth.getUser()).data.user;
+            const appId = addAppModal.dataset.editId;
+
+            if (!title || !url || !user) {
+                console.error('Título e URL são obrigatórios.');
+                return;
+            }
+
+            if (appId) { // Modo de edição
+                const { error: updateError } = await supabase
+                    .from('custom_apps')
+                    .update({ title, url })
+                    .eq('id', appId)
+                    .eq('user_id', user.id);
+
+                if (updateError) {
+                    console.error('Erro ao atualizar aplicativo:', updateError);
+                }
+
+            } else { // Modo de criação
+                const { error: insertError } = await supabase
+                    .from('custom_apps')
+                    .insert({ title, url, user_id: user.id });
+
+                if (insertError) {
+                    console.error('Erro ao criar aplicativo:', insertError);
+                }
+            }
+            await renderCustomApps(user.id);
+            hideAddAppModal();
+        }
+
+        // Função para deletar um aplicativo personalizado
+        async function deleteCustomApp(appId) {
+            const user = (await supabase.auth.getUser()).data.user;
+            if (!user) return;
+
+            const { error } = await supabase
+                .from('custom_apps')
+                .delete()
+                .eq('id', appId)
+                .eq('user_id', user.id);
+            
+            if (error) {
+                console.error('Erro ao deletar aplicativo:', error);
+            } else {
+                await renderCustomApps(user.id);
+                hideDeleteConfirmationModal();
+            }
+        }
+
 
         // --- LÓGICA DE ARRASTAR E SOLTAR (DRAG AND DROP) ---
         
@@ -1807,6 +2060,37 @@
             }, { offset: Number.POSITIVE_INFINITY }).element;
         }
 
+        // --- NOVOS EVENTOS DE APLICATIVOS PERSONALIZADOS ---
+        addAppButton.addEventListener('click', () => showAddAppModal());
+        closeAddAppModalButton.addEventListener('click', hideAddAppModal);
+        cancelAddAppButton.addEventListener('click', hideAddAppModal);
+        saveAppButton.addEventListener('click', saveCustomApp);
+
+        // Eventos para o novo modal de opções do app
+        openAppButton.addEventListener('click', () => {
+            const url = appOptionsModal.dataset.url;
+            if (url) {
+                window.open(url, '_blank');
+                hideAppOptionsModal();
+            }
+        });
+        editAppButton.addEventListener('click', () => {
+            const appId = appOptionsModal.dataset.editId;
+            const title = appOptionsModal.dataset.title;
+            const url = appOptionsModal.dataset.url;
+            if (appId && title && url) {
+                hideAppOptionsModal();
+                showAddAppModal({ id: appId, title, url });
+            }
+        });
+        deleteAppButton.addEventListener('click', () => {
+            const appId = appOptionsModal.dataset.editId;
+            if (appId) {
+                showDeleteConfirmationModal(appId, 'custom_app');
+            }
+        });
+        closeAppOptionsButton.addEventListener('click', hideAppOptionsModal);
+        closeAppModalButton.addEventListener('click', hideAppOptionsModal);
 
         // --- VERIFICAÇÃO DE ESTADO DE AUTENTICAÇÃO E URL ---
         supabase.auth.onAuthStateChange((event, session) => {
@@ -1815,6 +2099,17 @@
                 loadUserPreferences();
                 toggleUI(true);
                 initializeDragAndDrop();
+                
+                // Real-time listener para apps personalizados
+                // Remove o canal se ele já existir antes de criar um novo
+                if (customAppsSubscription) {
+                    supabase.removeChannel(customAppsSubscription);
+                }
+                customAppsSubscription = supabase.channel('public:custom_apps')
+                    .on('postgres_changes', { event: '*', schema: 'public', table: 'custom_apps', filter: `user_id=eq.${session.user.id}` }, payload => {
+                        renderCustomApps(session.user.id);
+                    })
+                    .subscribe();
 
                 // Inicia a subscrição em tempo real para as notas
                 if (!notesSubscription) {
@@ -1824,6 +2119,8 @@
                         })
                         .subscribe();
                 }
+
+                fetchShoppingList();
             } else {
                 const params = new URLSearchParams(window.location.hash.substring(1));
                 if (params.get('type') === 'recovery') {
@@ -1836,6 +2133,11 @@
                     if (notesSubscription) {
                         supabase.removeChannel(notesSubscription);
                         notesSubscription = null;
+                    }
+                    // Remove a subscrição dos apps personalizados ao sair
+                    if (customAppsSubscription) {
+                         supabase.removeChannel(customAppsSubscription);
+                         customAppsSubscription = null;
                     }
                 }
             }
@@ -1851,4 +2153,3 @@
     </script>
 </body>
 </html>
-
