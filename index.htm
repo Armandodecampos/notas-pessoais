@@ -112,49 +112,65 @@
 </head>
 <body>
     <!-- Novo container principal para centralizar todos os elementos -->
-    <div id="main-container" class="flex items-start sm:items-center justify-center min-h-screen p-4 pt-20 sm:pt-4">
+    <div id="main-container" class="flex items-center justify-center min-h-screen p-4">
         <!-- Conteúdo do Login -->
-        <div id="app" class="bg-white w-full max-w-md space-y-6">
+        <div id="app" class="w-full max-w-md">
             <div id="initial-login-view" class="text-center">
-                 <button id="show-profiles-button" class="w-full mt-6 px-4 py-3 bg-indigo-600 text-white font-semibold rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all text-lg">
-                    Login
+                 <button id="show-profiles-button" class="px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-700 text-white font-bold text-2xl rounded-full shadow-lg hover:shadow-2xl hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transform transition-all duration-300 ease-in-out">
+                    Acessar
                 </button>
             </div>
 
             <!-- Lista de Usuários (inicialmente escondida) -->
-            <div id="user-list-container" class="hidden flex-wrap justify-center gap-4">
-                <!-- Usuários serão injetados aqui via JavaScript -->
+            <div id="user-list-container" class="hidden fixed inset-0 bg-gray-100 flex flex-col items-center justify-center gap-8 p-4">
+                <div id="user-cards-wrapper" class="flex flex-wrap justify-center gap-4 max-w-4xl">
+                    <!-- Usuários serão injetados aqui via JavaScript -->
+                </div>
+                <button id="back-to-initial-button" class="absolute top-6 left-6 px-4 py-2 bg-white text-gray-800 font-semibold rounded-md shadow-sm hover:bg-gray-200 focus:outline-none transition-all flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                    Voltar
+                </button>
             </div>
 
             <!-- Formulário de Login (inicialmente escondido) -->
-            <div id="login-form-container" class="hidden flex flex-col items-center space-y-4 p-4">
-                <!-- Campo da Senha -->
-                <div class="w-full">
-                    <label for="password" class="block text-lg font-medium text-gray-700 text-center mb-2">Senha</label>
-                    <input type="password" id="password" class="block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-center text-lg">
-                </div>
+            <div id="login-form-container" class="hidden fixed inset-0 bg-gray-100 flex flex-col items-center justify-center p-4">
+                <div class="w-full max-w-xs space-y-4">
+                    <!-- Display do usuário selecionado -->
+                    <div class="flex flex-col items-center mb-2">
+                        <img id="selected-user-avatar" src="" alt="Avatar" class="w-20 h-20 rounded-full mb-2">
+                        <p id="selected-user-name" class="text-xl font-bold text-gray-800"></p>
+                    </div>
 
-                <!-- Botão de Entrar -->
-                <button id="login-button" class="w-full px-4 py-3 bg-green-500 text-white font-semibold rounded-md shadow-sm hover:bg-green-600 focus:outline-none transition-all text-lg">
-                    Entrar
-                </button>
-                
-                <!-- Botões secundários -->
-                <div class="flex justify-between w-full pt-4">
-                    <button id="back-button" class="px-6 py-2 bg-red-500 text-white font-semibold rounded-md shadow-sm hover:bg-red-600 focus:outline-none transition-all flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                          <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-                        </svg>
-                        Voltar
+                    <!-- Campo da Senha -->
+                    <div class="w-full">
+                        <label for="password" class="block text-lg font-medium text-gray-700 text-center mb-2">Senha</label>
+                        <input type="password" id="password" autocomplete="current-password" class="block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-center text-lg">
+                    </div>
+
+                    <!-- Botão de Entrar -->
+                    <button id="login-button" class="w-full px-4 py-3 bg-gradient-to-r from-indigo-600 to-purple-700 text-white font-bold rounded-md shadow-lg hover:shadow-xl focus:outline-none transition-all text-lg">
+                        Entrar
                     </button>
-                    <button id="reset-password-button" class="px-6 py-2 bg-orange-500 text-white font-semibold rounded-md shadow-sm hover:bg-orange-600 focus:outline-none transition-all">
+                    
+                    <!-- Botão de redefinir senha (agora como texto) -->
+                    <button id="reset-password-button" class="!mt-2 w-full text-sm text-gray-600 hover:text-indigo-600 hover:underline focus:outline-none transition-colors duration-200">
                         Redefinir Senha
                     </button>
                 </div>
+                
+                <!-- Botão Voltar -->
+                <button id="back-button" class="absolute top-6 left-6 px-4 py-2 bg-white text-gray-800 font-semibold rounded-md shadow-sm hover:bg-gray-200 focus:outline-none transition-all flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                    Voltar
+                </button>
             </div>
 
             <!-- Formulário de Nova Senha (inicialmente escondido) -->
-            <div id="new-password-container" class="hidden space-y-6">
+            <div id="new-password-container" class="hidden space-y-6 bg-white p-6 rounded-xl shadow-lg">
                 <button id="back-button-new-password" class="w-full flex items-center justify-center px-4 py-2 bg-gray-200 text-gray-800 font-semibold rounded-md shadow-sm hover:bg-gray-300 focus:outline-none transition-all">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                       <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
@@ -673,17 +689,21 @@
             }
         });
 
-        // --- REFERÊNCIas DE ELEMENTOS HTML ---
+        // --- REFERÊNCIAS DE ELEMENTOS HTML ---
         const mainContainer = document.getElementById('main-container');
         const app = document.getElementById('app');
         const loggedInAppContainer = document.getElementById('logged-in-app');
         const userListContainer = document.getElementById('user-list-container');
+        const userCardsWrapper = document.getElementById('user-cards-wrapper');
         const loginFormContainer = document.getElementById('login-form-container');
+        const selectedUserAvatar = document.getElementById('selected-user-avatar');
+        const selectedUserName = document.getElementById('selected-user-name');
         const userEmailDisplay = document.getElementById('user-email-display');
         const passwordInput = document.getElementById('password');
         const loginButton = document.getElementById('login-button');
         const resetPasswordButton = document.getElementById('reset-password-button');
         const backButton = document.getElementById('back-button');
+        const backToInitialButton = document.getElementById('back-to-initial-button');
         const resetPasswordModal = document.getElementById('reset-password-modal');
         const resetEmailDisplay = document.getElementById('reset-email-display');
         const closeModalButton = document.getElementById('close-modal-button');
@@ -870,9 +890,9 @@
             if (error) {
                 console.error('Erro ao buscar usuários:', error);
             } else if (data.length === 0) {
-                 userListContainer.innerHTML = '<p class="text-center text-gray-500">Nenhum usuário encontrado. Adicione usuários na tabela `profiles` do Supabase.</p>';
+                 userCardsWrapper.innerHTML = '<p class="text-center text-gray-500">Nenhum usuário encontrado. Adicione usuários na tabela `profiles` do Supabase.</p>';
             } else {
-                userListContainer.innerHTML = ''; 
+                userCardsWrapper.innerHTML = ''; 
                 data.forEach(user => {
                     const userCard = document.createElement('button');
                     userCard.className = 'user-card';
@@ -882,7 +902,7 @@
                         <img src="${avatarSrc}" alt="Profile" class="user-avatar w-16 h-16 rounded-full">
                         <p class="user-email">${user.profile_name || user.username}</p>
                     `;
-                    userListContainer.appendChild(userCard);
+                    userCardsWrapper.appendChild(userCard);
                 });
             }
         }
@@ -942,6 +962,15 @@
                 
                 // Restaura o estilo do body para o login
                 document.body.classList.add('bg-gray-100');
+                
+                // Lógica para posicionar o container
+                if (view === 'login') {
+                    mainContainer.classList.remove('items-center');
+                    mainContainer.classList.add('items-start', 'pt-20');
+                } else {
+                    mainContainer.classList.add('items-center');
+                    mainContainer.classList.remove('items-start', 'pt-20');
+                }
                 
                 // Esconde todas as vistas dentro do ecrã de login
                 initialLoginView.classList.add('hidden');
@@ -1457,7 +1486,15 @@
             const userCard = e.target.closest('.user-card');
             if (userCard) {
                 selectedEmail = userCard.dataset.email;
+                
+                // Preenche os dados do usuário no formulário de login
+                const avatarSrc = userCard.querySelector('.user-avatar').src;
+                const userName = userCard.querySelector('.user-email').textContent;
+                selectedUserAvatar.src = avatarSrc;
+                selectedUserName.textContent = userName;
+                
                 toggleUI(false, 'login');
+                passwordInput.focus();
             }
         });
 
@@ -1495,8 +1532,12 @@
         });
 
         backButton.addEventListener('click', () => {
-            toggleUI(false, 'initial');
+            toggleUI(false, 'user-list');
             passwordInput.value = '';
+        });
+
+        backToInitialButton.addEventListener('click', () => {
+            toggleUI(false, 'initial');
         });
 
         backButtonNewPassword.addEventListener('click', () => {
@@ -2545,5 +2586,10 @@
     </script>
 </body>
 </html>
+
+
+
+
+
 
 
