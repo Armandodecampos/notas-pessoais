@@ -1497,7 +1497,7 @@
             
             const { error } = await supabase
                 .from('shopping_list')
-                .insert([{ item_name: newItemName, quantity: newQuantity, unit: newUnit, user_id: user.id }]);
+                .insert([{ item_name: newItemName, quantity: newQuantity, unit: newUnit }]);
             
             if (error) {
                 console.error('Erro ao adicionar item:', error);
@@ -2848,4 +2848,5 @@
     </script>
 </body>
 </html>
+
 
