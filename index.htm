@@ -487,7 +487,7 @@
         <div class="p-2 bg-white sticky top-0 z-10 shadow-sm">
             <div class="flex justify-center space-x-2">
                 <button id="filter-notes-active" class="note-filter-button font-semibold py-2 px-4 rounded-md transition-colors duration-200">Ativas</button>
-                <button id="filter-notes-completed" class="note-filter-button font-semibold py-2 px-4 rounded-md transition-colors duration-200">Concluídas</button>
+                <button id="filter-notes-completed" class="note-filter-button font-semibold py-2 px-4 rounded-md transition-colors duration-200">Antigas</button>
                 <button id="filter-notes-fixed" class="note-filter-button font-semibold py-2 px-4 rounded-md transition-colors duration-200">Fixas</button>
                 <button id="filter-notes-all" class="note-filter-button font-semibold py-2 px-4 rounded-md transition-colors duration-200">Todas</button>
             </div>
@@ -615,17 +615,17 @@
                 </svg>
             </button>
         </header>
-        <div class="flex flex-col p-4 bg-gray-100 flex-grow space-y-4">
-            <button id="open-app-button" class="w-full px-4 py-3 bg-indigo-600 text-white font-semibold rounded-md shadow-sm hover:bg-indigo-700 transition-colors text-lg">
+        <div class="flex flex-col items-center p-4 bg-gray-100 flex-grow space-y-4">
+            <button id="open-app-button" class="px-4 py-3 bg-indigo-600 text-white font-semibold rounded-md shadow-sm hover:bg-indigo-700 transition-colors text-lg">
                 Abrir
             </button>
-            <button id="edit-app-button" class="w-full px-4 py-3 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300 transition-colors text-lg">
+            <button id="edit-app-button" class="px-4 py-3 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300 transition-colors text-lg">
                 Editar
             </button>
-            <button id="delete-app-button" class="w-full px-4 py-3 bg-red-500 text-white font-semibold rounded-md hover:bg-red-600 transition-colors text-lg">
+            <button id="delete-app-button" class="px-4 py-3 bg-red-500 text-white font-semibold rounded-md hover:bg-red-600 transition-colors text-lg">
                 Deletar
             </button>
-            <button id="close-app-modal-button" class="w-full px-4 py-3 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300 transition-colors text-lg">
+            <button id="close-app-modal-button" class="px-4 py-3 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300 transition-colors text-lg">
                 Fechar
             </button>
         </div>
@@ -1167,14 +1167,22 @@
                 .select('id, title, content, start_date, end_date, is_fixed')
                 .eq('user_id', user.id);
 
-            const today = new Date().toISOString().split('T')[0];
+            // Correção: Garante que estamos a usar a data local para evitar problemas de fuso horário.
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0'); // Meses são 0-indexados
+            const day = String(now.getDate()).padStart(2, '0');
+            const today = `${year}-${month}-${day}`;
+
             if (currentNoteFilter === 'fixed') {
                 query = query.eq('is_fixed', true);
             } else if (currentNoteFilter === 'active') {
+                // 'Ativas' são notas não fixas cujo período (de start_date a end_date) inclui o dia de hoje.
                 query = query.eq('is_fixed', false)
                              .lte('start_date', today)
                              .gte('end_date', today);
-            } else if (currentNoteFilter === 'completed') {
+            } else if (currentNoteFilter === 'antigas') { 
+                // 'Antigas' são notas não fixas cuja data final (end_date) já passou (é anterior a hoje).
                 query = query.eq('is_fixed', false)
                              .lt('end_date', today);
             }
@@ -2041,37 +2049,27 @@
         addItemConfirmButton.addEventListener('click', addItem);
 
         function showDeleteConfirmationModal(id, type) {
-            mainHeader.style.zIndex = '20';
             itemToDeleteInfo = { id, type };
             const messageEl = document.getElementById('delete-confirm-message');
             
             if (type === 'note') {
                 messageEl.textContent = 'Tem a certeza que quer apagar esta nota?';
-                notesModal.style.zIndex = '30';
             } else if (type === 'custom_app') {
                 messageEl.textContent = 'Tem certeza que deseja excluir este aplicativo?';
-                appOptionsModal.style.zIndex = '30';
             } else if (type === 'price') {
                 messageEl.textContent = 'Tem certeza que deseja excluir este preço?';
-                priceComparisonModal.style.zIndex = '30';
             }
             else {
                 messageEl.textContent = 'Tem certeza que deseja excluir este item da lista?';
-                shoppingListModal.style.zIndex = '30';
             }
             deleteConfirmModal.classList.remove('hidden');
             deleteConfirmModal.classList.add('flex');
         }
 
         function hideDeleteConfirmationModal() {
-            mainHeader.style.zIndex = '';
             itemToDeleteInfo = null;
             deleteConfirmModal.classList.add('hidden');
             deleteConfirmModal.classList.remove('flex');
-            notesModal.style.zIndex = '';
-            shoppingListModal.style.zIndex = '';
-            appOptionsModal.style.zIndex = '';
-            priceComparisonModal.style.zIndex = '';
         }
 
         confirmDeleteButton.addEventListener('click', async () => {
@@ -2084,6 +2082,10 @@
                     hideAppOptionsModal();
                 } else if (itemToDeleteInfo.type === 'price') {
                     await deletePrice(itemToDeleteInfo.id);
+                    // Atualiza a lista de preços manualmente para garantir que a UI responda imediatamente
+                    if (currentComparisonItemId) {
+                       fetchItemPrices(currentComparisonItemId);
+                    }
                 } else {
                     await deleteItem(itemToDeleteInfo.id);
                 }
@@ -2328,7 +2330,7 @@
             fetchNotes();
         });
         filterNotesCompleted.addEventListener('click', () => {
-            currentNoteFilter = 'completed';
+            currentNoteFilter = 'antigas'; // Ajustado para corresponder à UI
             setActiveNoteFilter('completed');
             fetchNotes();
         });
@@ -2848,5 +2850,4 @@
     </script>
 </body>
 </html>
-
 
