@@ -661,6 +661,55 @@
         </div>
     </div>
 
+    <!-- Modal de Comparação de Preços -->
+    <div id="price-comparison-modal" class="fixed inset-0 bg-gray-100 hidden flex-col z-50">
+        <!-- Cabeçalho do Modal -->
+        <header class="flex items-center justify-between p-4 bg-white shadow-md">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800">Comparar Preços</h2>
+                <p id="comparison-item-name" class="text-lg text-gray-600"></p>
+            </div>
+            <button id="close-price-comparison-modal" class="text-gray-500 hover:text-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </header>
+
+        <!-- Formulário para Adicionar Preço -->
+        <div class="p-4 bg-white border-b">
+            <div class="flex flex-col sm:flex-row gap-2">
+                <input type="text" id="price-location-input" placeholder="Nome do Local" class="flex-grow px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                <input type="number" id="price-value-input" placeholder="Preço (ex: 12.99)" step="0.01" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                <button id="add-price-button" class="px-4 py-2 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 transition-colors">Adicionar</button>
+            </div>
+        </div>
+
+        <!-- Lista de Preços -->
+        <div id="price-list-container" class="flex-grow overflow-y-auto p-4 space-y-2">
+            <!-- Preços serão injetados aqui -->
+        </div>
+    </div>
+
+    <!-- Modal para Editar Preço -->
+    <div id="edit-price-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-[60]">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-sm w-full space-y-4">
+            <h3 class="text-2xl font-bold text-gray-800 text-center">Editar Preço</h3>
+            <div class="relative">
+                <label for="edit-price-location-input" class="block text-sm font-medium text-gray-700 text-left">Local</label>
+                <input type="text" id="edit-price-location-input" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            <div class="relative">
+                <label for="edit-price-value-input" class="block text-sm font-medium text-gray-700 text-left">Preço</label>
+                <input type="number" id="edit-price-value-input" step="0.01" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            <div class="flex justify-between space-x-4 pt-2">
+                <button id="cancel-edit-price-button" class="w-full px-4 py-3 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300">Cancelar</button>
+                <button id="save-edit-price-button" class="w-full px-4 py-3 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700">Salvar</button>
+            </div>
+        </div>
+    </div>
+
 
     <script type="module">
         // --- CORREÇÃO IMPORTANTE PARA O ERRO "INVALID API KEY" ---
@@ -854,6 +903,20 @@
         const initialLoginView = document.getElementById('initial-login-view');
         const showProfilesButton = document.getElementById('show-profiles-button');
 
+        // Referências da Comparação de Preços
+        const priceComparisonModal = document.getElementById('price-comparison-modal');
+        const closePriceComparisonModalButton = document.getElementById('close-price-comparison-modal');
+        const comparisonItemName = document.getElementById('comparison-item-name');
+        const priceLocationInput = document.getElementById('price-location-input');
+        const priceValueInput = document.getElementById('price-value-input');
+        const addPriceButton = document.getElementById('add-price-button');
+        const priceListContainer = document.getElementById('price-list-container');
+        const editPriceModal = document.getElementById('edit-price-modal');
+        const editPriceLocationInput = document.getElementById('edit-price-location-input');
+        const editPriceValueInput = document.getElementById('edit-price-value-input');
+        const saveEditPriceButton = document.getElementById('save-edit-price-button');
+        const cancelEditPriceButton = document.getElementById('cancel-edit-price-button');
+
 
         let selectedEmail = ''; 
         let editingItemId = null; 
@@ -866,6 +929,9 @@
         let customAppsSubscription = null;
         let isDragging = false;
         let tempPreferences = {}; // State for settings modal
+        let currentComparisonItemId = null;
+        let priceSubscription = null;
+        let editingPriceId = null;
 
         const availableIcons = [
             'fas fa-link', 'fas fa-globe', 'fas fa-star', 'fas fa-heart', 'fas fa-book',
@@ -945,6 +1011,8 @@
             appOptionsModal.classList.add('hidden');
             editFixedAppModal.classList.add('hidden');
             trashBinModal.classList.add('hidden');
+            priceComparisonModal.classList.add('hidden');
+            editPriceModal.classList.add('hidden');
 
 
             if (isLoggedIn) {
@@ -1339,7 +1407,7 @@
                 });
                 
                 const actionButtons = document.createElement('div');
-                actionButtons.className = 'flex items-center space-x-2 flex-shrink-0';
+                actionButtons.className = 'flex items-center space-x-1 flex-shrink-0';
                 
                 const deleteButton = document.createElement('button');
                 deleteButton.className = 'delete-item-button p-1 text-red-500 hover:text-red-700 transition-colors';
@@ -1357,11 +1425,17 @@
                     </svg>
                 `;
                 editButton.addEventListener('click', () => showEditItemModal(item.id, item.item_name, item.quantity, item.unit));
+
+                const compareButton = document.createElement('button');
+                compareButton.className = 'compare-prices-button p-1 text-blue-500 hover:text-blue-700 transition-colors';
+                compareButton.innerHTML = `<i class="fas fa-dollar-sign"></i>`;
+                compareButton.addEventListener('click', () => showPriceComparisonModal(item.id, item.item_name));
                 
                 mainContent.appendChild(quantitySpan);
                 mainContent.appendChild(itemNameSpan);
-                actionButtons.appendChild(deleteButton);
+                actionButtons.appendChild(compareButton);
                 actionButtons.appendChild(editButton);
+                actionButtons.appendChild(deleteButton);
 
                 itemDiv.appendChild(mainContent);
                 itemDiv.appendChild(actionButtons);
@@ -1423,7 +1497,7 @@
             
             const { error } = await supabase
                 .from('shopping_list')
-                .insert([{ item_name: newItemName, quantity: newQuantity, unit: newUnit }]);
+                .insert([{ item_name: newItemName, quantity: newQuantity, unit: newUnit, user_id: user.id }]);
             
             if (error) {
                 console.error('Erro ao adicionar item:', error);
@@ -1479,6 +1553,157 @@
                 filterBoughtButton.classList.add('bg-green-500', 'text-white');
                 filterBoughtButton.classList.remove('bg-green-200', 'text-green-800');
             }
+        }
+
+        // --- FUNÇÕES DE COMPARAÇÃO DE PREÇOS ---
+        async function fetchItemPrices(itemId) {
+            if (!itemId) return;
+            const { data, error } = await supabase
+                .from('item_prices')
+                .select('*')
+                .eq('item_id', itemId);
+
+            if (error) {
+                console.error('Erro ao buscar preços:', error);
+            } else {
+                renderItemPrices(data);
+            }
+        }
+
+        function renderItemPrices(prices) {
+            priceListContainer.innerHTML = '';
+            if (!prices || prices.length === 0) {
+                priceListContainer.innerHTML = '<p class="text-center text-gray-500">Nenhum preço adicionado ainda.</p>';
+                return;
+            }
+
+            // Ordena por preço, do menor para o maior
+            prices.sort((a, b) => a.price - b.price);
+
+            prices.forEach((price, index) => {
+                const priceDiv = document.createElement('div');
+                const isBestPrice = index === 0;
+                priceDiv.className = `flex items-center justify-between p-3 rounded-lg shadow-sm border ${isBestPrice ? 'bg-green-100 border-green-400' : 'bg-white border-gray-200'}`;
+                
+                const formattedPrice = `R$ ${price.price.toFixed(2).replace('.', ',')}`;
+
+                priceDiv.innerHTML = `
+                    <div class="flex-grow">
+                        <p class="font-bold text-lg text-gray-800">${price.location}</p>
+                        <p class="font-semibold text-xl ${isBestPrice ? 'text-green-700' : 'text-gray-600'}">${formattedPrice}</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button class="edit-price-button p-2 text-gray-500 hover:text-gray-800" data-price-id="${price.id}" data-location="${price.location}" data-price="${price.price}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="delete-price-button p-2 text-red-500 hover:text-red-700" data-price-id="${price.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                priceListContainer.appendChild(priceDiv);
+            });
+        }
+
+        async function addPrice() {
+            const location = priceLocationInput.value.trim();
+            const price = parseFloat(priceValueInput.value);
+            const { data: { user } } = await supabase.auth.getUser();
+
+            if (!location || isNaN(price) || !user || !currentComparisonItemId) {
+                // Adicionar feedback ao usuário aqui, se desejar
+                return;
+            }
+
+            const { error } = await supabase
+                .from('item_prices')
+                .insert({
+                    item_id: currentComparisonItemId,
+                    user_id: user.id,
+                    location,
+                    price
+                });
+            
+            if (error) {
+                console.error("Erro ao adicionar preço:", error);
+            } else {
+                priceLocationInput.value = '';
+                priceValueInput.value = '';
+            }
+        }
+
+        async function updatePrice(priceId, newLocation, newPrice) {
+             const { error } = await supabase
+                .from('item_prices')
+                .update({ location: newLocation, price: newPrice })
+                .eq('id', priceId);
+            if (error) {
+                console.error("Erro ao atualizar preço:", error);
+            }
+        }
+
+        async function deletePrice(priceId) {
+             const { error } = await supabase
+                .from('item_prices')
+                .delete()
+                .eq('id', priceId);
+            if (error) {
+                console.error("Erro ao deletar preço:", error);
+            }
+        }
+
+        function showPriceComparisonModal(itemId, itemName) {
+            currentComparisonItemId = itemId;
+            comparisonItemName.textContent = itemName;
+            priceComparisonModal.classList.remove('hidden');
+            priceComparisonModal.classList.add('flex');
+
+            fetchItemPrices(itemId); // Busca inicial
+
+            // Inicia a subscrição em tempo real
+            if (priceSubscription) {
+                supabase.removeChannel(priceSubscription);
+            }
+            priceSubscription = supabase
+                .channel(`item_prices_${itemId}`)
+                .on('postgres_changes', {
+                    event: '*',
+                    schema: 'public',
+                    table: 'item_prices',
+                    filter: `item_id=eq.${itemId}`
+                }, payload => {
+                    fetchItemPrices(itemId);
+                })
+                .subscribe();
+        }
+
+        function hidePriceComparisonModal() {
+            priceComparisonModal.classList.add('hidden');
+            priceComparisonModal.classList.remove('flex');
+            currentComparisonItemId = null;
+            comparisonItemName.textContent = '';
+            priceLocationInput.value = '';
+            priceValueInput.value = '';
+
+            // Remove a subscrição para evitar escutas desnecessárias
+            if (priceSubscription) {
+                supabase.removeChannel(priceSubscription);
+                priceSubscription = null;
+            }
+        }
+
+        function showEditPriceModal(priceId, location, price) {
+            editingPriceId = priceId;
+            editPriceLocationInput.value = location;
+            editPriceValueInput.value = price;
+            editPriceModal.classList.remove('hidden');
+            editPriceModal.classList.add('flex');
+        }
+
+        function hideEditPriceModal() {
+            editingPriceId = null;
+            editPriceModal.classList.add('hidden');
+            editPriceModal.classList.remove('flex');
         }
 
         // --- EVENT LISTENERS ---
@@ -1826,6 +2051,9 @@
             } else if (type === 'custom_app') {
                 messageEl.textContent = 'Tem certeza que deseja excluir este aplicativo?';
                 appOptionsModal.style.zIndex = '30';
+            } else if (type === 'price') {
+                messageEl.textContent = 'Tem certeza que deseja excluir este preço?';
+                priceComparisonModal.style.zIndex = '30';
             }
             else {
                 messageEl.textContent = 'Tem certeza que deseja excluir este item da lista?';
@@ -1843,6 +2071,7 @@
             notesModal.style.zIndex = '';
             shoppingListModal.style.zIndex = '';
             appOptionsModal.style.zIndex = '';
+            priceComparisonModal.style.zIndex = '';
         }
 
         confirmDeleteButton.addEventListener('click', async () => {
@@ -1853,6 +2082,8 @@
                 } else if (itemToDeleteInfo.type === 'custom_app') {
                     await deleteCustomApp(itemToDeleteInfo.id);
                     hideAppOptionsModal();
+                } else if (itemToDeleteInfo.type === 'price') {
+                    await deletePrice(itemToDeleteInfo.id);
                 } else {
                     await deleteItem(itemToDeleteInfo.id);
                 }
@@ -2538,6 +2769,35 @@
             }
         });
 
+        // Event Listeners para Comparação de Preços
+        closePriceComparisonModalButton.addEventListener('click', hidePriceComparisonModal);
+        addPriceButton.addEventListener('click', addPrice);
+        cancelEditPriceButton.addEventListener('click', hideEditPriceModal);
+
+        priceListContainer.addEventListener('click', (e) => {
+            const editButton = e.target.closest('.edit-price-button');
+            if (editButton) {
+                const priceId = editButton.dataset.priceId;
+                const location = editButton.dataset.location;
+                const price = editButton.dataset.price;
+                showEditPriceModal(priceId, location, price);
+            }
+
+            const deleteButton = e.target.closest('.delete-price-button');
+            if (deleteButton) {
+                const priceId = deleteButton.dataset.priceId;
+                showDeleteConfirmationModal(priceId, 'price');
+            }
+        });
+        
+        saveEditPriceButton.addEventListener('click', async () => {
+            const newLocation = editPriceLocationInput.value.trim();
+            const newPrice = parseFloat(editPriceValueInput.value);
+            if(editingPriceId && newLocation && !isNaN(newPrice)) {
+                await updatePrice(editingPriceId, newLocation, newPrice);
+                hideEditPriceModal();
+            }
+        });
 
         // --- VERIFICAÇÃO DE ESTADO DE AUTENTICAÇÃO E URL ---
         supabase.auth.onAuthStateChange((event, session) => {
@@ -2572,8 +2832,10 @@
                 if (event === 'SIGNED_OUT') {
                     if (notesSubscription) supabase.removeChannel(notesSubscription);
                     if (customAppsSubscription) supabase.removeChannel(customAppsSubscription);
+                    if (priceSubscription) supabase.removeChannel(priceSubscription);
                     notesSubscription = null;
                     customAppsSubscription = null;
+                    priceSubscription = null;
                 }
             }
         });
@@ -2586,10 +2848,4 @@
     </script>
 </body>
 </html>
-
-
-
-
-
-
 
