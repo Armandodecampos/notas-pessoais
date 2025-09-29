@@ -45,13 +45,13 @@
         }
         /* Estilos para a grade de botões arrastáveis */
         .app-container {
-            @apply flex flex-col items-center w-24; /* Container for icon + label */
+            @apply flex flex-col items-center w-full; /* Container for icon + label */
             cursor: move;
         }
         .grid-item {
             background-color: #333;
-            width: 80px;
-            height: 80px;
+            width: 56px;
+            height: 56px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -64,11 +64,21 @@
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1); /* shadow-lg */
         }
         .grid-item-icon {
-            font-size: 2.25rem; /* Equivalente a text-4xl */
+            font-size: 1.5rem; /* Tamanho para celular (text-2xl) */
             color: white;
         }
         .grid-item-label {
-            @apply text-center font-semibold text-gray-700 text-sm mt-2;
+            @apply text-center font-semibold text-gray-700 text-xs mt-1 sm:text-sm sm:mt-2;
+        }
+        /* Estilos para telas maiores (sm: 640px e acima) */
+        @media (min-width: 640px) {
+            .grid-item {
+                width: 80px;
+                height: 80px;
+            }
+            .grid-item-icon {
+                font-size: 2.25rem;
+            }
         }
         .app-container.dragging {
             @apply opacity-50;
@@ -254,7 +264,7 @@
         </div>
         
         <!-- Grade de botões arrastáveis -->
-        <div id="button-grid-container" class="fixed top-24 inset-x-0 bottom-0 p-4 grid [grid-template-columns:repeat(auto-fill,minmax(100px,1fr))] gap-4 overflow-y-auto justify-items-center">
+        <div id="button-grid-container" class="fixed top-24 inset-x-0 bottom-0 p-4 grid grid-cols-5 gap-3 sm:[grid-template-columns:repeat(auto-fill,minmax(100px,1fr))] sm:gap-4 overflow-y-auto justify-items-center content-start">
             <!-- Aplicativos serão injetados aqui -->
         </div>
     </div>
@@ -665,19 +675,25 @@
                 </svg>
             </button>
         </header>
-        <div class="flex flex-col items-center p-4 bg-gray-100 flex-grow space-y-4">
-            <button id="open-app-button" class="px-4 py-3 bg-indigo-600 text-white font-semibold rounded-md shadow-sm hover:bg-indigo-700 transition-colors text-lg">
-                Abrir
-            </button>
-            <button id="edit-app-button" class="px-4 py-3 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300 transition-colors text-lg">
-                Editar
-            </button>
-            <button id="delete-app-button" class="px-4 py-3 bg-red-500 text-white font-semibold rounded-md hover:bg-red-600 transition-colors text-lg">
-                Deletar
-            </button>
-            <button id="close-app-modal-button" class="px-4 py-3 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300 transition-colors text-lg">
-                Fechar
-            </button>
+        <div class="flex-grow flex items-center justify-center p-4">
+            <div class="grid grid-cols-2 gap-4 w-full max-w-sm">
+                <button id="open-app-button" class="flex flex-col items-center justify-center text-white font-bold rounded-2xl shadow-lg hover:shadow-xl transition-all text-lg aspect-square bg-blue-500 hover:bg-blue-600">
+                    <i class="fas fa-external-link-alt text-3xl mb-2"></i>
+                    <span>Abrir</span>
+                </button>
+                <button id="edit-app-button" class="flex flex-col items-center justify-center text-white font-bold rounded-2xl shadow-lg hover:shadow-xl transition-all text-lg aspect-square bg-yellow-500 hover:bg-yellow-600">
+                    <i class="fas fa-edit text-3xl mb-2"></i>
+                    <span>Editar</span>
+                </button>
+                <button id="delete-app-button" class="flex flex-col items-center justify-center text-white font-bold rounded-2xl shadow-lg hover:shadow-xl transition-all text-lg aspect-square bg-red-500 hover:bg-red-600">
+                    <i class="fas fa-trash text-3xl mb-2"></i>
+                    <span id="delete-app-text">Deletar</span>
+                </button>
+                <button id="close-app-modal-button" class="flex flex-col items-center justify-center text-white font-bold rounded-2xl shadow-lg hover:shadow-xl transition-all text-lg aspect-square bg-gray-500 hover:bg-gray-600">
+                    <i class="fas fa-times text-3xl mb-2"></i>
+                    <span>Fechar</span>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -2982,10 +2998,11 @@
             appOptionsModal.dataset.bgColor = app.bg_color || '';
             appOptionsModal.dataset.iconColor = app.icon_color || '';
             
+            const deleteAppText = document.getElementById('delete-app-text');
             if (app.isFixed) {
-                deleteAppButton.textContent = 'Remover';
+                deleteAppText.textContent = 'Remover';
             } else {
-                deleteAppButton.textContent = 'Deletar';
+                deleteAppText.textContent = 'Deletar';
             }
 
             appOptionsTitle.textContent = app.title;
@@ -3445,6 +3462,9 @@
     </script>
 </body>
 </html>
+
+
+
 
 
 
