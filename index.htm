@@ -81,7 +81,7 @@
             }
         }
         .app-container.dragging {
-            @apply opacity-50;
+            @apply opacity-50 z-50; /* Garante que o item arrastado fique por cima */
         }
         /* Estilos para as Notas */
         .note-item {
@@ -264,7 +264,7 @@
         </div>
         
         <!-- Grade de botões arrastáveis -->
-        <div id="button-grid-container" class="fixed top-24 inset-x-0 bottom-0 p-4 grid grid-cols-5 gap-3 sm:[grid-template-columns:repeat(auto-fill,minmax(100px,1fr))] sm:gap-4 overflow-y-auto justify-items-center content-start">
+        <div id="button-grid-container" class="fixed top-24 inset-x-0 bottom-0 p-4 overflow-y-auto">
             <!-- Aplicativos serão injetados aqui -->
         </div>
     </div>
@@ -1118,6 +1118,8 @@
         let recipesSubscription = null;
         let recipeImagesSubscription = null;
         let isAppInitialized = false;
+        let dragStartOffset = { x: 0, y: 0 };
+        let dragStartPos = { x: 0, y: 0 };
 
 
         const availableIcons = [
@@ -2878,10 +2880,49 @@
 
 
         // --- LÓGICA DE APLICATIVOS PERSONALIZADOS E FIXOS ---
+        async function saveAppPosition(userId, appId, x, y) {
+            if (!userId || !appId) return;
 
-        async function renderApps(appsToRender) {
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('preferences')
+                .eq('id', userId)
+                .single();
+                
+            if (error && error.code !== 'PGRST116') {
+                console.error("Erro ao buscar preferências para guardar a posição do app:", error);
+                return;
+            }
+
+            const prefs = data?.preferences || {};
+            if (!prefs.app_positions) {
+                prefs.app_positions = {};
+            }
+
+            prefs.app_positions[appId] = { x, y };
+
+            const { error: updateError } = await supabase
+                .from('profiles')
+                .update({ preferences: prefs })
+                .eq('id', userId);
+
+            if (updateError) {
+                console.error('Erro ao guardar a posição do app:', updateError);
+            }
+        }
+
+
+        async function renderApps(appsToRender, appPositions, userId) {
             buttonGridContainer.innerHTML = '';
             
+            let currentX = 16;
+            let currentY = 16;
+            const containerWidth = buttonGridContainer.clientWidth;
+            // Estimar o tamanho do app com base na largura da tela
+            const appWidth = window.innerWidth < 640 ? 60 : 84; 
+            const appHeight = window.innerWidth < 640 ? 80 : 104;
+            const gap = 16;
+
             appsToRender.forEach(app => {
                 const appContainer = document.createElement('div');
                 appContainer.className = 'app-container';
@@ -2892,7 +2933,6 @@
                 if(app.url) { 
                     appContainer.dataset.url = app.url;
                 }
-                // Add new data attributes
                 if (app.icon_class) appContainer.dataset.iconClass = app.icon_class;
                 if (app.bg_color) appContainer.dataset.bgColor = app.bg_color;
                 appContainer.dataset.iconColor = app.icon_color;
@@ -2913,12 +2953,30 @@
                     if (isDragging) return;
                     showAppOptionsModal(app);
                 });
+                
+                appContainer.style.position = 'absolute';
+                const savedPos = appPositions[app.id];
+
+                if (savedPos) {
+                    appContainer.style.left = `${savedPos.x}px`;
+                    appContainer.style.top = `${savedPos.y}px`;
+                } else {
+                    appContainer.style.left = `${currentX}px`;
+                    appContainer.style.top = `${currentY}px`;
+                    saveAppPosition(userId, app.id, currentX, currentY);
+
+                    currentX += appWidth + gap;
+                    if (currentX + appWidth > containerWidth) {
+                        currentX = 16;
+                        currentY += appHeight + gap;
+                    }
+                }
 
                 buttonGridContainer.appendChild(appContainer);
             });
         }
         
-        async function fetchAndRenderAppOrder(userId) {
+        async function fetchAndRenderApps(userId) {
             if (!userId) return;
 
             const { data: profile, error: profileError } = await supabase
@@ -2930,6 +2988,8 @@
             const preferences = profileError ? {} : profile.preferences || {};
             const removedApps = preferences.removed_apps || [];
             const appNames = preferences.app_names || {};
+            const appPositions = preferences.app_positions || {};
+
 
             const fixedApps = fixedAppsMasterList.map(app => ({
                 ...app,
@@ -2947,32 +3007,9 @@
             
             const allAvailableApps = [...fixedApps, ...(customApps || [])];
             const visibleApps = allAvailableApps.filter(app => !removedApps.includes(app.id));
-            const appsMap = new Map(visibleApps.map(app => [app.id, app]));
-
-            const { data: orderData, error: orderError } = await supabase
-                .from('user_app_order')
-                .select('app_ids')
-                .eq('user_id', userId)
-                .single();
-
-            let finalAppOrder = [];
-
-            if (orderError && orderError.code !== 'PGRST116') {
-                 finalAppOrder = [...visibleApps];
-            } else if (orderData && orderData.app_ids) {
-                const orderedApps = orderData.app_ids
-                    .map(appId => appsMap.get(appId))
-                    .filter(Boolean);
-
-                const orderedAppIds = new Set(orderedApps.map(app => app.id));
-                const newApps = visibleApps.filter(app => !orderedAppIds.has(app.id));
-                
-                finalAppOrder = [...orderedApps, ...newApps];
-            } else {
-                finalAppOrder = [...visibleApps];
-            }
-
-            renderApps(finalAppOrder);
+            
+            // A ordem agora é apenas para o posicionamento inicial, podemos simplesmente usar a lista filtrada
+            renderApps(visibleApps, appPositions, userId);
         }
         
         async function saveAppOrder(userId) {
@@ -3087,7 +3124,7 @@
 
                 if (insertError) console.error('Erro ao criar aplicativo:', insertError);
             }
-            await fetchAndRenderAppOrder(user.id);
+            await fetchAndRenderApps(user.id);
             hideAddAppModal();
         }
 
@@ -3100,7 +3137,7 @@
             if (error) {
                 console.error('Erro ao deletar aplicativo:', error);
             } else {
-                await fetchAndRenderAppOrder(user.id);
+                await fetchAndRenderApps(user.id);
             }
         }
         
@@ -3154,53 +3191,119 @@
         buttonGridContainer.addEventListener('dragstart', e => {
             const draggable = e.target.closest('.app-container');
             if (draggable) {
+                // Guarda a posição original para reverter em caso de soltar inválido
+                dragStartPos.x = draggable.offsetLeft;
+                dragStartPos.y = draggable.offsetTop;
+
                 draggable.classList.add('dragging');
                 isDragging = true;
                 e.dataTransfer.effectAllowed = "move";
+                const rect = draggable.getBoundingClientRect();
+                dragStartOffset.x = e.clientX - rect.left;
+                dragStartOffset.y = e.clientY - rect.top;
             }
         });
 
         buttonGridContainer.addEventListener('dragover', e => {
             e.preventDefault();
-            const afterElement = getDragAfterElement(buttonGridContainer, e.clientX, e.clientY);
-            const draggable = document.querySelector('.app-container.dragging');
-            if (draggable) {
-                if (afterElement == null) {
-                    buttonGridContainer.appendChild(draggable);
-                } else {
-                    buttonGridContainer.insertBefore(draggable, afterElement);
+            const draggingEl = document.querySelector('.dragging');
+            if (!draggingEl) return;
+
+            const containerRect = buttonGridContainer.getBoundingClientRect();
+            // Move temporariamente o elemento para pré-visualização
+            let newLeft = e.clientX - containerRect.left - dragStartOffset.x;
+            let newTop = e.clientY - containerRect.top - dragStartOffset.y;
+            draggingEl.style.left = `${newLeft}px`;
+            draggingEl.style.top = `${newTop}px`;
+
+            const allApps = [...buttonGridContainer.querySelectorAll('.app-container:not(.dragging)')];
+
+            const draggingRect = draggingEl.getBoundingClientRect();
+
+            let isOverlapping = false;
+            for (const staticApp of allApps) {
+                const staticRect = staticApp.getBoundingClientRect();
+                // Verificação de colisão
+                if (!(draggingRect.right < staticRect.left || 
+                      draggingRect.left > staticRect.right || 
+                      draggingRect.bottom < staticRect.top || 
+                      draggingRect.top > staticRect.bottom)) {
+                    isOverlapping = true;
+                    break;
                 }
+            }
+
+            const gridItem = draggingEl.querySelector('.grid-item');
+            if (isOverlapping) {
+                gridItem.style.backgroundColor = '#ef4444'; // Cor vermelha para sobreposição
+            } else {
+                gridItem.style.backgroundColor = '#22c55e'; // Cor verde para espaço livre
             }
         });
 
         buttonGridContainer.addEventListener('dragend', async e => {
             const draggable = e.target.closest('.app-container');
             if (draggable) {
-                draggable.classList.remove('dragging');
-                isDragging = false;
-                const { data: { user } } = await supabase.auth.getUser();
-                if (user) {
-                    await saveAppOrder(user.id);
+                const gridItem = draggable.querySelector('.grid-item');
+                // Restaura a cor de fundo original
+                if (draggable.dataset.isFixed === 'true') {
+                    gridItem.style.backgroundColor = ''; // Permite que a classe CSS assuma
+                } else {
+                    gridItem.style.backgroundColor = draggable.dataset.bgColor || '#333';
                 }
+                
+                draggable.classList.remove('dragging');
+
+                const containerRect = buttonGridContainer.getBoundingClientRect();
+                const allApps = [...buttonGridContainer.querySelectorAll('.app-container')];
+
+                const draggingRect = draggable.getBoundingClientRect();
+                let isOverlappingOnDrop = false;
+                for (const staticApp of allApps) {
+                    if (staticApp === draggable) continue;
+                    const staticRect = staticApp.getBoundingClientRect();
+                    if (!(draggingRect.right < staticRect.left || 
+                          draggingRect.left > staticRect.right || 
+                          draggingRect.bottom < staticRect.top || 
+                          draggingRect.top > staticRect.bottom)) {
+                        isOverlappingOnDrop = true;
+                        break;
+                    }
+                }
+
+                if (isOverlappingOnDrop) {
+                    // Reverte para a posição original se houver sobreposição
+                    draggable.style.left = `${dragStartPos.x}px`;
+                    draggable.style.top = `${dragStartPos.y}px`;
+                } else {
+                    // Lógica para salvar a nova posição válida
+                    let newLeft = draggable.offsetLeft;
+                    let newTop = draggable.offsetTop;
+
+                    const appWidth = draggable.offsetWidth;
+                    const appHeight = draggable.offsetHeight;
+                    newLeft = Math.max(0, Math.min(newLeft, containerRect.width - appWidth));
+                    newTop = Math.max(0, Math.min(newTop, containerRect.height - appHeight));
+                    
+                    const gridSize = 10;
+                    const snappedLeft = Math.round(newLeft / gridSize) * gridSize;
+                    const snappedTop = Math.round(newTop / gridSize) * gridSize;
+
+                    draggable.style.left = `${snappedLeft}px`;
+                    draggable.style.top = `${snappedTop}px`;
+
+                    const { data: { user } } = await supabase.auth.getUser();
+                    if (user) {
+                        await saveAppPosition(user.id, draggable.dataset.id, snappedLeft, snappedTop);
+                    }
+                }
+
+                // Atraso para garantir que o clique não seja acionado
+                setTimeout(() => {
+                    isDragging = false;
+                }, 50);
             }
         });
-
-        function getDragAfterElement(container, x, y) {
-            const draggableElements = [...container.querySelectorAll('.app-container:not(.dragging)')];
-
-            return draggableElements.reduce((closest, child) => {
-                const box = child.getBoundingClientRect();
-                const offsetX = x - box.left - box.width / 2;
-                const offsetY = y - box.top - box.height / 2;
-                const offset = Math.sqrt(offsetX * offsetX + offsetY * offsetY);
-
-                if (offset < closest.offset) {
-                    return { offset: offset, element: child };
-                } else {
-                    return closest;
-                }
-            }, { offset: Number.POSITIVE_INFINITY }).element;
-        }
 
         // --- NOVOS EVENTOS DE APLICATIVOS ---
         addAppButton.addEventListener('click', () => showAddAppModal());
@@ -3264,7 +3367,7 @@
                 if (!removed.includes(appId)) removed.push(appId);
                 prefs.removed_apps = removed;
                 await saveUserPreferences(prefs);
-                await fetchAndRenderAppOrder(user.id);
+                await fetchAndRenderApps(user.id);
             } else {
                 showDeleteConfirmationModal(appId, 'custom_app');
             }
@@ -3285,7 +3388,7 @@
             prefs.app_names[appId] = newName;
 
             await saveUserPreferences(prefs);
-            await fetchAndRenderAppOrder(user.id);
+            await fetchAndRenderApps(user.id);
             hideEditFixedAppModal();
         });
         cancelEditFixedAppButton.addEventListener('click', hideEditFixedAppModal);
@@ -3312,7 +3415,7 @@
                 prefs.removed_apps = removed.filter(id => id !== appId);
 
                 await saveUserPreferences(prefs);
-                await fetchAndRenderAppOrder(user.id);
+                await fetchAndRenderApps(user.id);
                 await renderTrashList();
             }
         });
@@ -3403,7 +3506,7 @@
                     if (customAppsSubscription) supabase.removeChannel(customAppsSubscription);
                     customAppsSubscription = supabase.channel('public:custom_apps')
                         .on('postgres_changes', { event: '*', schema: 'public', table: 'custom_apps', filter: `user_id=eq.${session.user.id}` }, payload => {
-                            fetchAndRenderAppOrder(session.user.id);
+                            fetchAndRenderApps(session.user.id);
                         })
                         .subscribe();
 
@@ -3426,7 +3529,7 @@
                         .subscribe();
 
                     // --- Busca inicial de dados ---
-                    fetchAndRenderAppOrder(session.user.id);
+                    fetchAndRenderApps(session.user.id);
                     fetchShoppingList();
                 }
             } else { // Sem sessão ou o usuário saiu
@@ -3462,6 +3565,8 @@
     </script>
 </body>
 </html>
+
+
 
 
 
