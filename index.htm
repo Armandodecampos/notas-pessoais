@@ -51,25 +51,33 @@
             gap: 16px; /* Espaçamento entre os apps */
         }
         .app-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: move;
+            width: 80px; /* Largura para o container do ícone + texto */
+        }
+        #button-grid-container .grid-item {
             background-color: #333;
             width: 56px;
             height: 56px;
-            border-radius: 12px; /* Ícone com cantos arredondados */
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.3s ease-in-out;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-            cursor: move;
-            flex-shrink: 0; /* Impede que o ícone encolha */
+            flex-shrink: 0;
         }
-        /* Efeito de hover foi removido */
         .grid-item-icon {
-            font-size: 1.5rem; /* Tamanho para celular (text-2xl) */
+            font-size: 1.5rem;
             color: white;
         }
         .grid-item-label {
-           display: none; /* O nome do aplicativo agora é um tooltip */
+            @apply font-semibold text-gray-700 text-xs text-center; /* Texto pequeno e centrado */
+            margin-top: 8px; /* Espaço entre o ícone e o texto */
+            width: 100%;
+            word-wrap: break-word;
         }
         .app-container.dragging {
             @apply opacity-50 bg-gray-300;
@@ -2893,7 +2901,6 @@
                 appContainer.draggable = true;
                 appContainer.dataset.id = app.id;
                 appContainer.dataset.title = app.title;
-                appContainer.title = app.title; // Adiciona o tooltip nativo do browser
                 appContainer.dataset.isFixed = app.isFixed;
                 if (app.url) appContainer.dataset.url = app.url;
                 if (app.icon_class) appContainer.dataset.iconClass = app.icon_class;
@@ -2901,16 +2908,18 @@
                 appContainer.dataset.iconColor = app.icon_color;
 
                 const iconClass = app.isFixed ? app.iconClass : (app.icon_class || 'fas fa-link');
+                const bgColor = app.isFixed ? '' : `background-color: ${app.bg_color || '#333'}`;
                 const iconColor = app.isFixed ? '' : `color: ${app.icon_color || '#fff'}`;
 
-                // Aplica a cor de fundo personalizada para apps não fixos
-                if (!app.isFixed) {
-                    appContainer.style.backgroundColor = app.bg_color || '#333';
-                }
+                appContainer.innerHTML = `
+                    <div class="grid-item" style="${bgColor}">
+                        <i class="${iconClass} grid-item-icon" style="${iconColor}"></i>
+                    </div>
+                    <span class="grid-item-label text-theme">${app.title}</span>
+                `;
 
-                appContainer.innerHTML = `<i class="${iconClass} grid-item-icon" style="${iconColor}"></i>`;
-
-                appContainer.addEventListener('click', () => {
+                const gridItem = appContainer.querySelector('.grid-item');
+                gridItem.addEventListener('click', () => {
                     if (isDragging) return;
                     showAppOptionsModal(app);
                 });
