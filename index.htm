@@ -44,20 +44,32 @@
             @apply bg-green-200;
         }
         /* Estilos para a grade de botões arrastáveis */
+        #button-grid-container {
+            display: flex;
+            flex-direction: column; /* Organiza os apps em uma coluna */
+            align-items: flex-start; /* Alinha os apps à esquerda */
+            gap: 16px; /* Espaçamento entre os apps */
+        }
         .app-container {
-            @apply flex flex-col items-center w-full; /* Container for icon + label */
+            @apply flex flex-row items-center p-2 rounded-lg; /* Layout de linha para ícone e texto */
             cursor: move;
+            width: 100%;
+            max-width: 300px; /* Largura máxima para os itens */
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
         }
         .grid-item {
             background-color: #333;
             width: 56px;
             height: 56px;
-            border-radius: 50%;
+            border-radius: 12px; /* Ícone quadrado */
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.3s ease-in-out;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0; /* Impede que o ícone encolha */
         }
         .grid-item:hover {
             background-color: #1f2937; /* bg-gray-800 */
@@ -68,20 +80,10 @@
             color: white;
         }
         .grid-item-label {
-            @apply w-14 truncate text-center font-semibold text-gray-700 text-xs mt-1 sm:w-20 sm:text-sm sm:mt-2;
-        }
-        /* Estilos para telas maiores (sm: 640px e acima) */
-        @media (min-width: 640px) {
-            .grid-item {
-                width: 80px;
-                height: 80px;
-            }
-            .grid-item-icon {
-                font-size: 2.25rem;
-            }
+            @apply font-semibold text-gray-700 ml-4 text-lg; /* Estilo do texto ao lado do ícone */
         }
         .app-container.dragging {
-            @apply opacity-50 z-50; /* Garante que o item arrastado fique por cima */
+            @apply opacity-50 bg-gray-300;
         }
         /* Estilos para as Notas */
         .note-item {
@@ -204,13 +206,13 @@
                     <button id="login-button" class="w-full px-4 py-3 bg-gradient-to-r from-indigo-600 to-purple-700 text-white font-bold rounded-md shadow-lg hover:shadow-xl focus:outline-none transition-all text-lg">
                         Entrar
                     </button>
-                    
+
                     <!-- Botão de redefinir senha (agora como texto) -->
                     <button id="reset-password-button" class="!mt-2 w-full text-sm text-gray-600 hover:text-indigo-600 hover:underline focus:outline-none transition-colors duration-200">
                         Redefinir Senha
                     </button>
                 </div>
-                
+
                 <!-- Botão Voltar -->
                 <button id="back-button" class="absolute top-6 left-6 px-4 py-2 bg-white text-gray-800 font-semibold rounded-md shadow-sm hover:bg-gray-200 focus:outline-none transition-all flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
@@ -243,7 +245,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Nova tela do usuário logado -->
     <div id="logged-in-app" class="hidden h-screen overflow-hidden">
         <!-- Container fixo no canto superior esquerdo -->
@@ -262,7 +264,7 @@
                 </button>
             </div>
         </div>
-        
+
         <!-- Grade de botões arrastáveis -->
         <div id="button-grid-container" class="fixed top-24 inset-x-0 bottom-0 p-4 overflow-y-auto">
             <!-- Aplicativos serão injetados aqui -->
@@ -294,7 +296,7 @@
             </button>
         </div>
     </div>
-    
+
     <!-- Novo Modal para editar perfil -->
     <div id="edit-profile-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-50">
         <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-sm w-full text-center space-y-4">
@@ -306,7 +308,7 @@
                 </button>
             </div>
             <h3 class="text-2xl font-bold text-theme">Editar Perfil</h3>
-            
+
             <!-- Novo campo para o nome do perfil -->
             <div class="relative">
                 <label for="profile-name" class="block text-sm font-medium text-left text-theme">Nome do Perfil</label>
@@ -324,7 +326,7 @@
             <p id="upload-message" class="text-sm font-medium p-2 rounded-lg" style="display: none;"></p>
         </div>
     </div>
-    
+
     <!-- Modal para confirmação de redefinição de senha -->
     <div id="reset-password-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-50">
         <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-sm text-center space-y-4">
@@ -375,7 +377,7 @@
             </button>
         </footer>
     </div>
-    
+
     <!-- Novo Modal para Adicionar Itens -->
     <div id="add-item-modal" class="fixed inset-0 bg-gray-100 hidden flex-col z-50">
         <header class="flex items-center justify-between p-4 bg-white shadow-md">
@@ -495,7 +497,7 @@
                 </button>
             </div>
             <h3 class="text-2xl font-bold text-theme">Personalizar Aparência</h3>
-            
+
             <div class="relative">
                 <label for="header-color-input" class="block text-sm font-medium text-left text-theme">Cor do Cabeçalho</label>
                 <input type="color" id="header-color-input" class="mt-1 block w-full h-10 px-1 py-1 border border-gray-300 rounded-md shadow-sm" value="#FFFFFF">
@@ -510,13 +512,13 @@
                 <label for="text-color-input" class="block text-sm font-medium text-left text-theme">Cor do Texto</label>
                 <input type="color" id="text-color-input" class="mt-1 block w-full h-10 px-1 py-1 border border-gray-300 rounded-md shadow-sm" value="#1f2937">
             </div>
-    
+
             <div>
                 <label for="wallpaper-upload" class="block text-sm font-medium text-left text-theme">Carregar Imagem de Fundo</label>
                 <input type="file" id="wallpaper-upload" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 mt-1"/>
                 <p id="wallpaper-upload-message" class="text-sm font-medium p-2 rounded-lg" style="display: none;"></p>
             </div>
-            
+
             <button id="remove-wallpaper-button" class="w-full px-4 py-3 bg-orange-500 text-white font-semibold rounded-md hover:bg-orange-600 transition-colors">
                 Remover Personalização
             </button>
@@ -825,16 +827,16 @@
         <div class="flex flex-col p-4 bg-gray-100 flex-grow space-y-4 overflow-y-auto">
             <input type="text" id="edit-recipe-title" class="w-full p-3 border rounded-md text-lg" placeholder="Título da Receita...">
             <textarea id="edit-recipe-content" rows="8" class="w-full p-3 border rounded-md resize-y" placeholder="Modo de preparo..."></textarea>
-            
+
             <div>
                 <label class="block text-sm font-medium text-theme">Fotos (máx. 200px)</label>
                 <input type="file" id="recipe-image-upload" multiple accept="image/*" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"/>
             </div>
-            
+
             <div id="recipe-image-previews" class="flex flex-wrap gap-2">
                 <!-- Previews das imagens aparecerão aqui -->
             </div>
-            
+
             <p id="recipe-error-message" class="text-red-500 text-sm text-center hidden"></p>
 
             <div class="flex justify-end space-x-4">
@@ -867,7 +869,7 @@
         // --- CORREÇÃO IMPORTANTE PARA O ERRO "INVALID API KEY" ---
         // O erro que está a receber ("Invalid API key") significa que os valores abaixo
         // não correspondem ao seu projeto Supabase. É necessário substituí-los.
-        // 
+        //
         // COMO RESOLVER:
         // 1. Vá ao painel do seu projeto no site do Supabase.
         // 2. Navegue até "Project Settings" (Definições do Projeto) e depois "API".
@@ -930,7 +932,7 @@
         const userAvatarLoggedIn = document.getElementById('user-avatar-logged-in');
         const profileNameInput = document.getElementById('profile-name-input');
         const updateProfileButton = document.getElementById('update-profile-button');
-        
+
         // Referências do novo modal de espera
         const waitMessageModal = document.getElementById('wait-message-modal');
         const waitTimeSpan = document.getElementById('wait-time');
@@ -943,7 +945,7 @@
         const filterAllButton = document.getElementById('filter-all');
         const filterToBuyButton = document.getElementById('filter-to-buy');
         const filterBoughtButton = document.getElementById('filter-bought');
-        
+
         // Referências do novo modal de adicionar item
         const showAddItemModalButton = document.getElementById('show-add-item-modal-button');
         const addItemModal = document.getElementById('add-item-modal');
@@ -962,7 +964,7 @@
         const editItemUnit = document.getElementById('edit-item-unit');
         const saveEditButton = document.getElementById('save-edit-button');
         const cancelEditButton = document.getElementById('cancel-edit-button');
-        
+
         // Referências do modal de confirmação de exclusão
         const deleteConfirmModal = document.getElementById('delete-confirm-modal');
         const confirmDeleteButton = document.getElementById('confirm-delete-button');
@@ -984,8 +986,8 @@
         const wallpaperUploadInput = document.getElementById('wallpaper-upload');
         const wallpaperUploadMessage = document.getElementById('wallpaper-upload-message');
         const removeWallpaperButton = document.getElementById('remove-wallpaper-button');
-        const saveSettingsButton = document.getElementById('save-settings-button'); 
-        const cancelSettingsButton = document.getElementById('cancel-settings-button'); 
+        const saveSettingsButton = document.getElementById('save-settings-button');
+        const cancelSettingsButton = document.getElementById('cancel-settings-button');
         const buttonGridContainer = document.getElementById('button-grid-container');
         const mainHeader = document.getElementById('main-header');
 
@@ -994,7 +996,7 @@
         const closeNotesModalButton = document.getElementById('close-notes-modal-button');
         const notesContainer = document.getElementById('notes-container');
         const showAddNoteModalButton = document.getElementById('show-add-note-modal-button');
-        
+
         // Referências do Modal de Edição de Nota (usado para Adicionar e Editar)
         const editNoteModal = document.getElementById('edit-note-modal');
         const noteModalTitle = document.getElementById('note-modal-title');
@@ -1096,12 +1098,12 @@
         const recipeSearchInput = document.getElementById('recipe-search-input');
 
 
-        let selectedEmail = ''; 
-        let editingItemId = null; 
-        let editingNoteId = null; 
-        let currentFilter = 'to-buy'; 
-        let itemToDeleteInfo = null; 
-        let itemToMove = null; 
+        let selectedEmail = '';
+        let editingItemId = null;
+        let editingNoteId = null;
+        let currentFilter = 'to-buy';
+        let itemToDeleteInfo = null;
+        let itemToMove = null;
         let notesSubscription = null;
         let currentNoteFilter = 'active';
         let customAppsSubscription = null;
@@ -1118,9 +1120,6 @@
         let recipesSubscription = null;
         let recipeImagesSubscription = null;
         let isAppInitialized = false;
-        let dragStartOffset = { x: 0, y: 0 };
-        let dragStartPos = { x: 0, y: 0 };
-
 
         const availableIcons = [
             'fas fa-link', 'fas fa-globe', 'fas fa-star', 'fas fa-heart', 'fas fa-book',
@@ -1134,21 +1133,21 @@
             { id: 'notes-app', title: 'Notas', iconClass: 'fas fa-sticky-note', isFixed: true },
             { id: 'recipes-app', title: 'Receitas', iconClass: 'fas fa-utensils', isFixed: true } // NOVO
         ];
-        
+
         // --- FUNÇÕES DE INICIALIZAÇÃO E UI ---
 
         // Função para buscar os emails do Supabase e popular o dropdown
         async function fetchUsers() {
             const { data, error } = await supabase
                 .from('profiles')
-                .select('username, avatar_url, profile_name'); 
+                .select('username, avatar_url, profile_name');
 
             if (error) {
                 console.error('Erro ao buscar usuários:', error);
             } else if (data.length === 0) {
                  userCardsWrapper.innerHTML = '<p class="text-center text-gray-500">Nenhum usuário encontrado. Adicione usuários na tabela `profiles` do Supabase.</p>';
             } else {
-                userCardsWrapper.innerHTML = ''; 
+                userCardsWrapper.innerHTML = '';
                 data.forEach(user => {
                     const userCard = document.createElement('button');
                     userCard.className = 'user-card';
@@ -1170,7 +1169,7 @@
                 .select('avatar_url, profile_name')
                 .eq('id', user.id)
                 .single();
-            
+
             if (!error && profileData) {
                 userAvatarLoggedIn.src = profileData.avatar_url || `https://placehold.co/100x100/A0A0A0/FFFFFF?text=${(profileData.profile_name || user.email).charAt(0).toUpperCase()}`;
                 userEmailDisplay.textContent = profileData.profile_name || user.email;
@@ -1182,7 +1181,7 @@
                 profileNameInput.value = '';
             }
         }
-        
+
         // Função para alternar a visibilidade das áreas
         function toggleUI(isLoggedIn, view) {
             // Esconde todos os modais primeiro
@@ -1213,7 +1212,7 @@
                 // Mostra a App e esconde o contentor do Login
                 loggedInAppContainer.classList.remove('hidden');
                 mainContainer.classList.add('hidden');
-                
+
                 // Ajusta o estilo do body para a app
                 document.body.classList.remove('bg-gray-100');
 
@@ -1221,10 +1220,10 @@
                 // Mostra o contentor do Login e esconde a App
                 mainContainer.classList.remove('hidden');
                 loggedInAppContainer.classList.add('hidden');
-                
+
                 // Restaura o estilo do body para o login
                 document.body.classList.add('bg-gray-100');
-                
+
                 // Lógica para posicionar o container
                 if (view === 'login') {
                     mainContainer.classList.remove('items-center');
@@ -1233,7 +1232,7 @@
                     mainContainer.classList.add('items-center');
                     mainContainer.classList.remove('items-start', 'pt-20');
                 }
-                
+
                 // Esconde todas as vistas dentro do ecrã de login
                 initialLoginView.classList.add('hidden');
                 userListContainer.classList.add('hidden');
@@ -1273,7 +1272,7 @@
         }
 
         // --- FUNÇÕES DE PAPEL DE PAREDE E APARÊNCIA ---
-        
+
         // Aplica as preferências salvas (papel de parede e cor do cabeçalho)
         function applyPreferences(preferences) {
             // Estilos padrão
@@ -1324,7 +1323,7 @@
                 console.error('Erro ao salvar preferências:', error);
             }
         }
-        
+
         // Carrega as preferências do usuário ao logar
         async function loadUserPreferences() {
             const { data: { user } } = await supabase.auth.getUser();
@@ -1335,7 +1334,7 @@
                 .select('preferences')
                 .eq('id', user.id)
                 .single();
-            
+
             if (error && error.code !== 'PGRST116') {
                 console.error('Erro ao carregar preferências:', error);
                 applyPreferences(null); // Aplica defaults em caso de erro
@@ -1383,10 +1382,10 @@
                     </div>
                     <div class="note-actions">
                          <div class="text-xs text-gray-500">
-                            ${note.is_fixed 
-                                ? '<span><i class="fas fa-thumbtack"></i> Fixa</span>' 
-                                : note.start_date 
-                                    ? `<span>${new Date(note.start_date + 'T00:00:00').toLocaleDateString()} - ${new Date(note.end_date + 'T00:00:00').toLocaleDateString()}</span>` 
+                            ${note.is_fixed
+                                ? '<span><i class="fas fa-thumbtack"></i> Fixa</span>'
+                                : note.start_date
+                                    ? `<span>${new Date(note.start_date + 'T00:00:00').toLocaleDateString()} - ${new Date(note.end_date + 'T00:00:00').toLocaleDateString()}</span>`
                                     : ''}
                         </div>
                         <div>
@@ -1428,7 +1427,7 @@
                  // 'Futuras' são notas não fixas cuja data de início (start_date) é posterior a hoje.
                 query = query.eq('is_fixed', false)
                              .gt('start_date', today);
-            } else if (currentNoteFilter === 'antigas') { 
+            } else if (currentNoteFilter === 'antigas') {
                 // 'Antigas' são notas não fixas cuja data final (end_date) já passou (é anterior a hoje).
                 query = query.eq('is_fixed', false)
                              .lt('end_date', today);
@@ -1540,14 +1539,14 @@
 
         function showEditNoteModal(id, title, content, startDate, endDate, isFixed) {
             editingNoteId = id;
-            if (id) { 
+            if (id) {
                 noteModalTitle.textContent = 'Editar Nota';
                 editNoteTitleInput.value = title;
                 editNoteInput.value = content;
                 editNoteStartDateInput.value = startDate ? startDate.split('T')[0] : '';
                 editNoteEndDateInput.value = endDate ? endDate.split('T')[0] : '';
                 editNoteIsFixedCheckbox.checked = isFixed;
-            } else { 
+            } else {
                 noteModalTitle.textContent = 'Adicionar Nova Nota';
                 editNoteTitleInput.value = '';
                 editNoteInput.value = '';
@@ -1609,13 +1608,13 @@
             items.forEach(item => {
                 const itemDiv = document.createElement('div');
                 itemDiv.dataset.id = item.id;
-                
+
                 if (item.is_checked) {
                     itemDiv.className = 'shopping-list-item flex items-center justify-between p-3 border-b border-gray-200 bg-green-200 rounded-lg shadow-sm transition-colors duration-200';
                 } else {
                     itemDiv.className = 'shopping-list-item flex items-center justify-between p-3 border-b border-gray-200 bg-orange-200 rounded-lg shadow-sm transition-colors duration-200';
                 }
-                
+
                 const mainContent = document.createElement('div');
                 mainContent.className = 'flex items-center flex-grow space-x-2';
 
@@ -1631,10 +1630,10 @@
                 itemNameSpan.addEventListener('click', () => {
                     showMoveItemConfirmationModal(item.id, !item.is_checked);
                 });
-                
+
                 const actionButtons = document.createElement('div');
                 actionButtons.className = 'flex items-center space-x-2 flex-shrink-0';
-                
+
                 const deleteButton = document.createElement('button');
                 deleteButton.className = 'delete-item-button w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-red-500 hover:text-red-700 transition-colors';
                 deleteButton.innerHTML = `
@@ -1642,7 +1641,7 @@
                       <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.013 21H7.987a2 2 0 01-1.92-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
                 `;
-                
+
                 const editButton = document.createElement('button');
                 editButton.className = 'edit-item-button w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-700 transition-colors';
                 editButton.innerHTML = `
@@ -1656,7 +1655,7 @@
                 compareButton.className = 'compare-prices-button w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-blue-500 hover:text-blue-700 transition-colors';
                 compareButton.innerHTML = `<i class="fas fa-dollar-sign text-lg"></i>`;
                 compareButton.addEventListener('click', () => showPriceComparisonModal(item.id, item.item_name));
-                
+
                 mainContent.appendChild(quantitySpan);
                 mainContent.appendChild(itemNameSpan);
                 actionButtons.appendChild(compareButton);
@@ -1669,7 +1668,7 @@
                 shoppingListContainer.appendChild(itemDiv);
             });
         }
-        
+
         function showEditItemModal(itemId, itemName, itemQuantity, itemUnit) {
             editingItemId = itemId;
             editItemInput.value = itemName;
@@ -1679,7 +1678,7 @@
             editItemModal.classList.add('flex');
             editItemInput.focus();
         }
-        
+
         function closeEditItemModal() {
             editingItemId = null;
             editItemInput.value = '';
@@ -1699,13 +1698,13 @@
                 console.error('Erro ao atualizar item:', error);
             }
         }
-        
+
         async function toggleItemChecked(itemId, newStatus) {
             const { error } = await supabase
                 .from('shopping_list')
                 .update({ is_checked: newStatus })
                 .eq('id', itemId);
-            
+
             if (error) {
                 console.error('Erro ao atualizar status do item:', error);
             }
@@ -1720,18 +1719,18 @@
             if (!newItemName || !user) {
                 return;
             }
-            
+
             const { error } = await supabase
                 .from('shopping_list')
                 .insert([{ item_name: newItemName, quantity: newQuantity, unit: newUnit }]);
-            
+
             if (error) {
                 console.error('Erro ao adicionar item:', error);
             } else {
-                addItemNameInput.value = ''; 
+                addItemNameInput.value = '';
                 addItemQuantityInput.value = '';
                 addItemUnitInput.value = 'uni';
-                hideAddItemModal(); 
+                hideAddItemModal();
             }
         }
 
@@ -1745,7 +1744,7 @@
                 console.error('Erro ao deletar item:', error);
             }
         }
-        
+
         const shoppingListChannel = supabase.channel('public:shopping_list')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'shopping_list' }, payload => {
                 fetchShoppingList();
@@ -1810,7 +1809,7 @@
                 const priceDiv = document.createElement('div');
                 const isBestPrice = index === 0;
                 priceDiv.className = `flex items-center justify-between p-3 rounded-lg shadow-sm border ${isBestPrice ? 'bg-green-100 border-green-400' : 'bg-white border-gray-200'}`;
-                
+
                 const formattedPrice = `R$ ${price.price.toFixed(2).replace('.', ',')}`;
 
                 priceDiv.innerHTML = `
@@ -1849,7 +1848,7 @@
                     location,
                     price
                 });
-            
+
             if (error) {
                 console.error("Erro ao adicionar preço:", error);
             } else {
@@ -2024,7 +2023,7 @@
                 });
             });
         }
-        
+
         // FUNÇÃO ATUALIZADA: Filtra as receitas com base na pesquisa e renderiza
         function filterAndRenderRecipes() {
             const searchTerm = recipeSearchInput.value.toLowerCase().trim();
@@ -2039,7 +2038,7 @@
             const filteredRecipes = allRecipes.filter(recipe => {
                 // Combina o título e o conteúdo em um único texto para a pesquisa
                 const recipeText = (recipe.title.toLowerCase() + ' ' + (recipe.content ? recipe.content.toLowerCase() : ''));
-                
+
                 // Verifica se TODAS as palavras-chave estão presentes no texto da receita
                 return keywords.every(keyword => recipeText.includes(keyword));
             });
@@ -2080,7 +2079,7 @@
             editRecipeModal.classList.remove('hidden');
             editRecipeModal.classList.add('flex');
         }
-        
+
         // Fecha o modal de edição de receita
         function hideEditRecipeModal() {
             editRecipeModal.classList.add('hidden');
@@ -2131,7 +2130,7 @@
 
             saveRecipeEditButton.disabled = true;
             saveRecipeEditButton.textContent = 'Salvando...';
-            
+
             // 1. Upload de novas imagens
             const uploadedUrls = [];
             for (const file of recipeFilesToUpload) {
@@ -2144,7 +2143,7 @@
                 const { data } = supabase.storage.from('recipes').getPublicUrl(filePath);
                 uploadedUrls.push(data.publicUrl);
             }
-            
+
             // 2. Deletar imagens marcadas para exclusão (do Storage e do DB)
             if (recipeImagesToDelete.length > 0) {
                  const filePaths = recipeImagesToDelete.map(url => {
@@ -2170,7 +2169,7 @@
                     .insert({ title, content, user_id: user.id })
                     .select()
                     .single();
-                
+
                 if (error) {
                     console.error("Erro ao criar receita:", error);
                 } else {
@@ -2197,7 +2196,7 @@
                 .from('recipe_images')
                 .select('image_url')
                 .eq('recipe_id', recipeId);
-            
+
             if (imagesError) {
                 console.error("Erro ao buscar imagens para deletar:", imagesError);
                 return;
@@ -2223,13 +2222,13 @@
             const userCard = e.target.closest('.user-card');
             if (userCard) {
                 selectedEmail = userCard.dataset.email;
-                
+
                 // Preenche os dados do usuário no formulário de login
                 const avatarSrc = userCard.querySelector('.user-avatar').src;
                 const userName = userCard.querySelector('.user-email').textContent;
                 selectedUserAvatar.src = avatarSrc;
                 selectedUserName.textContent = userName;
-                
+
                 toggleUI(false, 'login');
                 passwordInput.focus();
             }
@@ -2325,9 +2324,9 @@
             waitMessageModal.classList.add('hidden');
             waitMessageModal.classList.remove('flex');
         });
-        
+
         // --- NOVOS EVENTOS PARA O MODAL DO PERFIL ---
-        
+
         profileButton.addEventListener('click', async () => {
             const { data: { session } } = await supabase.auth.getSession();
             if (session) {
@@ -2335,12 +2334,12 @@
                 profileModal.classList.add('flex');
             }
         });
-        
+
         closeProfileModalButton.addEventListener('click', () => {
             profileModal.classList.add('hidden');
             profileModal.classList.remove('flex');
         });
-        
+
         editProfileButton.addEventListener('click', async () => {
             profileModal.classList.add('hidden');
             profileModal.classList.remove('flex');
@@ -2368,7 +2367,7 @@
 
             if (user && user.email) {
                 const redirectToUrl = `${window.location.origin}${window.location.pathname}`;
-                
+
                 try {
                     const { error } = await supabase.auth.resetPasswordForEmail(user.email, { redirectTo: redirectToUrl });
 
@@ -2389,7 +2388,7 @@
                 }
             }
         });
-        
+
         logoutButtonModal.addEventListener('click', async () => {
             const { error } = await supabase.auth.signOut();
             if (error) {
@@ -2456,10 +2455,10 @@
                     uploadMessage.textContent = `Erro ao atualizar perfil: ${updateError.message}`;
                     uploadMessage.classList.add('text-red-700');
                 } else {
-                    userAvatarLoggedIn.src = publicUrl; 
+                    userAvatarLoggedIn.src = publicUrl;
                     uploadMessage.textContent = 'Upload bem-sucedido!';
                     uploadMessage.classList.add('text-green-700');
-                    avatarUploadInput.value = null; 
+                    avatarUploadInput.value = null;
                     fetchUsers();
                 }
             }
@@ -2515,7 +2514,7 @@
                 showDeleteConfirmationModal(itemId, 'shopping_item');
             }
         });
-        
+
         saveEditButton.addEventListener('click', async () => {
             if (editingItemId) {
                 await updateItem(editingItemId, editItemInput.value.trim(), parseFloat(editItemQuantity.value), editItemUnit.value);
@@ -2525,25 +2524,25 @@
 
         cancelEditButton.addEventListener('click', closeEditItemModal);
         closeEditItemModalButton.addEventListener('click', closeEditItemModal);
-        
+
         filterAllButton.addEventListener('click', () => {
             currentFilter = 'all';
             setActiveFilter('all');
             fetchShoppingList();
         });
-        
+
         filterToBuyButton.addEventListener('click', () => {
             currentFilter = 'to-buy';
             setActiveFilter('to-buy');
             fetchShoppingList();
         });
-        
+
         filterBoughtButton.addEventListener('click', () => {
             currentFilter = 'bought';
             setActiveFilter('bought');
             fetchShoppingList();
         });
-        
+
         function showAddItemModal() {
             addItemModal.classList.remove('hidden');
             addItemModal.classList.add('flex');
@@ -2563,7 +2562,7 @@
         function showDeleteConfirmationModal(id, type) {
             itemToDeleteInfo = { id, type };
             const messageEl = document.getElementById('delete-confirm-message');
-            
+
             if (type === 'note') {
                 messageEl.textContent = 'Tem a certeza que quer apagar esta nota?';
             } else if (type === 'custom_app') {
@@ -2590,7 +2589,7 @@
             if (itemToDeleteInfo) {
                 if (itemToDeleteInfo.type === 'note') {
                     await deleteNote(itemToDeleteInfo.id);
-                    fetchNotes(); 
+                    fetchNotes();
                 } else if (itemToDeleteInfo.type === 'custom_app') {
                     await deleteCustomApp(itemToDeleteInfo.id);
                     hideAppOptionsModal();
@@ -2616,9 +2615,9 @@
         function showMoveItemConfirmationModal(itemId, newStatus) {
             mainHeader.style.zIndex = '20';
             itemToMove = { id: itemId, status: newStatus };
-            if (newStatus === false) { 
+            if (newStatus === false) {
                 moveItemConfirmMessage.textContent = "Deseja adicionar este item à lista 'Para comprar'?";
-            } else { 
+            } else {
                 moveItemConfirmMessage.textContent = "Deseja mover este item para a lista de 'Comprados'?";
             }
             moveItemModal.classList.remove('hidden');
@@ -2656,12 +2655,12 @@
         settingsButton.addEventListener('click', async () => {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) return;
-            
+
             const { data, error } = await supabase.from('profiles').select('preferences').eq('id', user.id).single();
-            
+
             // Store a deep copy of current preferences to edit and potentially save later
             tempPreferences = JSON.parse(JSON.stringify((error || !data) ? {} : data.preferences || {}));
-            
+
             // Set input values based on the loaded preferences
             headerColorInput.value = tempPreferences.headerColor || '#FFFFFF';
             wallpaperColorInput.value = (tempPreferences.wallpaper?.type === 'color' ? tempPreferences.wallpaper.value : '#FFFFFF');
@@ -2684,12 +2683,12 @@
             await loadUserPreferences(); // Easiest way to revert to saved state
             closeSettingsModal();
         });
-        
+
         closeSettingsModalButton.addEventListener('click', async () => {
             await loadUserPreferences(); // Also treat 'X' as a cancel action
             closeSettingsModal();
         });
-        
+
         // Live preview for header color
         headerColorInput.addEventListener('input', (e) => {
             const color = e.target.value;
@@ -2743,16 +2742,16 @@
 
             const { data } = supabase.storage.from('wallpapers').getPublicUrl(filePath);
             const publicUrl = `${data.publicUrl}?t=${new Date().getTime()}`;
-            
+
             // Update temp state with new image wallpaper
             tempPreferences.wallpaper = { type: 'image', value: publicUrl };
-            
+
             // Apply the change for live preview
             applyPreferences(tempPreferences);
 
             wallpaperUploadMessage.textContent = 'Imagem carregada! Clique em Salvar.';
             wallpaperUploadMessage.classList.add('text-green-700');
-            wallpaperUploadInput.value = ''; 
+            wallpaperUploadInput.value = '';
         });
 
         // Resets the temporary preferences for a live preview of removal
@@ -2763,14 +2762,14 @@
             headerColorInput.value = '#FFFFFF';
             textColorInput.value = '#1f2937';
         });
-        
+
         closeNotesModalButton.addEventListener('click', () => {
             notesModal.classList.add('hidden');
             notesModal.classList.remove('flex');
         });
 
         showAddNoteModalButton.addEventListener('click', () => {
-            showEditNoteModal(null, '', '', null, null, false); 
+            showEditNoteModal(null, '', '', null, null, false);
         });
 
         notesContainer.addEventListener('click', (e) => {
@@ -2792,11 +2791,11 @@
                 showEditNoteModal(noteId, title, content, startDate, endDate, isFixed);
             } else if (deleteButton) {
                 showDeleteConfirmationModal(noteId, 'note');
-            } else { 
+            } else {
                 showViewNoteModal(title, content);
             }
         });
-        
+
         closeEditNoteModalButton.addEventListener('click', closeEditNoteModal);
         cancelNoteEditButton.addEventListener('click', closeEditNoteModal);
         saveNoteEditButton.addEventListener('click', async () => {
@@ -2819,9 +2818,9 @@
                 return;
             }
 
-            if (editingNoteId) { 
+            if (editingNoteId) {
                 await updateNote(editingNoteId, newTitle, newContent, startDate, endDate, isFixed);
-            } else { 
+            } else {
                 await addNote(newTitle, newContent, startDate, endDate, isFixed);
             }
             closeEditNoteModal();
@@ -2880,63 +2879,32 @@
 
 
         // --- LÓGICA DE APLICATIVOS PERSONALIZADOS E FIXOS ---
-        async function saveAppPosition(userId, appId, x, y) {
-            if (!userId || !appId) return;
-
-            const { data, error } = await supabase
-                .from('profiles')
-                .select('preferences')
-                .eq('id', userId)
-                .single();
-                
-            if (error && error.code !== 'PGRST116') {
-                console.error("Erro ao buscar preferências para guardar a posição do app:", error);
-                return;
-            }
-
-            const prefs = data?.preferences || {};
-            if (!prefs.app_positions) {
-                prefs.app_positions = {};
-            }
-
-            prefs.app_positions[appId] = { x, y };
-
-            const { error: updateError } = await supabase
-                .from('profiles')
-                .update({ preferences: prefs })
-                .eq('id', userId);
-
-            if (updateError) {
-                console.error('Erro ao guardar a posição do app:', updateError);
-            }
-        }
-
-
-        async function renderApps(appsToRender, appPositions, userId) {
+        async function renderApps(appsToRender, appOrder) {
             buttonGridContainer.innerHTML = '';
-            
-            let currentX = 16;
-            let currentY = 16;
-            const containerWidth = buttonGridContainer.clientWidth;
-            // Estimar o tamanho do app com base na largura da tela
-            const appWidth = window.innerWidth < 640 ? 60 : 84; 
-            const appHeight = window.innerWidth < 640 ? 80 : 104;
-            const gap = 16;
 
-            appsToRender.forEach(app => {
+            const sortedApps = [...appsToRender].sort((a, b) => {
+                const indexA = appOrder.indexOf(a.id);
+                const indexB = appOrder.indexOf(b.id);
+
+                if (indexA !== -1 && indexB !== -1) {
+                    return indexA - indexB;
+                }
+                if (indexA !== -1) return -1;
+                if (indexB !== -1) return 1;
+                return a.title.localeCompare(b.title);
+            });
+
+            sortedApps.forEach(app => {
                 const appContainer = document.createElement('div');
                 appContainer.className = 'app-container';
                 appContainer.draggable = true;
                 appContainer.dataset.id = app.id;
                 appContainer.dataset.title = app.title;
                 appContainer.dataset.isFixed = app.isFixed;
-                if(app.url) { 
-                    appContainer.dataset.url = app.url;
-                }
+                if (app.url) appContainer.dataset.url = app.url;
                 if (app.icon_class) appContainer.dataset.iconClass = app.icon_class;
                 if (app.bg_color) appContainer.dataset.bgColor = app.bg_color;
                 appContainer.dataset.iconColor = app.icon_color;
-
 
                 const iconClass = app.isFixed ? app.iconClass : (app.icon_class || 'fas fa-link');
                 const bgColor = app.isFixed ? '' : `background-color: ${app.bg_color || '#333'}`;
@@ -2948,48 +2916,31 @@
                     </div>
                     <span class="grid-item-label text-theme">${app.title}</span>
                 `;
-                
+
                 appContainer.addEventListener('click', () => {
                     if (isDragging) return;
                     showAppOptionsModal(app);
                 });
-                
-                appContainer.style.position = 'absolute';
-                const savedPos = appPositions[app.id];
-
-                if (savedPos) {
-                    appContainer.style.left = `${savedPos.x}px`;
-                    appContainer.style.top = `${savedPos.y}px`;
-                } else {
-                    appContainer.style.left = `${currentX}px`;
-                    appContainer.style.top = `${currentY}px`;
-                    saveAppPosition(userId, app.id, currentX, currentY);
-
-                    currentX += appWidth + gap;
-                    if (currentX + appWidth > containerWidth) {
-                        currentX = 16;
-                        currentY += appHeight + gap;
-                    }
-                }
 
                 buttonGridContainer.appendChild(appContainer);
             });
         }
-        
+
         async function fetchAndRenderApps(userId) {
             if (!userId) return;
 
-            const { data: profile, error: profileError } = await supabase
-                .from('profiles')
-                .select('preferences')
-                .eq('id', userId)
-                .single();
+            const [profileResponse, appOrderResponse] = await Promise.all([
+                supabase.from('profiles').select('preferences').eq('id', userId).single(),
+                supabase.from('user_app_order').select('app_ids').eq('user_id', userId).single()
+            ]);
 
+            const { data: profile, error: profileError } = profileResponse;
             const preferences = profileError ? {} : profile.preferences || {};
             const removedApps = preferences.removed_apps || [];
             const appNames = preferences.app_names || {};
-            const appPositions = preferences.app_positions || {};
 
+            const { data: appOrderData, error: appOrderError } = appOrderResponse;
+            const appOrder = appOrderError ? [] : appOrderData.app_ids || [];
 
             const fixedApps = fixedAppsMasterList.map(app => ({
                 ...app,
@@ -3004,18 +2955,17 @@
             if (fetchAppsError) {
                 console.error('Erro ao buscar apps existentes:', fetchAppsError);
             }
-            
+
             const allAvailableApps = [...fixedApps, ...(customApps || [])];
             const visibleApps = allAvailableApps.filter(app => !removedApps.includes(app.id));
-            
-            // A ordem agora é apenas para o posicionamento inicial, podemos simplesmente usar a lista filtrada
-            renderApps(visibleApps, appPositions, userId);
+
+            renderApps(visibleApps, appOrder);
         }
-        
+
         async function saveAppOrder(userId) {
             if (!userId) return;
             const appIds = [...buttonGridContainer.children].map(appContainer => appContainer.dataset.id);
-            
+
             const { error } = await supabase
                 .from('user_app_order')
                 .upsert({ user_id: userId, app_ids: appIds }, { onConflict: 'user_id' });
@@ -3034,7 +2984,7 @@
             appOptionsModal.dataset.iconClass = app.icon_class || '';
             appOptionsModal.dataset.bgColor = app.bg_color || '';
             appOptionsModal.dataset.iconColor = app.icon_color || '';
-            
+
             const deleteAppText = document.getElementById('delete-app-text');
             if (app.isFixed) {
                 deleteAppText.textContent = 'Remover';
@@ -3053,7 +3003,7 @@
         }
 
         function showAddAppModal(appData = null) {
-            if (appData) { 
+            if (appData) {
                 addAppModal.dataset.editId = appData.id;
                 document.getElementById('add-app-title').textContent = 'Editar Aplicativo';
                 appTitleInput.value = appData.title;
@@ -3065,7 +3015,7 @@
                 appIconColorInput.value = appData.icon_color || '#FFFFFF';
                 renderIconPicker(selectedIcon);
 
-            } else { 
+            } else {
                 addAppModal.removeAttribute('data-edit-id');
                 document.getElementById('add-app-title').textContent = 'Adicionar Aplicativo';
                 appTitleInput.value = '';
@@ -3105,11 +3055,11 @@
                 console.error('Título e URL são obrigatórios.');
                 return;
             }
-            
+
             const appData = { title, url, icon_class, bg_color, icon_color };
 
 
-            if (appId) { 
+            if (appId) {
                 const { error: updateError } = await supabase
                     .from('custom_apps')
                     .update(appData)
@@ -3117,7 +3067,7 @@
                     .eq('user_id', user.id);
 
                 if (updateError) console.error('Erro ao atualizar aplicativo:', updateError);
-            } else { 
+            } else {
                 const { error: insertError } = await supabase
                     .from('custom_apps')
                     .insert({ ...appData, user_id: user.id });
@@ -3133,14 +3083,14 @@
             if (!user) return;
 
             const { error } = await supabase.from('custom_apps').delete().match({ id: appId, user_id: user.id });
-            
+
             if (error) {
                 console.error('Erro ao deletar aplicativo:', error);
             } else {
                 await fetchAndRenderApps(user.id);
             }
         }
-        
+
         function showEditFixedAppModal(appId, currentTitle) {
             editFixedAppModal.dataset.id = appId;
             fixedAppNameInput.value = currentTitle;
@@ -3162,7 +3112,7 @@
             const prefs = data?.preferences || {};
             const removedIds = prefs.removed_apps || [];
             const appNames = prefs.app_names || {};
-            
+
             trashListContainer.innerHTML = '';
             if (removedIds.length === 0) {
                 trashListContainer.innerHTML = '<p class="text-center text-gray-500">A lixeira está vazia.</p>';
@@ -3188,122 +3138,59 @@
 
 
         // --- LÓGICA DE ARRASTAR E SOLTAR (DRAG AND DROP) ---
+        let draggedItem = null;
+
         buttonGridContainer.addEventListener('dragstart', e => {
             const draggable = e.target.closest('.app-container');
             if (draggable) {
-                // Guarda a posição original para reverter em caso de soltar inválido
-                dragStartPos.x = draggable.offsetLeft;
-                dragStartPos.y = draggable.offsetTop;
-
-                draggable.classList.add('dragging');
                 isDragging = true;
-                e.dataTransfer.effectAllowed = "move";
-                const rect = draggable.getBoundingClientRect();
-                dragStartOffset.x = e.clientX - rect.left;
-                dragStartOffset.y = e.clientY - rect.top;
-            }
-        });
-
-        buttonGridContainer.addEventListener('dragover', e => {
-            e.preventDefault();
-            const draggingEl = document.querySelector('.dragging');
-            if (!draggingEl) return;
-
-            const containerRect = buttonGridContainer.getBoundingClientRect();
-            // Move temporariamente o elemento para pré-visualização
-            let newLeft = e.clientX - containerRect.left - dragStartOffset.x;
-            let newTop = e.clientY - containerRect.top - dragStartOffset.y;
-            draggingEl.style.left = `${newLeft}px`;
-            draggingEl.style.top = `${newTop}px`;
-
-            const allApps = [...buttonGridContainer.querySelectorAll('.app-container:not(.dragging)')];
-
-            const draggingRect = draggingEl.getBoundingClientRect();
-
-            let isOverlapping = false;
-            for (const staticApp of allApps) {
-                const staticRect = staticApp.getBoundingClientRect();
-                // Verificação de colisão
-                if (!(draggingRect.right < staticRect.left || 
-                      draggingRect.left > staticRect.right || 
-                      draggingRect.bottom < staticRect.top || 
-                      draggingRect.top > staticRect.bottom)) {
-                    isOverlapping = true;
-                    break;
-                }
-            }
-
-            const gridItem = draggingEl.querySelector('.grid-item');
-            if (isOverlapping) {
-                gridItem.style.backgroundColor = '#ef4444'; // Cor vermelha para sobreposição
-            } else {
-                gridItem.style.backgroundColor = '#22c55e'; // Cor verde para espaço livre
+                draggedItem = draggable;
+                setTimeout(() => {
+                    draggable.classList.add('dragging');
+                }, 0);
             }
         });
 
         buttonGridContainer.addEventListener('dragend', async e => {
             const draggable = e.target.closest('.app-container');
             if (draggable) {
-                const gridItem = draggable.querySelector('.grid-item');
-                // Restaura a cor de fundo original
-                if (draggable.dataset.isFixed === 'true') {
-                    gridItem.style.backgroundColor = ''; // Permite que a classe CSS assuma
-                } else {
-                    gridItem.style.backgroundColor = draggable.dataset.bgColor || '#333';
-                }
-                
+                isDragging = false;
                 draggable.classList.remove('dragging');
+                draggedItem = null;
 
-                const containerRect = buttonGridContainer.getBoundingClientRect();
-                const allApps = [...buttonGridContainer.querySelectorAll('.app-container')];
-
-                const draggingRect = draggable.getBoundingClientRect();
-                let isOverlappingOnDrop = false;
-                for (const staticApp of allApps) {
-                    if (staticApp === draggable) continue;
-                    const staticRect = staticApp.getBoundingClientRect();
-                    if (!(draggingRect.right < staticRect.left || 
-                          draggingRect.left > staticRect.right || 
-                          draggingRect.bottom < staticRect.top || 
-                          draggingRect.top > staticRect.bottom)) {
-                        isOverlappingOnDrop = true;
-                        break;
-                    }
+                const { data: { user } } = await supabase.auth.getUser();
+                if (user) {
+                    await saveAppOrder(user.id);
                 }
-
-                if (isOverlappingOnDrop) {
-                    // Reverte para a posição original se houver sobreposição
-                    draggable.style.left = `${dragStartPos.x}px`;
-                    draggable.style.top = `${dragStartPos.y}px`;
-                } else {
-                    // Lógica para salvar a nova posição válida
-                    let newLeft = draggable.offsetLeft;
-                    let newTop = draggable.offsetTop;
-
-                    const appWidth = draggable.offsetWidth;
-                    const appHeight = draggable.offsetHeight;
-                    newLeft = Math.max(0, Math.min(newLeft, containerRect.width - appWidth));
-                    newTop = Math.max(0, Math.min(newTop, containerRect.height - appHeight));
-                    
-                    const gridSize = 10;
-                    const snappedLeft = Math.round(newLeft / gridSize) * gridSize;
-                    const snappedTop = Math.round(newTop / gridSize) * gridSize;
-
-                    draggable.style.left = `${snappedLeft}px`;
-                    draggable.style.top = `${snappedTop}px`;
-
-                    const { data: { user } } = await supabase.auth.getUser();
-                    if (user) {
-                        await saveAppPosition(user.id, draggable.dataset.id, snappedLeft, snappedTop);
-                    }
-                }
-
-                // Atraso para garantir que o clique não seja acionado
-                setTimeout(() => {
-                    isDragging = false;
-                }, 50);
             }
         });
+
+        buttonGridContainer.addEventListener('dragover', e => {
+            e.preventDefault();
+            const afterElement = getDragAfterElement(buttonGridContainer, e.clientY);
+            const draggable = document.querySelector('.dragging');
+            if (draggable) {
+                if (afterElement == null) {
+                    buttonGridContainer.appendChild(draggable);
+                } else {
+                    buttonGridContainer.insertBefore(draggable, afterElement);
+                }
+            }
+        });
+
+        function getDragAfterElement(container, y) {
+            const draggableElements = [...container.querySelectorAll('.app-container:not(.dragging)')];
+
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
 
         // --- NOVOS EVENTOS DE APLICATIVOS ---
         addAppButton.addEventListener('click', () => showAddAppModal());
@@ -3357,7 +3244,7 @@
             const isFixed = appOptionsModal.dataset.isFixed === 'true';
             const appId = appOptionsModal.dataset.id;
             const user = (await supabase.auth.getUser()).data.user;
-            
+
             hideAppOptionsModal();
 
             if (isFixed) {
@@ -3372,7 +3259,7 @@
                 showDeleteConfirmationModal(appId, 'custom_app');
             }
         });
-        
+
         closeAppOptionsButton.addEventListener('click', hideAppOptionsModal);
         closeAppModalButton.addEventListener('click', hideAppOptionsModal);
 
@@ -3381,7 +3268,7 @@
             const newName = fixedAppNameInput.value.trim();
             const user = (await supabase.auth.getUser()).data.user;
             if (!newName || !user) return;
-            
+
             const { data } = await supabase.from('profiles').select('preferences').eq('id', user.id).single();
             const prefs = data?.preferences || {};
             if (!prefs.app_names) prefs.app_names = {};
@@ -3441,7 +3328,7 @@
                 showDeleteConfirmationModal(priceId, 'price');
             }
         });
-        
+
         saveEditPriceButton.addEventListener('click', async () => {
             const newLocation = editPriceLocationInput.value.trim();
             const newPrice = parseFloat(editPriceValueInput.value);
@@ -3467,7 +3354,7 @@
         recipeImageUpload.addEventListener('change', async (e) => {
             recipeImagePreviews.innerHTML = '';
             recipeFilesToUpload = [];
-            
+
             for (const file of e.target.files) {
                 const resizedBlob = await resizeImage(file, 200, 200);
                 recipeFilesToUpload.push(resizedBlob);
@@ -3522,7 +3409,7 @@
                     recipesSubscription = supabase.channel('public:recipes')
                         .on('postgres_changes', { event: '*', schema: 'public', table: 'recipes' }, payload => fetchRecipes())
                         .subscribe();
-                    
+
                     if (recipeImagesSubscription) supabase.removeChannel(recipeImagesSubscription);
                     recipeImagesSubscription = supabase.channel('public:recipe_images')
                         .on('postgres_changes', { event: '*', schema: 'public', table: 'recipe_images' }, payload => fetchRecipes())
@@ -3556,7 +3443,7 @@
                 }
             }
         });
-        
+
         fetchUsers();
 
         showProfilesButton.addEventListener('click', () => {
@@ -3565,18 +3452,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
