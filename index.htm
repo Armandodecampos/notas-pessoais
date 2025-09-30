@@ -2898,7 +2898,6 @@
             sortedApps.forEach(app => {
                 const appContainer = document.createElement('div');
                 appContainer.className = 'app-container';
-                appContainer.draggable = true;
                 appContainer.dataset.id = app.id;
                 appContainer.dataset.title = app.title;
                 appContainer.dataset.isFixed = app.isFixed;
@@ -2912,7 +2911,7 @@
                 const iconColor = app.isFixed ? '' : `color: ${app.icon_color || '#fff'}`;
 
                 appContainer.innerHTML = `
-                    <div class="grid-item" style="${bgColor}">
+                    <div class="grid-item" draggable="true" style="${bgColor}">
                         <i class="${iconClass} grid-item-icon" style="${iconColor}"></i>
                     </div>
                     <span class="grid-item-label text-theme">${app.title}</span>
@@ -3145,10 +3144,14 @@
         let draggedItem = null;
 
         buttonGridContainer.addEventListener('dragstart', e => {
-            const draggable = e.target.closest('.app-container');
+            const iconElement = e.target.closest('.grid-item');
+            if (!iconElement) return; // O arrasto não começou no ícone
+
+            const draggable = iconElement.closest('.app-container');
             if (draggable) {
                 isDragging = true;
                 draggedItem = draggable;
+                // Adiciona um pequeno atraso para evitar que o elemento pisque
                 setTimeout(() => {
                     draggable.classList.add('dragging');
                 }, 0);
@@ -3156,7 +3159,10 @@
         });
 
         buttonGridContainer.addEventListener('dragend', async e => {
-            const draggable = e.target.closest('.app-container');
+            const iconElement = e.target.closest('.grid-item');
+            if (!iconElement) return;
+
+            const draggable = iconElement.closest('.app-container');
             if (draggable) {
                 isDragging = false;
                 draggable.classList.remove('dragging');
