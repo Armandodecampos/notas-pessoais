@@ -16,7 +16,6 @@
         body {
             font-family: 'Inter', sans-serif;
             @apply bg-gray-100;
-            overscroll-behavior-y: contain; /* Previne o pull-to-refresh em dispositivos móveis */
         }
         .text-theme {
             color: var(--text-primary);
@@ -3496,6 +3495,14 @@
         });
 
         fetchUsers();
+
+        // Adiciona um listener para o evento beforeunload para pedir confirmação antes de atualizar a página
+        window.addEventListener('beforeunload', function (e) {
+            // Cancela o evento
+            e.preventDefault();
+            // O Chrome exige que returnValue seja definido
+            e.returnValue = '';
+        });
 
         showProfilesButton.addEventListener('click', () => {
             toggleUI(false, 'user-list');
