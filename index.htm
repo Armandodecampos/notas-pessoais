@@ -2904,15 +2904,23 @@
                 if (app.url) appContainer.dataset.url = app.url;
                 if (app.icon_class) appContainer.dataset.iconClass = app.icon_class;
                 if (app.bg_color) appContainer.dataset.bgColor = app.bg_color;
-                appContainer.dataset.iconColor = app.icon_color;
+                if (app.icon_color) appContainer.dataset.iconColor = app.icon_color;
 
-                const iconClass = app.isFixed ? app.iconClass : (app.icon_class || 'fas fa-link');
-                const bgColor = app.isFixed ? '' : `background-color: ${app.bg_color || '#333'}`;
-                const iconColor = app.isFixed ? '' : `color: ${app.icon_color || '#fff'}`;
+                const iconClass = app.icon_class || 'fas fa-link';
+                const styleParts = [];
+                if (app.bg_color) {
+                    styleParts.push(`background-color: ${app.bg_color}`);
+                }
+                const iconStyleParts = [];
+                if (app.icon_color) {
+                    iconStyleParts.push(`color: ${app.icon_color}`);
+                }
+                const gridItemStyle = styleParts.join('; ');
+                const iconStyle = iconStyleParts.join('; ');
 
                 appContainer.innerHTML = `
-                    <div class="grid-item" draggable="true" style="${bgColor}">
-                        <i class="${iconClass} grid-item-icon" style="${iconColor}"></i>
+                    <div class="grid-item" draggable="true" style="${gridItemStyle}">
+                        <i class="${iconClass} grid-item-icon" style="${iconStyle}"></i>
                     </div>
                     <span class="grid-item-label text-theme">${app.title}</span>
                 `;
@@ -2938,15 +2946,21 @@
             const { data: profile, error: profileError } = profileResponse;
             const preferences = profileError ? {} : profile.preferences || {};
             const removedApps = preferences.removed_apps || [];
-            const appNames = preferences.app_names || {};
+            const appCustomizations = preferences.app_customizations || {};
 
             const { data: appOrderData, error: appOrderError } = appOrderResponse;
             const appOrder = appOrderError ? [] : appOrderData.app_ids || [];
 
-            const fixedApps = fixedAppsMasterList.map(app => ({
-                ...app,
-                title: appNames[app.id] || app.title
-            }));
+            const fixedApps = fixedAppsMasterList.map(app => {
+                const customization = appCustomizations[app.id] || {};
+                return {
+                    ...app,
+                    title: customization.title || app.title,
+                    icon_class: customization.icon_class || app.iconClass,
+                    bg_color: customization.bg_color, // Pode ser nulo, tratado na renderização
+                    icon_color: customization.icon_color, // Pode ser nulo, tratado na renderização
+                };
+            });
 
             const { data: customApps, error: fetchAppsError } = await supabase
                 .from('custom_apps')
@@ -3006,24 +3020,35 @@
         }
 
         function showAddAppModal(appData = null) {
-            if (appData) {
+            const urlInputContainer = appUrlInput.parentElement;
+
+            if (appData) { // Modo de Edição
                 addAppModal.dataset.editId = appData.id;
+                addAppModal.dataset.isFixed = appData.isFixed;
                 document.getElementById('add-app-title').textContent = 'Editar Aplicativo';
                 appTitleInput.value = appData.title;
-                appUrlInput.value = appData.url;
-                // Preencher novos campos
+                appUrlInput.value = appData.url || '';
+
+                if (appData.isFixed) {
+                    urlInputContainer.classList.add('hidden');
+                } else {
+                    urlInputContainer.classList.remove('hidden');
+                }
+
                 const selectedIcon = appData.icon_class || 'fas fa-link';
                 appIconClassInput.value = selectedIcon;
                 appBgColorInput.value = appData.bg_color || '#333333';
                 appIconColorInput.value = appData.icon_color || '#FFFFFF';
                 renderIconPicker(selectedIcon);
 
-            } else {
+            } else { // Modo de Adição
                 addAppModal.removeAttribute('data-edit-id');
+                addAppModal.removeAttribute('data-is-fixed');
                 document.getElementById('add-app-title').textContent = 'Adicionar Aplicativo';
                 appTitleInput.value = '';
                 appUrlInput.value = '';
-                // Valores padrão para novos campos
+                urlInputContainer.classList.remove('hidden');
+
                 const defaultIcon = 'fas fa-link';
                 appIconClassInput.value = defaultIcon;
                 appBgColorInput.value = '#333333';
@@ -3043,40 +3068,58 @@
             appUrlInput.value = '';
         }
 
-        async function saveCustomApp() {
-            const title = appTitleInput.value.trim();
-            const url = appUrlInput.value.trim();
+        async function saveAppDetails() {
             const user = (await supabase.auth.getUser()).data.user;
+            if (!user) return;
+
             const appId = addAppModal.dataset.editId;
-            // Obter novos valores
-            const icon_class = appIconClassInput.value;
-            const bg_color = appBgColorInput.value;
-            const icon_color = appIconColorInput.value;
+            const isFixed = addAppModal.dataset.isFixed === 'true';
 
+            const appDetails = {
+                title: appTitleInput.value.trim(),
+                url: appUrlInput.value.trim(),
+                icon_class: appIconClassInput.value,
+                bg_color: appBgColorInput.value,
+                icon_color: appIconColorInput.value,
+            };
 
-            if (!title || !url || !user) {
-                console.error('Título e URL são obrigatórios.');
-                return;
-            }
+            if (isFixed) {
+                // Salvar personalização para apps fixos nas preferências do perfil
+                const { data, error } = await supabase.from('profiles').select('preferences').eq('id', user.id).single();
+                if (error && error.code !== 'PGRST116') {
+                    console.error("Erro ao buscar perfil:", error);
+                    return;
+                }
 
-            const appData = { title, url, icon_class, bg_color, icon_color };
+                const prefs = data?.preferences || {};
+                if (!prefs.app_customizations) {
+                    prefs.app_customizations = {};
+                }
+                prefs.app_customizations[appId] = {
+                    title: appDetails.title,
+                    icon_class: appDetails.icon_class,
+                    bg_color: appDetails.bg_color,
+                    icon_color: appDetails.icon_color,
+                };
 
+                await saveUserPreferences(prefs);
 
-            if (appId) {
-                const { error: updateError } = await supabase
-                    .from('custom_apps')
-                    .update(appData)
-                    .eq('id', appId)
-                    .eq('user_id', user.id);
-
-                if (updateError) console.error('Erro ao atualizar aplicativo:', updateError);
             } else {
-                const { error: insertError } = await supabase
-                    .from('custom_apps')
-                    .insert({ ...appData, user_id: user.id });
+                // Lógica original para apps personalizados
+                if (!appDetails.title || !appDetails.url) {
+                    console.error('Título e URL são obrigatórios para apps personalizados.');
+                    return;
+                }
 
-                if (insertError) console.error('Erro ao criar aplicativo:', insertError);
+                if (appId) { // Editar app personalizado
+                    const { error } = await supabase.from('custom_apps').update(appDetails).match({ id: appId, user_id: user.id });
+                    if (error) console.error('Erro ao atualizar app personalizado:', error);
+                } else { // Adicionar novo app personalizado
+                    const { error } = await supabase.from('custom_apps').insert({ ...appDetails, user_id: user.id });
+                    if (error) console.error('Erro ao criar app personalizado:', error);
+                }
             }
+
             await fetchAndRenderApps(user.id);
             hideAddAppModal();
         }
@@ -3206,7 +3249,7 @@
         addAppButton.addEventListener('click', () => showAddAppModal());
         closeAddAppModalButton.addEventListener('click', hideAddAppModal);
         cancelAddAppButton.addEventListener('click', hideAddAppModal);
-        saveAppButton.addEventListener('click', saveCustomApp);
+        saveAppButton.addEventListener('click', saveAppDetails);
 
         openAppButton.addEventListener('click', () => {
             const appId = appOptionsModal.dataset.id;
@@ -3233,21 +3276,18 @@
         });
 
         editAppButton.addEventListener('click', () => {
-            const isFixed = appOptionsModal.dataset.isFixed === 'true';
-            const appId = appOptionsModal.dataset.id;
-            const title = appOptionsModal.dataset.title;
-            const url = appOptionsModal.dataset.url;
-            const icon_class = appOptionsModal.dataset.iconClass;
-            const bg_color = appOptionsModal.dataset.bgColor;
-            const icon_color = appOptionsModal.dataset.iconColor;
+            const appData = {
+                id: appOptionsModal.dataset.id,
+                title: appOptionsModal.dataset.title,
+                url: appOptionsModal.dataset.url,
+                isFixed: appOptionsModal.dataset.isFixed === 'true',
+                icon_class: appOptionsModal.dataset.iconClass,
+                bg_color: appOptionsModal.dataset.bgColor,
+                icon_color: appOptionsModal.dataset.iconColor
+            };
 
             hideAppOptionsModal();
-
-            if (isFixed) {
-                showEditFixedAppModal(appId, title);
-            } else {
-                showAddAppModal({ id: appId, title, url, icon_class, bg_color, icon_color });
-            }
+            showAddAppModal(appData);
         });
 
         deleteAppButton.addEventListener('click', async () => {
