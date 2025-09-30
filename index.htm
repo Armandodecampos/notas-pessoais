@@ -54,7 +54,6 @@
             display: flex;
             flex-direction: row; /* Ícone e texto lado a lado */
             align-items: center; /* Alinha verticalmente o ícone e o texto */
-            cursor: move;
             width: 100%; /* Ocupa a largura total */
             gap: 16px; /* Espaço entre o ícone e o texto */
         }
@@ -247,7 +246,7 @@
     <div id="logged-in-app" class="hidden h-screen overflow-hidden">
         <!-- Container fixo no canto superior esquerdo -->
         <div id="main-header" class="fixed top-0 left-0 right-0 bg-white p-4 shadow-md z-40 h-24 flex items-center">
-            <button id="profile-button" class="flex items-center space-x-4 p-2 rounded-full hover:ring-2 hover:ring-gray-200 transition-all duration-200 focus:outline-none">
+            <button id="profile-button" class="flex items-center space-x-4 p-2 rounded-full transition-all duration-200 focus:outline-none">
                 <img id="user-avatar-logged-in" src="https://placehold.co/100x100/A0A0A0/FFFFFF?text=P" alt="Profile" class="w-12 h-12 rounded-full object-cover">
                 <p id="user-email-display" class="text-xl font-bold text-theme"></p>
             </button>
