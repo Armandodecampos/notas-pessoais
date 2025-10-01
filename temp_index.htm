@@ -183,7 +183,7 @@
 </head>
 <body>
     <!-- Novo container principal para centralizar todos os elementos -->
-    <div id="main-container" class="flex items-center justify-center min-h-screen p-4">
+    <div id="main-container" class="flex items-center justify-center min-h-screen p-4 hidden">
         <!-- Conteúdo do Login -->
         <div id="app" class="w-full max-w-md">
             <div id="initial-login-view" class="text-center">
@@ -265,7 +265,7 @@
     </div>
 
     <!-- Nova tela do usuário logado -->
-    <div id="logged-in-app" class="hidden h-screen overflow-hidden">
+    <div id="logged-in-app" class="h-screen overflow-hidden">
         <!-- Container fixo no canto superior esquerdo -->
         <div id="main-header" class="fixed top-0 left-0 right-0 bg-white p-4 shadow-md z-40 h-24 flex items-center">
             <button id="profile-button" class="flex items-center space-x-4 p-2 rounded-full transition-all duration-200 focus:outline-none">
@@ -303,7 +303,26 @@
 
         <!-- Grade de botões arrastáveis -->
         <div id="button-grid-container" class="fixed top-24 inset-x-0 bottom-0 p-4 overflow-y-auto transition-all duration-300">
-            <!-- Aplicativos serão injetados aqui -->
+
+            <div class="app-container" data-id="shopping-list" data-title="Compras" data-is-fixed="true" data-icon-class="fas fa-shopping-cart">
+                <div class="grid-item" draggable="true" style="">
+                    <i class="fas fa-shopping-cart grid-item-icon" style=""></i>
+                </div>
+                <span class="grid-item-label text-theme noselect">Compras</span>
+            </div>
+            <div class="app-container" data-id="notes-app" data-title="Notas" data-is-fixed="true" data-icon-class="fas fa-sticky-note">
+                <div class="grid-item" draggable="true" style="">
+                    <i class="fas fa-sticky-note grid-item-icon" style=""></i>
+                </div>
+                <span class="grid-item-label text-theme noselect">Notas</span>
+            </div>
+            <div class="app-container" data-id="recipes-app" data-title="Receitas" data-is-fixed="true" data-icon-class="fas fa-utensils">
+                <div class="grid-item" draggable="true" style="">
+                    <i class="fas fa-utensils grid-item-icon" style=""></i>
+                </div>
+                <span class="grid-item-label text-theme noselect">Receitas</span>
+            </div>
+
         </div>
     </div>
 
