@@ -168,6 +168,12 @@
         button {
             -webkit-tap-highlight-color: transparent;
         }
+        /* Correção para remover a borda de foco/toque no botão de perfil */
+        #profile-button:focus, #profile-button:active {
+            outline: none !important;
+            box-shadow: none !important;
+            -webkit-tap-highlight-color: transparent !important;
+        }
     </style>
 </head>
 <body>
