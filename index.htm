@@ -278,8 +278,26 @@
             </div>
         </div>
 
+        <!-- Nova Faixa de Ações do Aplicativo -->
+        <div id="app-action-bar" class="fixed top-24 left-0 right-0 p-2 z-30 hidden">
+            <div class="flex justify-center space-x-2 sm:space-x-4 mx-auto">
+                <button id="open-app-button" class="flex items-center justify-center text-white font-bold rounded-md shadow-lg hover:shadow-xl transition-all text-sm sm:text-base bg-blue-500 hover:bg-blue-600 px-4 sm:px-6 py-2 sm:py-3">
+                    <span class="text-center">Abrir</span>
+                </button>
+                <button id="edit-app-button" class="flex items-center justify-center text-white font-bold rounded-md shadow-lg hover:shadow-xl transition-all text-sm sm:text-base bg-yellow-500 hover:bg-yellow-600 px-4 sm:px-6 py-2 sm:py-3">
+                    <span class="text-center">Editar</span>
+                </button>
+                <button id="delete-app-button" class="flex items-center justify-center text-white font-bold rounded-md shadow-lg hover:shadow-xl transition-all text-sm sm:text-base bg-red-500 hover:bg-red-600 px-4 sm:px-6 py-2 sm:py-3">
+                    <span id="delete-app-text" class="text-center">Remover</span>
+                </button>
+                <button id="close-app-modal-button" class="flex items-center justify-center text-white font-bold rounded-md shadow-lg hover:shadow-xl transition-all text-sm sm:text-base bg-gray-500 hover:bg-gray-600 px-4 sm:px-6 py-2 sm:py-3">
+                    <span class="text-center">Fechar</span>
+                </button>
+            </div>
+        </div>
+
         <!-- Grade de botões arrastáveis -->
-        <div id="button-grid-container" class="fixed top-24 inset-x-0 bottom-0 p-4 overflow-y-auto">
+        <div id="button-grid-container" class="fixed top-24 inset-x-0 bottom-0 p-4 overflow-y-auto transition-all duration-300">
             <!-- Aplicativos serão injetados aqui -->
         </div>
     </div>
@@ -680,36 +698,6 @@
         </div>
     </div>
 
-    <!-- Novo Modal de Opções do Aplicativo -->
-    <div id="app-options-modal" class="fixed inset-0 bg-gray-100 hidden flex-col z-50">
-        <header class="flex items-center justify-between p-4 bg-white shadow-md">
-            <div>
-                <h2 id="app-options-title" class="text-2xl font-bold truncate text-theme"></h2>
-                <p id="app-options-url" class="text-sm text-gray-500 truncate"></p>
-            </div>
-        </header>
-        <div class="flex-grow flex items-center justify-center p-4">
-            <div class="grid grid-cols-4 gap-2 w-full max-w-sm">
-                <button id="open-app-button" class="flex flex-col items-center justify-center text-white font-bold rounded-full shadow-lg hover:shadow-xl transition-all text-xs aspect-square bg-blue-500 hover:bg-blue-600 p-2">
-                    <i class="fas fa-external-link-alt text-lg mb-1"></i>
-                    <span class="text-center">Abrir</span>
-                </button>
-                <button id="edit-app-button" class="flex flex-col items-center justify-center text-white font-bold rounded-full shadow-lg hover:shadow-xl transition-all text-xs aspect-square bg-yellow-500 hover:bg-yellow-600 p-2">
-                    <i class="fas fa-edit text-lg mb-1"></i>
-                    <span class="text-center">Editar</span>
-                </button>
-                <button id="delete-app-button" class="flex flex-col items-center justify-center text-white font-bold rounded-full shadow-lg hover:shadow-xl transition-all text-xs aspect-square bg-red-500 hover:bg-red-600 p-2">
-                    <i class="fas fa-trash text-lg mb-1"></i>
-                    <span id="delete-app-text" class="text-center">Remover</span>
-                </button>
-                <button id="close-app-modal-button" class="flex flex-col items-center justify-center text-white font-bold rounded-full shadow-lg hover:shadow-xl transition-all text-xs aspect-square bg-gray-500 hover:bg-gray-600 p-2">
-                    <i class="fas fa-times text-lg mb-1"></i>
-                    <span class="text-center">Fechar</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
     <!-- Novo Modal para Editar Nome de App Fixo -->
     <div id="edit-fixed-app-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-50">
         <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-sm w-full space-y-4">
@@ -1045,10 +1033,8 @@
         const appBgColorInput = document.getElementById('app-bg-color-input');
         const appIconColorInput = document.getElementById('app-icon-color-input');
 
-        // Referências do novo modal de opções do aplicativo
-        const appOptionsModal = document.getElementById('app-options-modal');
-        const appOptionsTitle = document.getElementById('app-options-title');
-        const appOptionsUrl = document.getElementById('app-options-url'); // Novo
+        // Referências da nova faixa de ações e seus botões
+        const appActionBar = document.getElementById('app-action-bar');
         const openAppButton = document.getElementById('open-app-button');
         const editAppButton = document.getElementById('edit-app-button');
         const deleteAppButton = document.getElementById('delete-app-button');
@@ -1242,7 +1228,6 @@
             editNoteModal.classList.add('hidden');
             viewNoteModal.classList.add('hidden');
             addAppModal.classList.add('hidden');
-            appOptionsModal.classList.add('hidden');
             editFixedAppModal.classList.add('hidden');
             trashBinModal.classList.add('hidden');
             priceComparisonModal.classList.add('hidden');
@@ -1261,10 +1246,17 @@
                 // Ajusta o estilo do body para a app
                 document.body.classList.remove('bg-gray-100');
 
+                // Call this AFTER the container is visible to get correct offsetHeight
+                hideAppActionBar();
+
             } else {
                 // Mostra o contentor do Login e esconde a App
                 mainContainer.classList.remove('hidden');
                 loggedInAppContainer.classList.add('hidden');
+
+                // Just hide the bar, don't worry about grid position as it's hidden
+                appActionBar.classList.add('hidden');
+                appActionBar.classList.remove('flex');
 
                 // Restaura o estilo do body para o login
                 document.body.classList.add('bg-gray-100');
@@ -1346,8 +1338,10 @@
                 Object.assign(loggedInAppContainer.style, defaultWallpaperStyles);
             }
 
-            // Aplica cor do cabeçalho
-            mainHeader.style.backgroundColor = preferences?.headerColor || defaultHeaderColor;
+            // Aplica cor do cabeçalho e da faixa de ações
+            const headerColor = preferences?.headerColor || defaultHeaderColor;
+            mainHeader.style.backgroundColor = headerColor;
+            appActionBar.style.backgroundColor = headerColor;
 
             // Aplica cor do texto apenas à área logada, não aos modais
             const textColor = preferences?.textColor || '#1f2937'; // Default to gray-800
@@ -2754,6 +2748,7 @@
         headerColorInput.addEventListener('input', (e) => {
             const color = e.target.value;
             mainHeader.style.backgroundColor = color;
+            appActionBar.style.backgroundColor = color; // Sincroniza a cor da faixa de ações
             tempPreferences.headerColor = color; // Update temp state
         });
 
@@ -2988,7 +2983,7 @@
                 const gridItem = appContainer.querySelector('.grid-item');
                 gridItem.addEventListener('click', () => {
                     if (isDragging) return;
-                    showAppOptionsModal(app);
+                    showAppActionBar(app); // Alterado para chamar a nova função
                 });
 
                 buttonGridContainer.appendChild(appContainer);
@@ -3050,32 +3045,34 @@
             }
         }
 
-        function showAppOptionsModal(app) {
-            appOptionsModal.dataset.id = app.id;
-            appOptionsModal.dataset.title = app.title;
-            appOptionsModal.dataset.url = app.url || '';
-            appOptionsModal.dataset.isFixed = app.isFixed;
-            // Pass custom style data to the modal
-            appOptionsModal.dataset.iconClass = app.icon_class || '';
-            appOptionsModal.dataset.bgColor = app.bg_color || '';
-            appOptionsModal.dataset.iconColor = app.icon_color || '';
+        function showAppActionBar(app) {
+            // Armazena os dados do app diretamente na faixa de ações
+            appActionBar.dataset.id = app.id;
+            appActionBar.dataset.title = app.title;
+            appActionBar.dataset.url = app.url || '';
+            appActionBar.dataset.isFixed = app.isFixed;
+            appActionBar.dataset.iconClass = app.icon_class || '';
+            appActionBar.dataset.bgColor = app.bg_color || '';
+            appActionBar.dataset.iconColor = app.icon_color || '';
 
-            const deleteAppText = document.getElementById('delete-app-text');
-            deleteAppText.textContent = 'Remover'; // Unifica o texto para todos os apps
-            if (app.isFixed) {
-                appOptionsUrl.textContent = ''; // Oculta o URL para apps fixos
-            } else {
-                appOptionsUrl.textContent = app.url || ''; // Mostra o URL
-            }
+            // Mostra a faixa de ações
+            appActionBar.classList.remove('hidden');
+            appActionBar.classList.add('flex');
 
-            appOptionsTitle.textContent = app.title;
-            appOptionsModal.classList.remove('hidden');
-            appOptionsModal.classList.add('flex');
+            // Calcula a altura da faixa de ações e ajusta a posição do grid de apps
+            const actionBarHeight = appActionBar.offsetHeight;
+            const headerHeight = mainHeader.offsetHeight; // 96px ou 6rem
+            buttonGridContainer.style.top = `${headerHeight + actionBarHeight}px`;
         }
 
-        function hideAppOptionsModal() {
-            appOptionsModal.classList.add('hidden');
-            appOptionsModal.classList.remove('flex');
+        function hideAppActionBar() {
+            // Esconde a faixa de ações
+            appActionBar.classList.add('hidden');
+            appActionBar.classList.remove('flex');
+
+            // Reseta a posição do grid de apps
+            const headerHeight = mainHeader.offsetHeight;
+            buttonGridContainer.style.top = `${headerHeight}px`;
         }
 
         function showAddAppModal(appData = null) {
@@ -3348,9 +3345,9 @@
         saveAppButton.addEventListener('click', saveAppDetails);
 
         openAppButton.addEventListener('click', () => {
-            const appId = appOptionsModal.dataset.id;
-            const appUrl = appOptionsModal.dataset.url;
-            hideAppOptionsModal();
+            const appId = appActionBar.dataset.id;
+            const appUrl = appActionBar.dataset.url;
+            hideAppActionBar();
 
             if (appId === 'shopping-list') {
                 shoppingListModal.classList.remove('hidden');
@@ -3373,25 +3370,25 @@
 
         editAppButton.addEventListener('click', () => {
             const appData = {
-                id: appOptionsModal.dataset.id,
-                title: appOptionsModal.dataset.title,
-                url: appOptionsModal.dataset.url,
-                isFixed: appOptionsModal.dataset.isFixed === 'true',
-                icon_class: appOptionsModal.dataset.iconClass,
-                bg_color: appOptionsModal.dataset.bgColor,
-                icon_color: appOptionsModal.dataset.iconColor
+                id: appActionBar.dataset.id,
+                title: appActionBar.dataset.title,
+                url: appActionBar.dataset.url,
+                isFixed: appActionBar.dataset.isFixed === 'true',
+                icon_class: appActionBar.dataset.iconClass,
+                bg_color: appActionBar.dataset.bgColor,
+                icon_color: appActionBar.dataset.iconColor
             };
 
-            hideAppOptionsModal();
+            hideAppActionBar();
             showAddAppModal(appData);
         });
 
         deleteAppButton.addEventListener('click', async () => {
-            const appId = appOptionsModal.dataset.id;
+            const appId = appActionBar.dataset.id;
             const user = (await supabase.auth.getUser()).data.user;
             if (!user) return;
 
-            hideAppOptionsModal();
+            hideAppActionBar();
 
             // Unify behavior: always move to trash (add to removed_apps)
             const { data } = await supabase.from('profiles').select('preferences').eq('id', user.id).single();
@@ -3406,7 +3403,7 @@
             }
         });
 
-        closeAppModalButton.addEventListener('click', hideAppOptionsModal);
+        closeAppModalButton.addEventListener('click', hideAppActionBar);
 
         saveEditFixedAppButton.addEventListener('click', async () => {
             const appId = editFixedAppModal.dataset.id;
