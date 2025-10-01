@@ -280,21 +280,21 @@
 
         <!-- Nova Faixa de Ações do Aplicativo -->
         <div id="app-action-bar" class="fixed top-24 left-0 right-0 bg-white p-2 shadow-md z-30 hidden justify-center">
-            <div class="flex space-x-2">
-                <button id="open-app-button" class="flex flex-col items-center justify-center text-white font-bold rounded-full shadow-lg hover:shadow-xl transition-all text-xs aspect-square bg-blue-500 hover:bg-blue-600 p-2 w-16 h-16">
-                    <i class="fas fa-external-link-alt text-lg mb-1"></i>
+            <div class="flex space-x-4">
+                <button id="open-app-button" class="flex flex-col items-center justify-center text-white font-bold rounded-full shadow-lg hover:shadow-xl transition-all text-sm aspect-square bg-blue-500 hover:bg-blue-600 p-4 w-20 h-20">
+                    <i class="fas fa-external-link-alt text-2xl mb-1"></i>
                     <span class="text-center">Abrir</span>
                 </button>
-                <button id="edit-app-button" class="flex flex-col items-center justify-center text-white font-bold rounded-full shadow-lg hover:shadow-xl transition-all text-xs aspect-square bg-yellow-500 hover:bg-yellow-600 p-2 w-16 h-16">
-                    <i class="fas fa-edit text-lg mb-1"></i>
+                <button id="edit-app-button" class="flex flex-col items-center justify-center text-white font-bold rounded-full shadow-lg hover:shadow-xl transition-all text-sm aspect-square bg-yellow-500 hover:bg-yellow-600 p-4 w-20 h-20">
+                    <i class="fas fa-edit text-2xl mb-1"></i>
                     <span class="text-center">Editar</span>
                 </button>
-                <button id="delete-app-button" class="flex flex-col items-center justify-center text-white font-bold rounded-full shadow-lg hover:shadow-xl transition-all text-xs aspect-square bg-red-500 hover:bg-red-600 p-2 w-16 h-16">
-                    <i class="fas fa-trash text-lg mb-1"></i>
+                <button id="delete-app-button" class="flex flex-col items-center justify-center text-white font-bold rounded-full shadow-lg hover:shadow-xl transition-all text-sm aspect-square bg-red-500 hover:bg-red-600 p-4 w-20 h-20">
+                    <i class="fas fa-trash text-2xl mb-1"></i>
                     <span id="delete-app-text" class="text-center">Remover</span>
                 </button>
-                <button id="close-app-modal-button" class="flex flex-col items-center justify-center text-white font-bold rounded-full shadow-lg hover:shadow-xl transition-all text-xs aspect-square bg-gray-500 hover:bg-gray-600 p-2 w-16 h-16">
-                    <i class="fas fa-times text-lg mb-1"></i>
+                <button id="close-app-modal-button" class="flex flex-col items-center justify-center text-white font-bold rounded-full shadow-lg hover:shadow-xl transition-all text-sm aspect-square bg-gray-500 hover:bg-gray-600 p-4 w-20 h-20">
+                    <i class="fas fa-times text-2xl mb-1"></i>
                     <span class="text-center">Fechar</span>
                 </button>
             </div>
@@ -1232,7 +1232,6 @@
             editNoteModal.classList.add('hidden');
             viewNoteModal.classList.add('hidden');
             addAppModal.classList.add('hidden');
-            hideAppActionBar(); // Usa a nova função para esconder a faixa de ações
             editFixedAppModal.classList.add('hidden');
             trashBinModal.classList.add('hidden');
             priceComparisonModal.classList.add('hidden');
@@ -1251,10 +1250,17 @@
                 // Ajusta o estilo do body para a app
                 document.body.classList.remove('bg-gray-100');
 
+                // Call this AFTER the container is visible to get correct offsetHeight
+                hideAppActionBar();
+
             } else {
                 // Mostra o contentor do Login e esconde a App
                 mainContainer.classList.remove('hidden');
                 loggedInAppContainer.classList.add('hidden');
+
+                // Just hide the bar, don't worry about grid position as it's hidden
+                appActionBar.classList.add('hidden');
+                appActionBar.classList.remove('flex');
 
                 // Restaura o estilo do body para o login
                 document.body.classList.add('bg-gray-100');
@@ -1336,8 +1342,10 @@
                 Object.assign(loggedInAppContainer.style, defaultWallpaperStyles);
             }
 
-            // Aplica cor do cabeçalho
-            mainHeader.style.backgroundColor = preferences?.headerColor || defaultHeaderColor;
+            // Aplica cor do cabeçalho e da faixa de ações
+            const headerColor = preferences?.headerColor || defaultHeaderColor;
+            mainHeader.style.backgroundColor = headerColor;
+            appActionBar.style.backgroundColor = headerColor;
 
             // Aplica cor do texto apenas à área logada, não aos modais
             const textColor = preferences?.textColor || '#1f2937'; // Default to gray-800
@@ -2744,6 +2752,7 @@
         headerColorInput.addEventListener('input', (e) => {
             const color = e.target.value;
             mainHeader.style.backgroundColor = color;
+            appActionBar.style.backgroundColor = color; // Sincroniza a cor da faixa de ações
             tempPreferences.headerColor = color; // Update temp state
         });
 
