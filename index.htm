@@ -157,6 +157,17 @@
         .remove-image-btn {
             @apply absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold cursor-pointer;
         }
+        .noselect {
+            -webkit-touch-callout: none; /* iOS Safari */
+            -webkit-user-select: none;   /* Safari */
+            -khtml-user-select: none;    /* Konqueror HTML */
+            -moz-user-select: none;      /* Old versions of Firefox */
+            -ms-user-select: none;       /* Internet Explorer/Edge */
+            user-select: none;           /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+        }
+        button {
+            -webkit-tap-highlight-color: transparent;
+        }
     </style>
 </head>
 <body>
@@ -248,7 +259,7 @@
         <div id="main-header" class="fixed top-0 left-0 right-0 bg-white p-4 shadow-md z-40 h-24 flex items-center">
             <button id="profile-button" class="flex items-center space-x-4 p-2 rounded-full transition-all duration-200 focus:outline-none">
                 <img id="user-avatar-logged-in" src="https://placehold.co/100x100/A0A0A0/FFFFFF?text=P" alt="Profile" class="w-12 h-12 rounded-full object-cover">
-                <p id="user-email-display" class="text-xl font-bold text-theme"></p>
+                <p id="user-email-display" class="text-xl font-bold text-theme noselect"></p>
             </button>
             <!-- Botões de Ação -->
             <div class="absolute right-4 top-1/2 -translate-y-1/2 flex items-center space-x-2">
@@ -2955,7 +2966,7 @@
                     <div class="grid-item" draggable="true" style="${gridItemStyle}">
                         <i class="${iconClass} grid-item-icon" style="${iconStyle}"></i>
                     </div>
-                    <span class="grid-item-label text-theme">${app.title}</span>
+                    <span class="grid-item-label text-theme noselect">${app.title}</span>
                 `;
 
                 const gridItem = appContainer.querySelector('.grid-item');
