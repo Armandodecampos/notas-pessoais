@@ -687,29 +687,24 @@
                 <h2 id="app-options-title" class="text-2xl font-bold truncate text-theme"></h2>
                 <p id="app-options-url" class="text-sm text-gray-500 truncate"></p>
             </div>
-            <button id="close-app-options-button" class="text-gray-500 hover:text-gray-700">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
         </header>
         <div class="flex-grow flex items-center justify-center p-4">
-            <div class="grid grid-cols-2 gap-4 w-full max-w-xs">
-                <button id="open-app-button" class="flex flex-col items-center justify-center text-white font-bold rounded-2xl shadow-lg hover:shadow-xl transition-all text-base aspect-square bg-blue-500 hover:bg-blue-600">
-                    <i class="fas fa-external-link-alt text-2xl mb-1"></i>
-                    <span>Abrir</span>
+            <div class="grid grid-cols-4 gap-2 w-full max-w-sm">
+                <button id="open-app-button" class="flex flex-col items-center justify-center text-white font-bold rounded-full shadow-lg hover:shadow-xl transition-all text-xs aspect-square bg-blue-500 hover:bg-blue-600 p-2">
+                    <i class="fas fa-external-link-alt text-lg mb-1"></i>
+                    <span class="text-center">Abrir</span>
                 </button>
-                <button id="edit-app-button" class="flex flex-col items-center justify-center text-white font-bold rounded-2xl shadow-lg hover:shadow-xl transition-all text-base aspect-square bg-yellow-500 hover:bg-yellow-600">
-                    <i class="fas fa-edit text-2xl mb-1"></i>
-                    <span>Editar</span>
+                <button id="edit-app-button" class="flex flex-col items-center justify-center text-white font-bold rounded-full shadow-lg hover:shadow-xl transition-all text-xs aspect-square bg-yellow-500 hover:bg-yellow-600 p-2">
+                    <i class="fas fa-edit text-lg mb-1"></i>
+                    <span class="text-center">Editar</span>
                 </button>
-                <button id="delete-app-button" class="flex flex-col items-center justify-center text-white font-bold rounded-2xl shadow-lg hover:shadow-xl transition-all text-base aspect-square bg-red-500 hover:bg-red-600">
-                    <i class="fas fa-trash text-2xl mb-1"></i>
-                    <span id="delete-app-text">Remover</span>
+                <button id="delete-app-button" class="flex flex-col items-center justify-center text-white font-bold rounded-full shadow-lg hover:shadow-xl transition-all text-xs aspect-square bg-red-500 hover:bg-red-600 p-2">
+                    <i class="fas fa-trash text-lg mb-1"></i>
+                    <span id="delete-app-text" class="text-center">Remover</span>
                 </button>
-                <button id="close-app-modal-button" class="flex flex-col items-center justify-center text-white font-bold rounded-2xl shadow-lg hover:shadow-xl transition-all text-base aspect-square bg-gray-500 hover:bg-gray-600">
-                    <i class="fas fa-times text-2xl mb-1"></i>
-                    <span>Fechar</span>
+                <button id="close-app-modal-button" class="flex flex-col items-center justify-center text-white font-bold rounded-full shadow-lg hover:shadow-xl transition-all text-xs aspect-square bg-gray-500 hover:bg-gray-600 p-2">
+                    <i class="fas fa-times text-lg mb-1"></i>
+                    <span class="text-center">Fechar</span>
                 </button>
             </div>
         </div>
@@ -1057,7 +1052,6 @@
         const openAppButton = document.getElementById('open-app-button');
         const editAppButton = document.getElementById('edit-app-button');
         const deleteAppButton = document.getElementById('delete-app-button');
-        const closeAppOptionsButton = document.getElementById('close-app-options-button');
         const closeAppModalButton = document.getElementById('close-app-modal-button');
 
         // Referências da Lixeira
@@ -3412,7 +3406,6 @@
             }
         });
 
-        closeAppOptionsButton.addEventListener('click', hideAppOptionsModal);
         closeAppModalButton.addEventListener('click', hideAppOptionsModal);
 
         saveEditFixedAppButton.addEventListener('click', async () => {
