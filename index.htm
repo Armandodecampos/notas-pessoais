@@ -56,6 +56,7 @@
             align-items: center; /* Alinha verticalmente o ícone e o texto */
             width: 100%; /* Ocupa a largura total */
             gap: 16px; /* Espaço entre o ícone e o texto */
+            transition: transform 0.3s ease-in-out; /* Transição para o efeito de empurrar */
         }
         #button-grid-container .grid-item {
             background-color: #333;
@@ -69,10 +70,9 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
             flex-shrink: 0;
         }
-        /* NOVO: Estilo para o ícone do app selecionado */
         #button-grid-container .grid-item.selected {
-            transform: scale(1.15);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+            transform: scale(1.2); /* Aumenta um pouco mais o ícone */
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25), 0 8px 10px -6px rgba(0, 0, 0, 0.1); /* Sombra mais forte */
         }
         .grid-item-icon {
             font-size: 1.5rem;
@@ -284,7 +284,7 @@
         </div>
 
         <!-- Nova Faixa de Ações do Aplicativo -->
-        <div id="app-action-bar" class="fixed top-24 left-0 right-0 p-2 z-30 hidden">
+        <div id="app-action-bar" class="fixed top-24 left-0 right-0 p-2 z-30" style="transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out; transform: translateY(-150%);">
             <div class="flex justify-center space-x-2 sm:space-x-4 mx-auto">
                 <button id="open-app-button" class="flex items-center justify-center text-white font-bold rounded-md shadow-lg hover:shadow-xl transition-all text-sm sm:text-base bg-blue-500 hover:bg-blue-600 px-4 sm:px-6 py-2 sm:py-3">
                     <span class="text-center">Abrir</span>
@@ -3051,7 +3051,6 @@
         }
 
         function showAppActionBar(app) {
-            // Armazena os dados do app diretamente na faixa de ações
             appActionBar.dataset.id = app.id;
             appActionBar.dataset.title = app.title;
             appActionBar.dataset.url = app.url || '';
@@ -3060,46 +3059,49 @@
             appActionBar.dataset.bgColor = app.bg_color || '';
             appActionBar.dataset.iconColor = app.icon_color || '';
 
-            // NOVO: Lógica para destacar o ícone selecionado
-            // 1. Remove a seleção de qualquer outro item
-            const currentlySelected = buttonGridContainer.querySelector('.grid-item.selected');
-            if (currentlySelected) {
-                currentlySelected.classList.remove('selected');
-            }
+            const allAppContainers = Array.from(buttonGridContainer.children);
+            const selectedIndex = allAppContainers.findIndex(el => el.dataset.id === app.id);
 
-            // 2. Adiciona a seleção ao item clicado
-            const appElement = buttonGridContainer.querySelector(`.app-container[data-id="${app.id}"]`);
-            if (appElement) {
-                const gridItem = appElement.querySelector('.grid-item');
-                if (gridItem) {
-                    gridItem.classList.add('selected');
+            // Reset all apps first
+            allAppContainers.forEach(container => {
+                container.classList.remove('selected');
+                container.querySelector('.grid-item').classList.remove('selected');
+                container.style.transform = 'translateY(0)';
+            });
+
+            // Apply selection and push effect
+            if (selectedIndex !== -1) {
+                const selectedContainer = allAppContainers[selectedIndex];
+                selectedContainer.classList.add('selected');
+                selectedContainer.querySelector('.grid-item').classList.add('selected');
+
+                // Push down subsequent elements
+                const pushDistance = 28; // Extra space for visual effect
+                for (let i = selectedIndex + 1; i < allAppContainers.length; i++) {
+                    allAppContainers[i].style.transform = `translateY(${pushDistance}px)`;
                 }
             }
 
+            // Animate action bar
+            appActionBar.style.transform = 'translateY(-150%)';
+            void appActionBar.offsetHeight;
+            appActionBar.style.transform = 'translateY(0)';
 
-            // Mostra a faixa de ações
-            appActionBar.classList.remove('hidden');
-            appActionBar.classList.add('flex');
-
-            // Calcula a altura da faixa de ações e ajusta a posição do grid de apps
             const actionBarHeight = appActionBar.offsetHeight;
-            const headerHeight = mainHeader.offsetHeight; // 96px ou 6rem
+            const headerHeight = mainHeader.offsetHeight;
             buttonGridContainer.style.top = `${headerHeight + actionBarHeight}px`;
         }
 
         function hideAppActionBar() {
-            // Esconde a faixa de ações
-            appActionBar.classList.add('hidden');
-            appActionBar.classList.remove('flex');
+            appActionBar.style.transform = 'translateY(-150%)';
 
-            // NOVO: Remove a seleção de qualquer item que a tenha
-            const currentlySelected = buttonGridContainer.querySelector('.grid-item.selected');
-            if (currentlySelected) {
-                currentlySelected.classList.remove('selected');
-            }
+            const allAppContainers = Array.from(buttonGridContainer.children);
+            allAppContainers.forEach(container => {
+                container.classList.remove('selected');
+                container.querySelector('.grid-item').classList.remove('selected');
+                container.style.transform = 'translateY(0)';
+            });
 
-
-            // Reseta a posição do grid de apps
             const headerHeight = mainHeader.offsetHeight;
             buttonGridContainer.style.top = `${headerHeight}px`;
         }
