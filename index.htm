@@ -705,7 +705,7 @@
                 </button>
                 <button id="delete-app-button" class="flex flex-col items-center justify-center text-white font-bold rounded-2xl shadow-lg hover:shadow-xl transition-all text-base aspect-square bg-red-500 hover:bg-red-600">
                     <i class="fas fa-trash text-2xl mb-1"></i>
-                    <span id="delete-app-text">Deletar</span>
+                    <span id="delete-app-text">Remover</span>
                 </button>
                 <button id="close-app-modal-button" class="flex flex-col items-center justify-center text-white font-bold rounded-2xl shadow-lg hover:shadow-xl transition-all text-base aspect-square bg-gray-500 hover:bg-gray-600">
                     <i class="fas fa-times text-2xl mb-1"></i>
@@ -2610,20 +2610,20 @@
         addItemCancelButton.addEventListener('click', hideAddItemModal);
         addItemConfirmButton.addEventListener('click', addItem);
 
-        function showDeleteConfirmationModal(id, type) {
+        function showDeleteConfirmationModal(id, type, name = '') {
             itemToDeleteInfo = { id, type };
             const messageEl = document.getElementById('delete-confirm-message');
 
             if (type === 'note') {
                 messageEl.textContent = 'Tem a certeza que quer apagar esta nota?';
-            } else if (type === 'custom_app') {
-                messageEl.textContent = 'Tem certeza que deseja excluir este aplicativo?';
+            } else if (type === 'custom_app_permanent') {
+                messageEl.innerHTML = `Tem certeza que deseja excluir permanentemente o aplicativo "<strong>${name}</strong>"? <br>Esta ação não pode ser desfeita.`;
             } else if (type === 'price') {
                 messageEl.textContent = 'Tem certeza que deseja excluir este preço?';
-            } else if (type === 'recipe') { // NOVO
+            } else if (type === 'recipe') {
                 messageEl.textContent = 'Tem a certeza que quer apagar esta receita? Esta ação não pode ser desfeita.';
             }
-            else {
+            else { // Default for shopping list item
                 messageEl.textContent = 'Tem certeza que deseja excluir este item da lista?';
             }
             deleteConfirmModal.classList.remove('hidden');
@@ -2637,25 +2637,41 @@
         }
 
         confirmDeleteButton.addEventListener('click', async () => {
-            if (itemToDeleteInfo) {
-                if (itemToDeleteInfo.type === 'note') {
-                    await deleteNote(itemToDeleteInfo.id);
-                    fetchNotes();
-                } else if (itemToDeleteInfo.type === 'custom_app') {
-                    await deleteCustomApp(itemToDeleteInfo.id);
-                    hideAppOptionsModal();
-                } else if (itemToDeleteInfo.type === 'price') {
-                    await deletePrice(itemToDeleteInfo.id);
-                    // Atualiza a lista de preços manualmente para garantir que a UI responda imediatamente
-                    if (currentComparisonItemId) {
-                       fetchItemPrices(currentComparisonItemId);
-                    }
-                } else if (itemToDeleteInfo.type === 'recipe') { // NOVO
-                    await deleteRecipe(itemToDeleteInfo.id);
-                } else {
-                    await deleteItem(itemToDeleteInfo.id);
+            if (!itemToDeleteInfo) return;
+
+            const { id, type } = itemToDeleteInfo;
+            const user = (await supabase.auth.getUser()).data.user;
+
+            if (type === 'note') {
+                await deleteNote(id);
+                fetchNotes();
+            } else if (type === 'price') {
+                await deletePrice(id);
+                if (currentComparisonItemId) {
+                    fetchItemPrices(currentComparisonItemId);
                 }
+            } else if (type === 'recipe') {
+                await deleteRecipe(id);
+            } else if (type === 'custom_app_permanent') {
+                if (user) {
+                    // 1. Delete from the database table
+                    await supabase.from('custom_apps').delete().match({ id: id, user_id: user.id });
+
+                    // 2. Remove from the 'removed_apps' list in preferences
+                    const { data } = await supabase.from('profiles').select('preferences').eq('id', user.id).single();
+                    const prefs = data?.preferences || {};
+                    if (prefs.removed_apps) {
+                        prefs.removed_apps = prefs.removed_apps.filter(appId => appId !== id);
+                        await saveUserPreferences(prefs);
+                    }
+
+                    // 3. Refresh the trash list
+                    await renderTrashList();
+                }
+            } else { // Default case for shopping list item
+                await deleteItem(id);
             }
+
             hideDeleteConfirmationModal();
         });
 
@@ -3051,11 +3067,10 @@
             appOptionsModal.dataset.iconColor = app.icon_color || '';
 
             const deleteAppText = document.getElementById('delete-app-text');
+            deleteAppText.textContent = 'Remover'; // Unifica o texto para todos os apps
             if (app.isFixed) {
-                deleteAppText.textContent = 'Remover';
                 appOptionsUrl.textContent = ''; // Oculta o URL para apps fixos
             } else {
-                deleteAppText.textContent = 'Deletar';
                 appOptionsUrl.textContent = app.url || ''; // Mostra o URL
             }
 
@@ -3204,10 +3219,21 @@
             const user = (await supabase.auth.getUser()).data.user;
             if (!user) return;
 
-            const { data, error } = await supabase.from('profiles').select('preferences').eq('id', user.id).single();
-            const prefs = data?.preferences || {};
+            // Fetch preferences and custom apps in parallel
+            const [profileResponse, customAppsResponse] = await Promise.all([
+                supabase.from('profiles').select('preferences').eq('id', user.id).single(),
+                supabase.from('custom_apps').select('*').eq('user_id', user.id)
+            ]);
+
+            const { data: profileData, error: profileError } = profileResponse;
+            if (profileError && profileError.code !== 'PGRST116') { // PGRST116 means no rows found, which is fine
+                console.error('Error fetching profile for trash:', profileError);
+                return;
+            }
+
+            const prefs = profileData?.preferences || {};
             const removedIds = prefs.removed_apps || [];
-            const appNames = prefs.app_names || {};
+            const appCustomizations = prefs.app_customizations || {};
 
             trashListContainer.innerHTML = '';
             if (removedIds.length === 0) {
@@ -3215,18 +3241,44 @@
                 return;
             }
 
-            const removedApps = fixedAppsMasterList.filter(app => removedIds.includes(app.id));
+            // Prepare the list of all possible apps (fixed and custom)
+            const fixedApps = fixedAppsMasterList.map(app => {
+                const customization = appCustomizations[app.id] || {};
+                return {
+                    ...app,
+                    title: customization.title || app.title,
+                    icon_class: customization.icon_class || app.iconClass,
+                };
+            });
+
+            const { data: customApps, error: customAppsError } = customAppsResponse;
+            if (customAppsError) {
+                console.error('Error fetching custom apps for trash:', customAppsError);
+            }
+
+            const allApps = [...fixedApps, ...(customApps || [])];
+
+            // Filter to get only the removed apps
+            const removedApps = allApps.filter(app => removedIds.includes(app.id));
 
             removedApps.forEach(app => {
-                const appTitle = appNames[app.id] || app.title;
                 const itemEl = document.createElement('div');
                 itemEl.className = 'flex items-center justify-between p-3 bg-white rounded-lg shadow';
+
+                // Define the buttons based on whether the app is fixed or custom
+                const buttonsHtml = `
+                    <div class="flex items-center space-x-2">
+                        <button data-id="${app.id}" class="restore-app-button px-4 py-2 bg-green-500 text-white font-semibold rounded-md hover:bg-green-600">Restaurar</button>
+                        ${!app.isFixed ? `<button data-id="${app.id}" data-title="${app.title}" class="delete-app-permanently-button px-4 py-2 bg-red-500 text-white font-semibold rounded-md hover:bg-red-600">Excluir</button>` : ''}
+                    </div>
+                `;
+
                 itemEl.innerHTML = `
                     <div class="flex items-center space-x-3">
-                        <i class="${app.iconClass} text-2xl text-gray-600"></i>
-                        <span class="font-semibold text-theme">${appTitle}</span>
+                        <i class="${app.icon_class || app.iconClass} text-2xl text-gray-600"></i>
+                        <span class="font-semibold text-theme">${app.title}</span>
                     </div>
-                    <button data-id="${app.id}" class="restore-app-button px-4 py-2 bg-green-500 text-white font-semibold rounded-md hover:bg-green-600">Restaurar</button>
+                    ${buttonsHtml}
                 `;
                 trashListContainer.appendChild(itemEl);
             });
@@ -3341,22 +3393,22 @@
         });
 
         deleteAppButton.addEventListener('click', async () => {
-            const isFixed = appOptionsModal.dataset.isFixed === 'true';
             const appId = appOptionsModal.dataset.id;
             const user = (await supabase.auth.getUser()).data.user;
+            if (!user) return;
 
             hideAppOptionsModal();
 
-            if (isFixed) {
-                const { data } = await supabase.from('profiles').select('preferences').eq('id', user.id).single();
-                const prefs = data?.preferences || {};
-                const removed = prefs.removed_apps || [];
-                if (!removed.includes(appId)) removed.push(appId);
+            // Unify behavior: always move to trash (add to removed_apps)
+            const { data } = await supabase.from('profiles').select('preferences').eq('id', user.id).single();
+            const prefs = data?.preferences || {};
+            const removed = prefs.removed_apps || [];
+
+            if (!removed.includes(appId)) {
+                removed.push(appId);
                 prefs.removed_apps = removed;
                 await saveUserPreferences(prefs);
                 await fetchAndRenderApps(user.id);
-            } else {
-                showDeleteConfirmationModal(appId, 'custom_app');
             }
         });
 
@@ -3391,11 +3443,13 @@
         });
         trashListContainer.addEventListener('click', async (e) => {
             const restoreButton = e.target.closest('.restore-app-button');
+            const deletePermanentlyButton = e.target.closest('.delete-app-permanently-button');
+
+            const user = (await supabase.auth.getUser()).data.user;
+            if (!user) return;
+
             if (restoreButton) {
                 const appId = restoreButton.dataset.id;
-                const user = (await supabase.auth.getUser()).data.user;
-                if (!user) return;
-
                 const { data } = await supabase.from('profiles').select('preferences').eq('id', user.id).single();
                 const prefs = data?.preferences || {};
                 let removed = prefs.removed_apps || [];
@@ -3404,6 +3458,10 @@
                 await saveUserPreferences(prefs);
                 await fetchAndRenderApps(user.id);
                 await renderTrashList();
+            } else if (deletePermanentlyButton) {
+                const appId = deletePermanentlyButton.dataset.id;
+                const appTitle = deletePermanentlyButton.dataset.title;
+                showDeleteConfirmationModal(appId, 'custom_app_permanent', appTitle);
             }
         });
 
