@@ -69,6 +69,10 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
             flex-shrink: 0;
         }
+        .grid-item.selected-app {
+            transform: scale(1.15);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+        }
         .grid-item-icon {
             font-size: 1.5rem;
             color: white;
@@ -1092,6 +1096,7 @@
         let recipesSubscription = null;
         let recipeImagesSubscription = null;
         let isAppInitialized = false;
+        let outsideClickListener = null;
 
         const availableIcons = [
             // Web & Interface
@@ -2955,8 +2960,7 @@
                     <span class="grid-item-label text-theme noselect">${app.title}</span>
                 `;
 
-                const gridItem = appContainer.querySelector('.grid-item');
-                gridItem.addEventListener('click', (e) => {
+                appContainer.addEventListener('click', (e) => {
                     e.stopPropagation(); // Impede que o clique se propague para o document
                     if (isDragging) return;
                     showAppActions(appContainer, app);
@@ -3025,6 +3029,11 @@
             const existingActionBar = document.getElementById('dynamic-action-bar');
             if (existingActionBar) {
                 existingActionBar.remove();
+            }
+            // Deselect any currently selected app icon
+            const selectedIcon = document.querySelector('.grid-item.selected-app');
+            if (selectedIcon) {
+                selectedIcon.classList.remove('selected-app');
             }
         }
 
@@ -3105,6 +3114,12 @@
             actionBar.appendChild(removeButton);
             actionBar.appendChild(editButton);
             actionBar.appendChild(openButton);
+
+            // Adiciona a classe de seleção ao ícone do app clicado
+            const iconElement = appContainer.querySelector('.grid-item');
+            if(iconElement) {
+                iconElement.classList.add('selected-app');
+            }
 
             // Insere a barra de ações logo após o container do aplicativo clicado
             appContainer.insertAdjacentElement('afterend', actionBar);
@@ -3603,9 +3618,26 @@
                     // --- Busca inicial de dados ---
                     fetchAndRenderApps(session.user.id);
                     fetchShoppingList();
+
+                    // Adiciona o listener para cliques fora dos apps quando o usuário está logado
+                    outsideClickListener = (e) => {
+                        const actionBar = document.getElementById('dynamic-action-bar');
+                        // Se a barra de ações existir e o clique não for dentro dela, feche-a.
+                        // Clicar num app já tem stopPropagation, então não vai acionar isto.
+                        if (actionBar && !actionBar.contains(e.target)) {
+                            hideAppActions();
+                        }
+                    };
+                    document.addEventListener('click', outsideClickListener);
                 }
             } else { // Sem sessão ou o usuário saiu
                 isAppInitialized = false; // Reinicia a flag
+
+                // Remove o listener de clique global se existir
+                if (outsideClickListener) {
+                    document.removeEventListener('click', outsideClickListener);
+                    outsideClickListener = null;
+                }
 
                 // Limpa todas as subscrições para evitar vazamentos de memória
                 if (notesSubscription) supabase.removeChannel(notesSubscription);
@@ -3643,14 +3675,6 @@
             toggleUI(false, 'user-list');
         });
 
-        // Adiciona um listener global para fechar a barra de ações ao clicar em qualquer outro lugar
-        document.addEventListener('click', (e) => {
-            const actionBar = document.getElementById('dynamic-action-bar');
-            // Se a barra de ações existir e o clique não for dentro dela, feche-a
-            if (actionBar && !actionBar.contains(e.target)) {
-                hideAppActions();
-            }
-        });
     </script>
 </body>
 </html>
