@@ -414,6 +414,21 @@
         </footer>
     </div>
 
+    <!-- Modal para Seleção de Filtro de Notas -->
+    <div id="note-filter-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-[60]">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-xs w-full flex flex-col space-y-2">
+            <h3 class="text-xl font-bold text-center text-theme mb-2">Filtrar Notas Por</h3>
+            <button class="note-filter-option w-full text-left p-3 hover:bg-gray-100 rounded-md" data-filter="active">Dia de Hoje</button>
+            <button class="note-filter-option w-full text-left p-3 hover:bg-gray-100 rounded-md" data-filter="futuras">Futuras</button>
+            <button class="note-filter-option w-full text-left p-3 hover:bg-gray-100 rounded-md" data-filter="antigas">Antigas</button>
+            <button class="note-filter-option w-full text-left p-3 hover:bg-gray-100 rounded-md" data-filter="fixed">Fixas</button>
+            <button class="note-filter-option w-full text-left p-3 hover:bg-gray-100 rounded-md" data-filter="all">Todas</button>
+            <button id="close-note-filter-modal-button" class="w-full px-4 py-3 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300 transition-colors mt-4">
+                Fechar
+            </button>
+        </div>
+    </div>
+
     <!-- Novo Modal para Adicionar Itens -->
     <div id="add-item-modal" class="fixed inset-0 bg-gray-100 hidden flex-col z-50">
         <header class="flex items-center justify-between p-4 bg-white shadow-md">
@@ -580,14 +595,11 @@
                     </svg>
                 </button>
         </header>
-        <div class="p-2 bg-white sticky top-0 z-10 shadow-sm">
-            <div class="flex justify-center space-x-2">
-                <button id="filter-notes-active" class="note-filter-button font-semibold py-2 px-4 rounded-md transition-colors duration-200">Dia de Hoje</button>
-                <button id="filter-notes-future" class="note-filter-button font-semibold py-2 px-4 rounded-md transition-colors duration-200">Futuras</button>
-                <button id="filter-notes-completed" class="note-filter-button font-semibold py-2 px-4 rounded-md transition-colors duration-200">Antigas</button>
-                <button id="filter-notes-fixed" class="note-filter-button font-semibold py-2 px-4 rounded-md transition-colors duration-200">Fixas</button>
-                <button id="filter-notes-all" class="note-filter-button font-semibold py-2 px-4 rounded-md transition-colors duration-200">Todas</button>
-            </div>
+        <div class="p-4 bg-white sticky top-0 z-10 shadow-sm flex justify-between items-center">
+            <button id="show-note-filter-modal-button" class="px-4 py-2 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300">
+                Filtrar
+            </button>
+            <p class="font-semibold text-gray-600">Filtro: <span id="current-note-filter-display">Dia de Hoje</span></p>
         </div>
         <div id="notes-container" class="flex-grow overflow-y-auto p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 items-start">
             <!-- As notas serão inseridas aqui -->
@@ -1012,12 +1024,15 @@
         const editNoteStartDateInput = document.getElementById('edit-note-start-date');
         const editNoteEndDateInput = document.getElementById('edit-note-end-date');
         const editNoteIsFixedCheckbox = document.getElementById('edit-note-is-fixed');
-        const filterNotesAll = document.getElementById('filter-notes-all');
-        const filterNotesFixed = document.getElementById('filter-notes-fixed');
-        const filterNotesActive = document.getElementById('filter-notes-active');
-        const filterNotesCompleted = document.getElementById('filter-notes-completed');
-        const filterNotesFuture = document.getElementById('filter-notes-future'); // Novo
         const noteErrorMessage = document.getElementById('note-error-message');
+
+        // NOVO: Referências do Modal de Filtro de Notas
+        const showNoteFilterModalButton = document.getElementById('show-note-filter-modal-button');
+        const noteFilterModal = document.getElementById('note-filter-modal');
+        const closeNoteFilterModalButton = document.getElementById('close-note-filter-modal-button');
+        const currentNoteFilterDisplay = document.getElementById('current-note-filter-display');
+        const noteFilterOptions = document.querySelectorAll('.note-filter-option');
+
 
         // Referências do Modal de Visualização de Nota
         const viewNoteModal = document.getElementById('view-note-modal');
@@ -1232,6 +1247,7 @@
             notesModal.classList.add('hidden');
             editNoteModal.classList.add('hidden');
             viewNoteModal.classList.add('hidden');
+            noteFilterModal.classList.add('hidden');
             addAppModal.classList.add('hidden');
             editFixedAppModal.classList.add('hidden');
             trashBinModal.classList.add('hidden');
@@ -2899,43 +2915,33 @@
             }
         });
 
-        function setActiveNoteFilter(filter) {
-            document.querySelectorAll('.note-filter-button').forEach(btn => {
-                btn.classList.remove('bg-indigo-600', 'text-white');
-                btn.classList.add('bg-gray-200', 'text-gray-800');
-            });
-
-            const activeBtn = document.getElementById(`filter-notes-${filter}`);
-            if(activeBtn) {
-                activeBtn.classList.remove('bg-gray-200', 'text-gray-800');
-                activeBtn.classList.add('bg-indigo-600', 'text-white');
-            }
+        // NOVO: Funções e eventos para o modal de filtro de notas
+        function showNoteFilterModal() {
+            noteFilterModal.classList.remove('hidden');
+            noteFilterModal.classList.add('flex');
         }
 
-        filterNotesAll.addEventListener('click', () => {
-            currentNoteFilter = 'all';
-            setActiveNoteFilter('all');
+        function hideNoteFilterModal() {
+            noteFilterModal.classList.add('hidden');
+            noteFilterModal.classList.remove('flex');
+        }
+
+        function selectNoteFilter(filterValue, filterText) {
+            currentNoteFilter = filterValue;
+            currentNoteFilterDisplay.textContent = filterText;
             fetchNotes();
-        });
-        filterNotesFixed.addEventListener('click', () => {
-            currentNoteFilter = 'fixed';
-            setActiveNoteFilter('fixed');
-            fetchNotes();
-        });
-        filterNotesActive.addEventListener('click', () => {
-            currentNoteFilter = 'active';
-            setActiveNoteFilter('active');
-            fetchNotes();
-        });
-        filterNotesCompleted.addEventListener('click', () => {
-            currentNoteFilter = 'antigas'; // Ajustado para corresponder à UI
-            setActiveNoteFilter('completed');
-            fetchNotes();
-        });
-        filterNotesFuture.addEventListener('click', () => { // Novo
-            currentNoteFilter = 'futuras';
-            setActiveNoteFilter('future');
-            fetchNotes();
+            hideNoteFilterModal();
+        }
+
+        showNoteFilterModalButton.addEventListener('click', showNoteFilterModal);
+        closeNoteFilterModalButton.addEventListener('click', hideNoteFilterModal);
+
+        noteFilterOptions.forEach(button => {
+            button.addEventListener('click', () => {
+                const filterValue = button.dataset.filter;
+                const filterText = button.textContent;
+                selectNoteFilter(filterValue, filterText);
+            });
         });
 
 
