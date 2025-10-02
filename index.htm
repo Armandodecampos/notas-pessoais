@@ -283,20 +283,20 @@
             </div>
         </div>
 
-        <!-- Nova Faixa de Ações do Aplicativo -->
-        <div id="app-action-bar" class="fixed top-24 left-0 right-0 p-2 z-30 hidden">
-            <div class="flex justify-center space-x-2 sm:space-x-4 mx-auto">
-                <button id="open-app-button" class="flex items-center justify-center text-white font-bold rounded-md shadow-lg hover:shadow-xl transition-all text-sm sm:text-base bg-blue-500 hover:bg-blue-600 px-4 sm:px-6 py-2 sm:py-3">
-                    <span class="text-center">Abrir</span>
+        <!-- Modal de Ações do Aplicativo -->
+        <div id="app-action-bar" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-50">
+            <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-xs w-full flex flex-col space-y-4">
+                <button id="open-app-button" class="w-full px-4 py-3 text-white font-bold rounded-md shadow-lg hover:shadow-xl transition-all text-lg bg-blue-500 hover:bg-blue-600">
+                    Abrir
                 </button>
-                <button id="edit-app-button" class="flex items-center justify-center text-white font-bold rounded-md shadow-lg hover:shadow-xl transition-all text-sm sm:text-base bg-yellow-500 hover:bg-yellow-600 px-4 sm:px-6 py-2 sm:py-3">
-                    <span class="text-center">Editar</span>
+                <button id="edit-app-button" class="w-full px-4 py-3 text-white font-bold rounded-md shadow-lg hover:shadow-xl transition-all text-lg bg-yellow-500 hover:bg-yellow-600">
+                    Editar
                 </button>
-                <button id="delete-app-button" class="flex items-center justify-center text-white font-bold rounded-md shadow-lg hover:shadow-xl transition-all text-sm sm:text-base bg-red-500 hover:bg-red-600 px-4 sm:px-6 py-2 sm:py-3">
-                    <span id="delete-app-text" class="text-center">Remover</span>
+                <button id="delete-app-button" class="w-full px-4 py-3 text-white font-bold rounded-md shadow-lg hover:shadow-xl transition-all text-lg bg-red-500 hover:bg-red-600">
+                    <span id="delete-app-text">Remover</span>
                 </button>
-                <button id="close-app-modal-button" class="flex items-center justify-center text-white font-bold rounded-md shadow-lg hover:shadow-xl transition-all text-sm sm:text-base bg-gray-500 hover:bg-gray-600 px-4 sm:px-6 py-2 sm:py-3">
-                    <span class="text-center">Fechar</span>
+                <button id="close-app-modal-button" class="w-full px-4 py-3 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300 transition-colors mt-2">
+                    Fechar
                 </button>
             </div>
         </div>
@@ -3050,7 +3050,7 @@
             }
         }
 
-        function showAppActionBar(app) {
+        window.showAppActionBar = function showAppActionBar(app) {
             // Armazena os dados do app diretamente na faixa de ações
             appActionBar.dataset.id = app.id;
             appActionBar.dataset.title = app.title;
@@ -3080,11 +3080,6 @@
             // Mostra a faixa de ações
             appActionBar.classList.remove('hidden');
             appActionBar.classList.add('flex');
-
-            // Calcula a altura da faixa de ações e ajusta a posição do grid de apps
-            const actionBarHeight = appActionBar.offsetHeight;
-            const headerHeight = mainHeader.offsetHeight; // 96px ou 6rem
-            buttonGridContainer.style.top = `${headerHeight + actionBarHeight}px`;
         }
 
         function hideAppActionBar() {
@@ -3097,11 +3092,6 @@
             if (currentlySelected) {
                 currentlySelected.classList.remove('selected');
             }
-
-
-            // Reseta a posição do grid de apps
-            const headerHeight = mainHeader.offsetHeight;
-            buttonGridContainer.style.top = `${headerHeight}px`;
         }
 
         function showAddAppModal(appData = null) {
