@@ -52,10 +52,10 @@
         }
         .app-container {
             display: flex;
-            flex-direction: column; /* Empilha o conteúdo principal e os botões de ação */
-            align-items: flex-start; /* Alinha tudo à esquerda */
+            flex-direction: row; /* Ícone e texto lado a lado */
+            align-items: center; /* Alinha verticalmente o ícone e o texto */
             width: 100%; /* Ocupa a largura total */
-            gap: 8px; /* Espaçamento entre a linha do app e os botões de ação */
+            gap: 16px; /* Espaço entre o ícone e o texto */
             transition: transform 0.3s ease-in-out; /* Transição para o efeito de empurrar */
         }
         #button-grid-container .grid-item {
@@ -283,6 +283,23 @@
             </div>
         </div>
 
+        <!-- Nova Faixa de Ações do Aplicativo -->
+        <div id="app-action-bar" class="fixed top-24 left-0 right-0 p-2 z-30" style="transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out; transform: translateY(-150%);">
+            <div class="flex justify-center space-x-2 sm:space-x-4 mx-auto">
+                <button id="open-app-button" class="flex items-center justify-center text-white font-bold rounded-md shadow-lg hover:shadow-xl transition-all text-sm sm:text-base bg-blue-500 hover:bg-blue-600 px-4 sm:px-6 py-2 sm:py-3">
+                    <span class="text-center">Abrir</span>
+                </button>
+                <button id="edit-app-button" class="flex items-center justify-center text-white font-bold rounded-md shadow-lg hover:shadow-xl transition-all text-sm sm:text-base bg-yellow-500 hover:bg-yellow-600 px-4 sm:px-6 py-2 sm:py-3">
+                    <span class="text-center">Editar</span>
+                </button>
+                <button id="delete-app-button" class="flex items-center justify-center text-white font-bold rounded-md shadow-lg hover:shadow-xl transition-all text-sm sm:text-base bg-red-500 hover:bg-red-600 px-4 sm:px-6 py-2 sm:py-3">
+                    <span id="delete-app-text" class="text-center">Remover</span>
+                </button>
+                <button id="close-app-modal-button" class="flex items-center justify-center text-white font-bold rounded-md shadow-lg hover:shadow-xl transition-all text-sm sm:text-base bg-gray-500 hover:bg-gray-600 px-4 sm:px-6 py-2 sm:py-3">
+                    <span class="text-center">Fechar</span>
+                </button>
+            </div>
+        </div>
 
         <!-- Grade de botões arrastáveis -->
         <div id="button-grid-container" class="fixed top-24 inset-x-0 bottom-0 p-4 overflow-y-auto transition-all duration-300">
@@ -1021,6 +1038,13 @@
         const appBgColorInput = document.getElementById('app-bg-color-input');
         const appIconColorInput = document.getElementById('app-icon-color-input');
 
+        // Referências da nova faixa de ações e seus botões
+        const appActionBar = document.getElementById('app-action-bar');
+        const openAppButton = document.getElementById('open-app-button');
+        const editAppButton = document.getElementById('edit-app-button');
+        const deleteAppButton = document.getElementById('delete-app-button');
+        const closeAppModalButton = document.getElementById('close-app-modal-button');
+
         // Referências da Lixeira
         const trashBinButton = document.getElementById('trash-bin-button');
         const trashBinModal = document.getElementById('trash-bin-modal');
@@ -1098,8 +1122,6 @@
         let recipesSubscription = null;
         let recipeImagesSubscription = null;
         let isAppInitialized = false;
-        let activeAppContainer = null;
-        let actionsTimer = null;
 
         const availableIcons = [
             // Web & Interface
@@ -1229,14 +1251,17 @@
                 // Ajusta o estilo do body para a app
                 document.body.classList.remove('bg-gray-100');
 
-                const headerHeight = mainHeader.offsetHeight;
-                buttonGridContainer.style.top = `${headerHeight}px`;
-
+                // Call this AFTER the container is visible to get correct offsetHeight
+                hideAppActionBar();
 
             } else {
                 // Mostra o contentor do Login e esconde a App
                 mainContainer.classList.remove('hidden');
                 loggedInAppContainer.classList.add('hidden');
+
+                // Just hide the bar, don't worry about grid position as it's hidden
+                appActionBar.classList.add('hidden');
+                appActionBar.classList.remove('flex');
 
                 // Restaura o estilo do body para o login
                 document.body.classList.add('bg-gray-100');
@@ -1321,6 +1346,7 @@
             // Aplica cor do cabeçalho e da faixa de ações
             const headerColor = preferences?.headerColor || defaultHeaderColor;
             mainHeader.style.backgroundColor = headerColor;
+            appActionBar.style.backgroundColor = headerColor;
 
             // Aplica cor do texto apenas à área logada, não aos modais
             const textColor = preferences?.textColor || '#1f2937'; // Default to gray-800
@@ -2727,6 +2753,7 @@
         headerColorInput.addEventListener('input', (e) => {
             const color = e.target.value;
             mainHeader.style.backgroundColor = color;
+            appActionBar.style.backgroundColor = color; // Sincroniza a cor da faixa de ações
             tempPreferences.headerColor = color; // Update temp state
         });
 
@@ -2913,66 +2940,6 @@
 
 
         // --- LÓGICA DE APLICATIVOS PERSONALIZADOS E FIXOS ---
-
-        function hideActiveAppActions() {
-            if (actionsTimer) {
-                clearTimeout(actionsTimer);
-                actionsTimer = null;
-            }
-            if (activeAppContainer) {
-                const actions = activeAppContainer.querySelector('.app-actions');
-                if (actions) {
-                    actions.classList.add('hidden');
-                }
-                activeAppContainer.classList.remove('selected');
-                activeAppContainer.querySelector('.grid-item').classList.remove('selected');
-                activeAppContainer = null;
-            }
-        }
-
-        function openApp(app) {
-            hideActiveAppActions();
-            if (app.id === 'shopping-list') {
-                shoppingListModal.classList.remove('hidden');
-                shoppingListModal.classList.add('flex');
-                setActiveFilter(currentFilter);
-                fetchShoppingList();
-            } else if (app.id === 'notes-app') {
-                notesModal.classList.remove('hidden');
-                notesModal.classList.add('flex');
-                setActiveNoteFilter(currentNoteFilter);
-                fetchNotes();
-            } else if (app.id === 'recipes-app') {
-                recipesModal.classList.remove('hidden');
-                recipesModal.classList.add('flex');
-                fetchRecipes();
-            } else if (app.url) {
-                window.open(app.url, '_blank');
-            }
-        }
-
-        function editApp(app) {
-            hideActiveAppActions();
-            showAddAppModal(app);
-        }
-
-        async function removeApp(app) {
-            hideActiveAppActions();
-            const user = (await supabase.auth.getUser()).data.user;
-            if (!user) return;
-
-            const { data } = await supabase.from('profiles').select('preferences').eq('id', user.id).single();
-            const prefs = data?.preferences || {};
-            const removed = prefs.removed_apps || [];
-
-            if (!removed.includes(app.id)) {
-                removed.push(app.id);
-                prefs.removed_apps = removed;
-                await saveUserPreferences(prefs);
-                await fetchAndRenderApps(user.id);
-            }
-        }
-
         async function renderApps(appsToRender, appOrder) {
             buttonGridContainer.innerHTML = '';
 
@@ -3012,58 +2979,16 @@
                 const iconStyle = iconStyleParts.join('; ');
 
                 appContainer.innerHTML = `
-                    <div class="flex flex-row items-center w-full gap-4 cursor-pointer app-info">
-                        <div class="grid-item" draggable="true" style="${gridItemStyle}">
-                            <i class="${iconClass} grid-item-icon" style="${iconStyle}"></i>
-                        </div>
-                        <span class="grid-item-label text-theme noselect">${app.title}</span>
+                    <div class="grid-item" draggable="true" style="${gridItemStyle}">
+                        <i class="${iconClass} grid-item-icon" style="${iconStyle}"></i>
                     </div>
-                    <div class="app-actions hidden w-full flex justify-start space-x-2 pl-[72px]">
-                        <button class="remove-button px-4 py-2 text-white font-semibold rounded-md bg-red-500 hover:bg-red-600">Remover</button>
-                        <button class="edit-button px-4 py-2 text-white font-semibold rounded-md bg-orange-500 hover:bg-orange-600">Editar</button>
-                        <button class="open-button px-4 py-2 text-white font-semibold rounded-md bg-green-500 hover:bg-green-600">Abrir</button>
-                    </div>
+                    <span class="grid-item-label text-theme noselect">${app.title}</span>
                 `;
 
-                const appInfo = appContainer.querySelector('.app-info');
-                const appActions = appContainer.querySelector('.app-actions');
-
-                appInfo.addEventListener('click', () => {
+                const gridItem = appContainer.querySelector('.grid-item');
+                gridItem.addEventListener('click', () => {
                     if (isDragging) return;
-
-                    if (activeAppContainer === appContainer) {
-                        hideActiveAppActions();
-                        return;
-                    }
-
-                    if (activeAppContainer) {
-                        hideActiveAppActions();
-                    }
-
-                    appActions.classList.remove('hidden');
-                    appContainer.classList.add('selected');
-                    appContainer.querySelector('.grid-item').classList.add('selected');
-                    activeAppContainer = appContainer;
-
-                    if (actionsTimer) clearTimeout(actionsTimer);
-                    actionsTimer = setTimeout(() => {
-                        hideActiveAppActions();
-                    }, 5000);
-                });
-
-                appContainer.querySelector('.remove-button').addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    removeApp(app);
-                });
-
-                appContainer.querySelector('.edit-button').addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    editApp(app);
-                });
-
-                appContainer.querySelector('.open-button').addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    openApp(app);
+                    showAppActionBar(app); // Alterado para chamar a nova função
                 });
 
                 buttonGridContainer.appendChild(appContainer);
@@ -3123,6 +3048,62 @@
             if (error) {
                 console.error('Erro ao salvar a ordem dos apps:', error);
             }
+        }
+
+        function showAppActionBar(app) {
+            appActionBar.dataset.id = app.id;
+            appActionBar.dataset.title = app.title;
+            appActionBar.dataset.url = app.url || '';
+            appActionBar.dataset.isFixed = app.isFixed;
+            appActionBar.dataset.iconClass = app.icon_class || '';
+            appActionBar.dataset.bgColor = app.bg_color || '';
+            appActionBar.dataset.iconColor = app.icon_color || '';
+
+            const allAppContainers = Array.from(buttonGridContainer.children);
+            const selectedIndex = allAppContainers.findIndex(el => el.dataset.id === app.id);
+
+            // Reset all apps first
+            allAppContainers.forEach(container => {
+                container.classList.remove('selected');
+                container.querySelector('.grid-item').classList.remove('selected');
+                container.style.transform = 'translateY(0)';
+            });
+
+            // Apply selection and push effect
+            if (selectedIndex !== -1) {
+                const selectedContainer = allAppContainers[selectedIndex];
+                selectedContainer.classList.add('selected');
+                selectedContainer.querySelector('.grid-item').classList.add('selected');
+
+                // Push down subsequent elements
+                const pushDistance = 28; // Extra space for visual effect
+                for (let i = selectedIndex + 1; i < allAppContainers.length; i++) {
+                    allAppContainers[i].style.transform = `translateY(${pushDistance}px)`;
+                }
+            }
+
+            // Animate action bar
+            appActionBar.style.transform = 'translateY(-150%)';
+            void appActionBar.offsetHeight;
+            appActionBar.style.transform = 'translateY(0)';
+
+            const actionBarHeight = appActionBar.offsetHeight;
+            const headerHeight = mainHeader.offsetHeight;
+            buttonGridContainer.style.top = `${headerHeight + actionBarHeight}px`;
+        }
+
+        function hideAppActionBar() {
+            appActionBar.style.transform = 'translateY(-150%)';
+
+            const allAppContainers = Array.from(buttonGridContainer.children);
+            allAppContainers.forEach(container => {
+                container.classList.remove('selected');
+                container.querySelector('.grid-item').classList.remove('selected');
+                container.style.transform = 'translateY(0)';
+            });
+
+            const headerHeight = mainHeader.offsetHeight;
+            buttonGridContainer.style.top = `${headerHeight}px`;
         }
 
         function showAddAppModal(appData = null) {
