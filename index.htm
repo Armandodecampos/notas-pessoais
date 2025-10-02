@@ -21,15 +21,15 @@
             color: var(--text-primary);
         }
         .user-card {
-            @apply flex flex-col items-center justify-center text-center p-4 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 cursor-pointer w-48 h-48;
+            @apply flex flex-col items-center justify-center text-center p-4 bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 cursor-pointer w-48 h-48;
         }
         .user-avatar {
             width: 80px;
             height: 80px;
-            @apply rounded-full object-cover mb-4;
+            @apply rounded-full object-cover mb-6;
         }
         .user-email {
-            @apply text-lg text-gray-800 font-semibold truncate;
+            @apply text-lg text-gray-200 font-semibold truncate;
         }
         .shopping-list-item {
             @apply flex items-center justify-between p-3 border-b border-gray-200;
@@ -193,11 +193,11 @@
             </div>
 
             <!-- Lista de Usuários (inicialmente escondida) -->
-            <div id="user-list-container" class="hidden fixed inset-0 bg-gray-100 flex flex-col items-center justify-center gap-8 p-4">
+            <div id="user-list-container" class="hidden fixed inset-0 bg-gray-900 flex flex-col items-center justify-center gap-8 p-4">
                 <div id="user-cards-wrapper" class="flex flex-wrap justify-center gap-4 max-w-4xl">
                     <!-- Usuários serão injetados aqui via JavaScript -->
                 </div>
-                <button id="back-to-initial-button" class="absolute top-6 left-6 px-4 py-2 bg-white text-gray-800 font-semibold rounded-md shadow-sm hover:bg-gray-200 focus:outline-none transition-all flex items-center">
+                <button id="back-to-initial-button" class="absolute top-6 left-6 px-4 py-2 bg-gray-700 text-gray-200 font-semibold rounded-md shadow-sm hover:bg-gray-600 focus:outline-none transition-all flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
                     </svg>
