@@ -69,9 +69,10 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
             flex-shrink: 0;
         }
-        .grid-item.selected-app {
+        /* NOVO: Estilo para o ícone do app selecionado */
+        #button-grid-container .grid-item.selected {
             transform: scale(1.15);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
         }
         .grid-item-icon {
             font-size: 1.5rem;
@@ -278,6 +279,24 @@
                 </button>
                 <button id="add-app-button" class="w-12 h-12 flex items-center justify-center rounded-full text-white bg-gradient-to-br from-purple-600 to-indigo-700 shadow-xl hover:scale-110 hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transform transition-all duration-300 ease-in-out">
                     <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Nova Faixa de Ações do Aplicativo -->
+        <div id="app-action-bar" class="fixed top-24 left-0 right-0 p-2 z-30 hidden">
+            <div class="flex justify-center space-x-2 sm:space-x-4 mx-auto">
+                <button id="open-app-button" class="flex items-center justify-center text-white font-bold rounded-md shadow-lg hover:shadow-xl transition-all text-sm sm:text-base bg-blue-500 hover:bg-blue-600 px-4 sm:px-6 py-2 sm:py-3">
+                    <span class="text-center">Abrir</span>
+                </button>
+                <button id="edit-app-button" class="flex items-center justify-center text-white font-bold rounded-md shadow-lg hover:shadow-xl transition-all text-sm sm:text-base bg-yellow-500 hover:bg-yellow-600 px-4 sm:px-6 py-2 sm:py-3">
+                    <span class="text-center">Editar</span>
+                </button>
+                <button id="delete-app-button" class="flex items-center justify-center text-white font-bold rounded-md shadow-lg hover:shadow-xl transition-all text-sm sm:text-base bg-red-500 hover:bg-red-600 px-4 sm:px-6 py-2 sm:py-3">
+                    <span id="delete-app-text" class="text-center">Remover</span>
+                </button>
+                <button id="close-app-modal-button" class="flex items-center justify-center text-white font-bold rounded-md shadow-lg hover:shadow-xl transition-all text-sm sm:text-base bg-gray-500 hover:bg-gray-600 px-4 sm:px-6 py-2 sm:py-3">
+                    <span class="text-center">Fechar</span>
                 </button>
             </div>
         </div>
@@ -1019,6 +1038,13 @@
         const appBgColorInput = document.getElementById('app-bg-color-input');
         const appIconColorInput = document.getElementById('app-icon-color-input');
 
+        // Referências da nova faixa de ações e seus botões
+        const appActionBar = document.getElementById('app-action-bar');
+        const openAppButton = document.getElementById('open-app-button');
+        const editAppButton = document.getElementById('edit-app-button');
+        const deleteAppButton = document.getElementById('delete-app-button');
+        const closeAppModalButton = document.getElementById('close-app-modal-button');
+
         // Referências da Lixeira
         const trashBinButton = document.getElementById('trash-bin-button');
         const trashBinModal = document.getElementById('trash-bin-modal');
@@ -1096,7 +1122,6 @@
         let recipesSubscription = null;
         let recipeImagesSubscription = null;
         let isAppInitialized = false;
-        let outsideClickListener = null;
 
         const availableIcons = [
             // Web & Interface
@@ -1227,7 +1252,7 @@
                 document.body.classList.remove('bg-gray-100');
 
                 // Call this AFTER the container is visible to get correct offsetHeight
-        // hideAppActionBar(); // No longer exists
+                hideAppActionBar();
 
             } else {
                 // Mostra o contentor do Login e esconde a App
@@ -1235,8 +1260,8 @@
                 loggedInAppContainer.classList.add('hidden');
 
                 // Just hide the bar, don't worry about grid position as it's hidden
-        // appActionBar.classList.add('hidden');
-        // appActionBar.classList.remove('flex');
+                appActionBar.classList.add('hidden');
+                appActionBar.classList.remove('flex');
 
                 // Restaura o estilo do body para o login
                 document.body.classList.add('bg-gray-100');
@@ -1321,7 +1346,7 @@
             // Aplica cor do cabeçalho e da faixa de ações
             const headerColor = preferences?.headerColor || defaultHeaderColor;
             mainHeader.style.backgroundColor = headerColor;
-        //appActionBar.style.backgroundColor = headerColor;
+            appActionBar.style.backgroundColor = headerColor;
 
             // Aplica cor do texto apenas à área logada, não aos modais
             const textColor = preferences?.textColor || '#1f2937'; // Default to gray-800
@@ -2728,7 +2753,7 @@
         headerColorInput.addEventListener('input', (e) => {
             const color = e.target.value;
             mainHeader.style.backgroundColor = color;
-            // appActionBar.style.backgroundColor = color; // Sincroniza a cor da faixa de ações
+            appActionBar.style.backgroundColor = color; // Sincroniza a cor da faixa de ações
             tempPreferences.headerColor = color; // Update temp state
         });
 
@@ -2960,10 +2985,10 @@
                     <span class="grid-item-label text-theme noselect">${app.title}</span>
                 `;
 
-                appContainer.addEventListener('click', (e) => {
-                    e.stopPropagation(); // Impede que o clique se propague para o document
+                const gridItem = appContainer.querySelector('.grid-item');
+                gridItem.addEventListener('click', () => {
                     if (isDragging) return;
-                    showAppActions(appContainer, app);
+                    showAppActionBar(app); // Alterado para chamar a nova função
                 });
 
                 buttonGridContainer.appendChild(appContainer);
@@ -3025,107 +3050,59 @@
             }
         }
 
-        function hideAppActions() {
-            const existingActionBar = document.getElementById('dynamic-action-bar');
-            if (existingActionBar) {
-                existingActionBar.remove();
+        function showAppActionBar(app) {
+            // Armazena os dados do app diretamente na faixa de ações
+            appActionBar.dataset.id = app.id;
+            appActionBar.dataset.title = app.title;
+            appActionBar.dataset.url = app.url || '';
+            appActionBar.dataset.isFixed = app.isFixed;
+            appActionBar.dataset.iconClass = app.icon_class || '';
+            appActionBar.dataset.bgColor = app.bg_color || '';
+            appActionBar.dataset.iconColor = app.icon_color || '';
+
+            // NOVO: Lógica para destacar o ícone selecionado
+            // 1. Remove a seleção de qualquer outro item
+            const currentlySelected = buttonGridContainer.querySelector('.grid-item.selected');
+            if (currentlySelected) {
+                currentlySelected.classList.remove('selected');
             }
-            // Deselect any currently selected app icon
-            const selectedIcon = document.querySelector('.grid-item.selected-app');
-            if (selectedIcon) {
-                selectedIcon.classList.remove('selected-app');
+
+            // 2. Adiciona a seleção ao item clicado
+            const appElement = buttonGridContainer.querySelector(`.app-container[data-id="${app.id}"]`);
+            if (appElement) {
+                const gridItem = appElement.querySelector('.grid-item');
+                if (gridItem) {
+                    gridItem.classList.add('selected');
+                }
             }
+
+
+            // Mostra a faixa de ações
+            appActionBar.classList.remove('hidden');
+            appActionBar.classList.add('flex');
+
+            // Calcula a altura da faixa de ações e ajusta a posição do grid de apps
+            const actionBarHeight = appActionBar.offsetHeight;
+            const headerHeight = mainHeader.offsetHeight; // 96px ou 6rem
+            buttonGridContainer.style.top = `${headerHeight + actionBarHeight}px`;
         }
 
-        function showAppActions(appContainer, app) {
-            // Remove a barra de ações existente, se houver
-            const existingBar = document.getElementById('dynamic-action-bar');
-            if (existingBar) {
-                const isSameApp = existingBar.previousSibling === appContainer;
-                existingBar.remove();
-                if (isSameApp) {
-                    return; // Se clicou no mesmo app, apenas fecha a barra
-                }
+        function hideAppActionBar() {
+            // Esconde a faixa de ações
+            appActionBar.classList.add('hidden');
+            appActionBar.classList.remove('flex');
+
+            // NOVO: Remove a seleção de qualquer item que a tenha
+            const currentlySelected = buttonGridContainer.querySelector('.grid-item.selected');
+            if (currentlySelected) {
+                currentlySelected.classList.remove('selected');
             }
 
-            // Cria o novo container para os botões de ação
-            const actionBar = document.createElement('div');
-            actionBar.id = 'dynamic-action-bar';
-            // Estilos para alinhar à esquerda, com um pouco de margem e espaço entre os botões
-            actionBar.className = 'flex justify-start space-x-2 p-2 pl-0';
 
-            // Botão Remover
-            const removeButton = document.createElement('button');
-            removeButton.textContent = 'Remover';
-            removeButton.className = 'px-4 py-2 bg-red-500 text-white font-semibold rounded-md hover:bg-red-600 transition-colors';
-            removeButton.onclick = async () => {
-                const user = (await supabase.auth.getUser()).data.user;
-                if (!user) return;
-
-                hideAppActions();
-
-                const { data } = await supabase.from('profiles').select('preferences').eq('id', user.id).single();
-                const prefs = data?.preferences || {};
-                const removed = prefs.removed_apps || [];
-
-                if (!removed.includes(app.id)) {
-                    removed.push(app.id);
-                    prefs.removed_apps = removed;
-                    await saveUserPreferences(prefs);
-                    await fetchAndRenderApps(user.id);
-                }
-            };
-
-            // Botão Editar
-            const editButton = document.createElement('button');
-            editButton.textContent = 'Editar';
-            editButton.className = 'px-4 py-2 bg-yellow-500 text-white font-semibold rounded-md hover:bg-yellow-600 transition-colors';
-            editButton.onclick = () => {
-                hideAppActions();
-                showAddAppModal(app);
-            };
-
-            // Botão Abrir
-            const openButton = document.createElement('button');
-            openButton.textContent = 'Abrir';
-            openButton.className = 'px-4 py-2 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 transition-colors';
-            openButton.onclick = () => {
-                hideAppActions();
-                if (app.id === 'shopping-list') {
-                    shoppingListModal.classList.remove('hidden');
-                    shoppingListModal.classList.add('flex');
-                    setActiveFilter(currentFilter);
-                    fetchShoppingList();
-                } else if (app.id === 'notes-app') {
-                    notesModal.classList.remove('hidden');
-                    notesModal.classList.add('flex');
-                    setActiveNoteFilter(currentNoteFilter);
-                    fetchNotes();
-                } else if (app.id === 'recipes-app') {
-                    recipesModal.classList.remove('hidden');
-                    recipesModal.classList.add('flex');
-                    fetchRecipes();
-                } else if (app.url) {
-                    window.open(app.url, '_blank');
-                }
-            };
-
-            // Adiciona os botões na ordem correta
-            actionBar.appendChild(removeButton);
-            actionBar.appendChild(editButton);
-            actionBar.appendChild(openButton);
-
-            // Adiciona a classe de seleção ao ícone do app clicado
-            const iconElement = appContainer.querySelector('.grid-item');
-            if(iconElement) {
-                iconElement.classList.add('selected-app');
-            }
-
-            // Insere a barra de ações logo após o container do aplicativo clicado
-            appContainer.insertAdjacentElement('afterend', actionBar);
+            // Reseta a posição do grid de apps
+            const headerHeight = mainHeader.offsetHeight;
+            buttonGridContainer.style.top = `${headerHeight}px`;
         }
-        window.showAppActions = showAppActions;
-
 
         function showAddAppModal(appData = null) {
             const urlInputContainer = appUrlInput.parentElement;
@@ -3618,26 +3595,9 @@
                     // --- Busca inicial de dados ---
                     fetchAndRenderApps(session.user.id);
                     fetchShoppingList();
-
-                    // Adiciona o listener para cliques fora dos apps quando o usuário está logado
-                    outsideClickListener = (e) => {
-                        const actionBar = document.getElementById('dynamic-action-bar');
-                        // Se a barra de ações existir e o clique não for dentro dela, feche-a.
-                        // Clicar num app já tem stopPropagation, então não vai acionar isto.
-                        if (actionBar && !actionBar.contains(e.target)) {
-                            hideAppActions();
-                        }
-                    };
-                    document.addEventListener('click', outsideClickListener);
                 }
             } else { // Sem sessão ou o usuário saiu
                 isAppInitialized = false; // Reinicia a flag
-
-                // Remove o listener de clique global se existir
-                if (outsideClickListener) {
-                    document.removeEventListener('click', outsideClickListener);
-                    outsideClickListener = null;
-                }
 
                 // Limpa todas as subscrições para evitar vazamentos de memória
                 if (notesSubscription) supabase.removeChannel(notesSubscription);
@@ -3674,7 +3634,6 @@
         showProfilesButton.addEventListener('click', () => {
             toggleUI(false, 'user-list');
         });
-
     </script>
 </body>
 </html>
