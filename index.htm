@@ -205,7 +205,6 @@
                 <div class="w-full max-w-xs space-y-4">
                     <!-- Display do usuário selecionado -->
                     <div class="flex flex-col items-center mb-2">
-                        <img id="selected-user-avatar" src="" alt="Avatar" class="w-20 h-20 rounded-full mb-2">
                         <p id="selected-user-name" class="text-xl font-bold text-gray-800"></p>
                     </div>
 
@@ -2287,9 +2286,7 @@
                 selectedEmail = userCard.dataset.email;
 
                 // Preenche os dados do usuário no formulário de login
-                const avatarSrc = userCard.querySelector('.user-avatar').src;
                 const userName = userCard.querySelector('.user-email').textContent;
-                selectedUserAvatar.src = avatarSrc;
                 selectedUserName.textContent = userName;
 
                 toggleUI(false, 'login');
