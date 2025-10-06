@@ -23,16 +23,8 @@
         .user-card {
             @apply flex justify-center items-center p-4 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 cursor-pointer w-full;
         }
-        .user-avatar {
-            width: 56px;
-            height: 56px;
-            object-fit: cover;
-            flex-shrink: 0;
-            border-radius: 9999px;
-            margin-right: 1rem;
-        }
         .user-email {
-            @apply text-lg text-gray-800 font-semibold truncate; /* Made font larger and bolder */
+            @apply text-lg text-gray-800 font-semibold;
         }
         .shopping-list-item {
             @apply flex items-center justify-between p-3 border-b border-gray-200;
@@ -1216,7 +1208,6 @@
                     const avatarSrc = user.avatar_url || `https://placehold.co/64x64/A0A0A0/FFFFFF?text=${(user.profile_name || user.username).charAt(0).toUpperCase()}`;
                     userCard.innerHTML = `
                         <div class="flex items-center">
-                            <img src="${avatarSrc}" alt="Profile" class="user-avatar">
                             <p class="user-email">${user.profile_name || user.username}</p>
                         </div>
                     `;
