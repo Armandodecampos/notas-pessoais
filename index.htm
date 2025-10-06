@@ -21,15 +21,15 @@
             color: var(--text-primary);
         }
         .user-card {
-            @apply flex flex-col items-center justify-center text-center p-4 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 cursor-pointer w-40 h-40;
+            @apply flex flex-row items-center justify-start text-left p-4 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 cursor-pointer w-full;
         }
         .user-avatar {
-            width: 64px;
-            height: 64px;
-            @apply rounded-full object-cover mb-2;
+            width: 56px; /* Reduced size slightly */
+            height: 56px;
+            @apply rounded-full object-cover mr-4 flex-shrink-0; /* Added margin to the right and prevent shrinking */
         }
         .user-email {
-            @apply text-sm text-gray-700 font-medium truncate;
+            @apply text-lg text-gray-800 font-semibold truncate; /* Made font larger and bolder */
         }
         .shopping-list-item {
             @apply flex items-center justify-between p-3 border-b border-gray-200;
@@ -194,7 +194,7 @@
 
             <!-- Lista de Usuários (inicialmente escondida) -->
             <div id="user-list-container" class="hidden fixed inset-0 bg-gray-100 flex flex-col items-center justify-center gap-8 p-4">
-                <div id="user-cards-wrapper" class="flex flex-wrap justify-center gap-4 max-w-4xl">
+                <div id="user-cards-wrapper" class="flex flex-col items-center gap-4 w-full max-w-sm">
                     <!-- Usuários serão injetados aqui via JavaScript -->
                 </div>
                 <button id="back-to-initial-button" class="absolute top-6 left-6 px-4 py-2 bg-white text-gray-800 font-semibold rounded-md shadow-sm hover:bg-gray-200 focus:outline-none transition-all flex items-center">
@@ -1198,6 +1198,13 @@
             } else if (data.length === 0) {
                  userCardsWrapper.innerHTML = '<p class="text-center text-gray-500">Nenhum usuário encontrado. Adicione usuários na tabela `profiles` do Supabase.</p>';
             } else {
+                // NOVO: Ordena os usuários em ordem alfabética pelo nome do perfil ou, na falta deste, pelo nome de usuário.
+                data.sort((a, b) => {
+                    const nameA = (a.profile_name || a.username).toLowerCase();
+                    const nameB = (b.profile_name || b.username).toLowerCase();
+                    return nameA.localeCompare(nameB);
+                });
+
                 userCardsWrapper.innerHTML = '';
                 data.forEach(user => {
                     const userCard = document.createElement('button');
