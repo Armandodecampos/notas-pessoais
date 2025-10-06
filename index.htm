@@ -21,7 +21,7 @@
             color: var(--text-primary);
         }
         .user-card {
-            @apply flex flex-row items-center p-4 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 cursor-pointer;
+            @apply flex justify-center items-center p-4 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 cursor-pointer w-full;
         }
         .user-avatar {
             width: 56px; /* Reduced size slightly */
@@ -1212,8 +1212,10 @@
                     userCard.dataset.email = user.username;
                     const avatarSrc = user.avatar_url || `https://placehold.co/64x64/A0A0A0/FFFFFF?text=${(user.profile_name || user.username).charAt(0).toUpperCase()}`;
                     userCard.innerHTML = `
-                        <img src="${avatarSrc}" alt="Profile" class="user-avatar w-16 h-16 rounded-full">
-                        <p class="user-email">${user.profile_name || user.username}</p>
+                        <div class="flex items-center">
+                            <img src="${avatarSrc}" alt="Profile" class="user-avatar">
+                            <p class="user-email">${user.profile_name || user.username}</p>
+                        </div>
                     `;
                     userCardsWrapper.appendChild(userCard);
                 });
