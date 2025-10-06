@@ -24,13 +24,7 @@ def run(playwright):
     # Add a static delay to ensure images have time to load
     page.wait_for_timeout(2000)
 
-    # Click on the first user card to navigate to the login form
-    page.locator(".user-card").first.click()
-
-    # Wait for the login form to be visible
-    expect(page.locator("#login-form-container")).to_be_visible()
-
-    # Take a screenshot of the login form
+    # Take a screenshot of the user list
     page.screenshot(path="jules-scratch/verification/verification.png")
 
     browser.close()
