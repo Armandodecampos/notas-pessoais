@@ -24,9 +24,12 @@
             @apply flex justify-center items-center p-4 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 cursor-pointer w-full;
         }
         .user-avatar {
-            width: 56px; /* Reduced size slightly */
+            width: 56px;
             height: 56px;
-            @apply rounded-full object-cover mr-4 flex-shrink-0; /* Added margin to the right and prevent shrinking */
+            object-fit: cover;
+            flex-shrink: 0;
+            border-radius: 9999px;
+            margin-right: 1rem;
         }
         .user-email {
             @apply text-lg text-gray-800 font-semibold truncate; /* Made font larger and bolder */
