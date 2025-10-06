@@ -20,12 +20,6 @@
         .text-theme {
             color: var(--text-primary);
         }
-        .user-card {
-            @apply flex justify-center items-center p-4 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 cursor-pointer w-full;
-        }
-        .user-email {
-            @apply text-lg text-gray-800 font-semibold;
-        }
         .shopping-list-item {
             @apply flex items-center justify-between p-3 border-b border-gray-200;
         }
@@ -1202,14 +1196,10 @@
                 userCardsWrapper.innerHTML = '';
                 data.forEach(user => {
                     const userCard = document.createElement('button');
-                    userCard.className = 'user-card';
+                    // Apply Tailwind classes directly to make the user card look like a button
+                    userCard.className = 'w-full px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-2xl rounded-md shadow-lg hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transform transition-all duration-300 ease-in-out';
                     userCard.dataset.email = user.username;
-                    const avatarSrc = user.avatar_url || `https://placehold.co/64x64/A0A0A0/FFFFFF?text=${(user.profile_name || user.username).charAt(0).toUpperCase()}`;
-                    userCard.innerHTML = `
-                        <div class="flex items-center">
-                            <p class="user-email">${user.profile_name || user.username}</p>
-                        </div>
-                    `;
+                    userCard.textContent = user.profile_name || user.username;
                     userCardsWrapper.appendChild(userCard);
                 });
             }
