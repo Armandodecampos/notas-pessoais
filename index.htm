@@ -2271,12 +2271,12 @@
 
         // --- EVENT LISTENERS ---
         userListContainer.addEventListener('click', (e) => {
-            const userCard = e.target.closest('.user-card');
+            const userCard = e.target.closest('button[data-email]');
             if (userCard) {
                 selectedEmail = userCard.dataset.email;
 
                 // Preenche os dados do usuário no formulário de login
-                const userName = userCard.querySelector('.user-email').textContent;
+                const userName = userCard.textContent;
                 selectedUserName.textContent = userName;
 
                 toggleUI(false, 'login');
