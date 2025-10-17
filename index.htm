@@ -868,6 +868,64 @@
         </div>
     </div>
 
+    <!-- NOVO: Modal do App de Senhas -->
+    <div id="passwords-modal" class="fixed inset-0 bg-gray-100 hidden flex-col z-50">
+        <header class="p-4 bg-white shadow-md">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-2xl font-bold text-theme">Senhas</h2>
+                <button id="close-passwords-modal" class="text-gray-500 hover:text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+        </header>
+        <div id="passwords-container" class="flex-grow overflow-y-auto p-4 space-y-3 pb-20">
+            <!-- Entradas de senha serão inseridas aqui -->
+        </div>
+        <footer class="p-4 bg-white shadow-lg fixed bottom-0 left-0 right-0">
+            <button id="show-add-password-modal-button" class="w-full px-4 py-3 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 transition-colors">
+                Adicionar Nova Senha
+            </button>
+        </footer>
+    </div>
+
+    <!-- NOVO: Modal para Adicionar/Editar Senha -->
+    <div id="edit-password-modal" class="fixed inset-0 bg-gray-100 hidden flex-col z-[60]">
+        <header class="flex items-center justify-between p-4 bg-white shadow-md">
+            <h2 id="password-modal-title" class="text-2xl font-bold text-theme"></h2>
+            <button id="close-edit-password-modal" class="text-gray-500 hover:text-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </header>
+        <div class="flex flex-col p-4 bg-gray-100 flex-grow space-y-4 overflow-y-auto">
+            <div class="relative">
+                <label for="edit-password-name" class="block text-sm font-medium text-left text-theme">Nome</label>
+                <input type="text" id="edit-password-name" placeholder="Ex: Conta Google" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            <div class="relative">
+                <label for="edit-password-login" class="block text-sm font-medium text-left text-theme">Login</label>
+                <input type="text" id="edit-password-login" placeholder="Ex: usuario@email.com" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            <div class="relative">
+                <label for="edit-password-value" class="block text-sm font-medium text-left text-theme">Senha</label>
+                <div class="relative mt-1">
+                    <input type="password" id="edit-password-value" placeholder="Digite a senha" class="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 pr-10">
+                    <button class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500 hover:text-gray-700 toggle-password-visibility">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+            <p id="password-error-message" class="text-red-500 text-sm text-center hidden"></p>
+            <div class="flex justify-end space-x-4 pt-2">
+                <button id="cancel-password-edit-button" class="px-6 py-2 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300">Cancelar</button>
+                <button id="save-password-edit-button" class="px-6 py-2 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600">Salvar</button>
+            </div>
+        </div>
+    </div>
+
 
     <script type="module">
         // --- CORREÇÃO IMPORTANTE PARA O ERRO "INVALID API KEY" ---
@@ -1102,6 +1160,21 @@
         const viewRecipeContent = document.getElementById('view-recipe-content');
         const recipeSearchInput = document.getElementById('recipe-search-input');
 
+        // NOVO: Referências do App de Senhas
+        const passwordsModal = document.getElementById('passwords-modal');
+        const closePasswordsModal = document.getElementById('close-passwords-modal');
+        const passwordsContainer = document.getElementById('passwords-container');
+        const showAddPasswordModalButton = document.getElementById('show-add-password-modal-button');
+        const editPasswordModal = document.getElementById('edit-password-modal');
+        const passwordModalTitle = document.getElementById('password-modal-title');
+        const closeEditPasswordModal = document.getElementById('close-edit-password-modal');
+        const editPasswordNameInput = document.getElementById('edit-password-name');
+        const editPasswordLoginInput = document.getElementById('edit-password-login');
+        const editPasswordValueInput = document.getElementById('edit-password-value');
+        const passwordErrorMessage = document.getElementById('password-error-message');
+        const cancelPasswordEditButton = document.getElementById('cancel-password-edit-button');
+        const savePasswordEditButton = document.getElementById('save-password-edit-button');
+
 
         let selectedEmail = '';
         let editingItemId = null;
@@ -1125,6 +1198,8 @@
         let recipesSubscription = null;
         let recipeImagesSubscription = null;
         let isAppInitialized = false;
+        let editingPasswordId = null;
+        let passwordsSubscription = null;
 
         const availableIcons = [
             // Web & Interface
@@ -1170,7 +1245,8 @@
         const fixedAppsMasterList = [
             { id: 'shopping-list', title: 'Compras', iconClass: 'fas fa-shopping-cart', isFixed: true },
             { id: 'notes-app', title: 'Notas', iconClass: 'fas fa-sticky-note', isFixed: true },
-            { id: 'recipes-app', title: 'Receitas', iconClass: 'fas fa-utensils', isFixed: true } // NOVO
+            { id: 'recipes-app', title: 'Receitas', iconClass: 'fas fa-utensils', isFixed: true },
+            { id: 'passwords-app', title: 'Senhas', iconClass: 'fas fa-key', isFixed: true }
         ];
 
         // --- FUNÇÕES DE INICIALIZAÇÃO E UI ---
@@ -1249,6 +1325,9 @@
             recipesModal.classList.add('hidden');
             editRecipeModal.classList.add('hidden');
             viewRecipeModal.classList.add('hidden');
+            // NOVO: Esconder modais de senhas
+            passwordsModal.classList.add('hidden');
+            editPasswordModal.classList.add('hidden');
 
 
             if (isLoggedIn) {
@@ -1797,19 +1876,6 @@
             }
         }
 
-        const shoppingListChannel = supabase.channel('public:shopping_list')
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'shopping_list' }, payload => {
-                fetchShoppingList();
-            })
-            .subscribe((status, err) => {
-                if (status === 'SUBSCRIBED') {
-                    console.log('Real-time subscription to shopping_list successful!');
-                }
-                if (err) {
-                    console.error('Real-time subscription error:', err);
-                }
-            });
-
         function setActiveFilter(filter) {
             filterAllButton.classList.remove('bg-indigo-600', 'text-white');
             filterAllButton.classList.add('bg-indigo-200', 'text-indigo-800');
@@ -2166,6 +2232,137 @@
         function hideViewRecipeModal() {
             viewRecipeModal.classList.add('hidden');
             viewRecipeModal.classList.remove('flex');
+        }
+
+        // --- NOVO: FUNÇÕES DO APP DE SENHAS ---
+
+        // Busca e renderiza as senhas
+        async function fetchPasswords() {
+            const { data, error } = await supabase
+                .from('passwords')
+                .select('*')
+                .order('name', { ascending: true });
+
+            if (error) {
+                console.error('Erro ao buscar senhas:', error);
+                passwordsContainer.innerHTML = '<p class="text-red-500">Não foi possível carregar as senhas.</p>';
+            } else {
+                renderPasswords(data);
+            }
+        }
+
+        // Renderiza as senhas na UI
+        function renderPasswords(passwords) {
+            passwordsContainer.innerHTML = '';
+            if (passwords.length === 0) {
+                passwordsContainer.innerHTML = '<p class="text-center text-gray-500">Nenhuma senha salva. Adicione uma nova!</p>';
+                return;
+            }
+
+            passwords.forEach(pw => {
+                const pwEl = document.createElement('div');
+                pwEl.className = 'p-4 bg-white rounded-lg shadow-sm flex flex-col space-y-2';
+                pwEl.dataset.id = pw.id;
+                pwEl.dataset.name = pw.name;
+                pwEl.dataset.login = pw.login;
+                pwEl.dataset.password = pw.password;
+
+                pwEl.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-bold text-lg text-theme">${pw.name}</h3>
+                            <p class="text-sm text-gray-600">${pw.login}</p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button class="password-edit-button p-2 text-gray-500 hover:text-indigo-600"><i class="fas fa-edit"></i></button>
+                            <button class="password-delete-button p-2 text-gray-500 hover:text-red-600"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <input type="password" readonly value="${pw.password}" class="w-full bg-gray-100 border-none rounded-md p-2 pr-10">
+                        <button class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500 hover:text-gray-700 toggle-password-visibility">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                `;
+                passwordsContainer.appendChild(pwEl);
+            });
+        }
+
+        // Mostra o modal para adicionar/editar senha
+        function showEditPasswordModal(password = null) {
+            passwordErrorMessage.classList.add('hidden');
+            if (password) {
+                editingPasswordId = password.id;
+                passwordModalTitle.textContent = 'Editar Senha';
+                editPasswordNameInput.value = password.name;
+                editPasswordLoginInput.value = password.login;
+                editPasswordValueInput.value = password.password;
+            } else {
+                editingPasswordId = null;
+                passwordModalTitle.textContent = 'Adicionar Nova Senha';
+                editPasswordNameInput.value = '';
+                editPasswordLoginInput.value = '';
+                editPasswordValueInput.value = '';
+            }
+            editPasswordModal.classList.remove('hidden');
+            editPasswordModal.classList.add('flex');
+            editPasswordNameInput.focus();
+        }
+
+        // Esconde o modal de adicionar/editar senha
+        function hideEditPasswordModal() {
+            editPasswordModal.classList.add('hidden');
+            editPasswordModal.classList.remove('flex');
+            editingPasswordId = null;
+        }
+
+        // Salva a senha (cria ou atualiza)
+        async function savePassword() {
+            const name = editPasswordNameInput.value.trim();
+            const login = editPasswordLoginInput.value.trim();
+            const password = editPasswordValueInput.value.trim();
+            const user = (await supabase.auth.getUser()).data.user;
+
+            if (!name || !login || !password || !user) {
+                passwordErrorMessage.textContent = 'Todos os campos são obrigatórios.';
+                passwordErrorMessage.classList.remove('hidden');
+                return;
+            }
+
+            const passwordData = { user_id: user.id, name, login, password };
+
+            let error;
+            if (editingPasswordId) {
+                // Atualiza
+                const { error: updateError } = await supabase
+                    .from('passwords')
+                    .update(passwordData)
+                    .eq('id', editingPasswordId);
+                error = updateError;
+            } else {
+                // Insere
+                const { error: insertError } = await supabase
+                    .from('passwords')
+                    .insert(passwordData);
+                error = insertError;
+            }
+
+            if (error) {
+                console.error("Erro ao salvar senha:", error);
+                passwordErrorMessage.textContent = 'Ocorreu um erro ao salvar.';
+                passwordErrorMessage.classList.remove('hidden');
+            } else {
+                hideEditPasswordModal();
+            }
+        }
+
+        // Deleta uma senha
+        async function deletePassword(passwordId) {
+            const { error } = await supabase.from('passwords').delete().eq('id', passwordId);
+            if (error) {
+                console.error("Erro ao deletar senha:", error);
+            }
         }
 
         // Salva a receita (cria ou atualiza)
@@ -3403,6 +3600,10 @@
                 recipesModal.classList.remove('hidden');
                 recipesModal.classList.add('flex');
                 fetchRecipes();
+            } else if (appId === 'passwords-app') {
+                passwordsModal.classList.remove('hidden');
+                passwordsModal.classList.add('flex');
+                fetchPasswords();
             } else if (appUrl) {
                 window.open(appUrl, '_blank');
             }
@@ -3564,6 +3765,118 @@
             }
         });
 
+        // --- NOVO: EVENTOS DO APP DE SENHAS ---
+        closePasswordsModal.addEventListener('click', () => {
+            passwordsModal.classList.add('hidden');
+            passwordsModal.classList.remove('flex');
+        });
+
+        showAddPasswordModalButton.addEventListener('click', () => showEditPasswordModal());
+        closeEditPasswordModal.addEventListener('click', hideEditPasswordModal);
+        cancelPasswordEditButton.addEventListener('click', hideEditPasswordModal);
+        savePasswordEditButton.addEventListener('click', savePassword);
+
+        passwordsContainer.addEventListener('click', (e) => {
+            const editButton = e.target.closest('.password-edit-button');
+            const deleteButton = e.target.closest('.password-delete-button');
+
+            if (editButton) {
+                const pwEl = editButton.closest('[data-id]');
+                const passwordData = {
+                    id: pwEl.dataset.id,
+                    name: pwEl.dataset.name,
+                    login: pwEl.dataset.login,
+                    password: pwEl.dataset.password
+                };
+                showEditPasswordModal(passwordData);
+            } else if (deleteButton) {
+                const pwEl = deleteButton.closest('[data-id]');
+                showDeleteConfirmationModal(pwEl.dataset.id, 'password');
+            }
+        });
+
+        // Listener de evento para o toggle de visibilidade (delegado para ambos os modais)
+        document.addEventListener('click', (e) => {
+            const toggleButton = e.target.closest('.toggle-password-visibility');
+            if (toggleButton) {
+                const icon = toggleButton.querySelector('i');
+                const input = toggleButton.previousElementSibling;
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            }
+        });
+
+        // Atualiza a função de confirmação de exclusão para lidar com senhas
+        function showDeleteConfirmationModal(id, type, name = '') {
+            itemToDeleteInfo = { id, type };
+            const messageEl = document.getElementById('delete-confirm-message');
+
+            if (type === 'note') {
+                messageEl.textContent = 'Tem a certeza que quer apagar esta nota?';
+            } else if (type === 'custom_app_permanent') {
+                messageEl.innerHTML = `Tem certeza que deseja excluir permanentemente o aplicativo "<strong>${name}</strong>"? <br>Esta ação não pode ser desfeita.`;
+            } else if (type === 'price') {
+                messageEl.textContent = 'Tem certeza que deseja excluir este preço?';
+            } else if (type === 'recipe') {
+                messageEl.textContent = 'Tem a certeza que quer apagar esta receita? Esta ação não pode ser desfeita.';
+            } else if (type === 'password') {
+                messageEl.textContent = 'Tem certeza que deseja excluir esta senha?';
+            }
+            else { // Default for shopping list item
+                messageEl.textContent = 'Tem certeza que deseja excluir este item da lista?';
+            }
+            deleteConfirmModal.classList.remove('hidden');
+            deleteConfirmModal.classList.add('flex');
+        }
+
+        confirmDeleteButton.addEventListener('click', async () => {
+            if (!itemToDeleteInfo) return;
+
+            const { id, type } = itemToDeleteInfo;
+            const user = (await supabase.auth.getUser()).data.user;
+
+            if (type === 'note') {
+                await deleteNote(id);
+                fetchNotes();
+            } else if (type === 'price') {
+                await deletePrice(id);
+                if (currentComparisonItemId) {
+                    fetchItemPrices(currentComparisonItemId);
+                }
+            } else if (type === 'recipe') {
+                await deleteRecipe(id);
+            } else if (type === 'password') {
+                await deletePassword(id);
+            } else if (type === 'custom_app_permanent') {
+                if (user) {
+                    // 1. Delete from the database table
+                    await supabase.from('custom_apps').delete().match({ id: id, user_id: user.id });
+
+                    // 2. Remove from the 'removed_apps' list in preferences
+                    const { data } = await supabase.from('profiles').select('preferences').eq('id', user.id).single();
+                    const prefs = data?.preferences || {};
+                    if (prefs.removed_apps) {
+                        prefs.removed_apps = prefs.removed_apps.filter(appId => appId !== id);
+                        await saveUserPreferences(prefs);
+                    }
+
+                    // 3. Refresh the trash list
+                    await renderTrashList();
+                }
+            } else { // Default case for shopping list item
+                await deleteItem(id);
+            }
+
+            hideDeleteConfirmationModal();
+        });
+
 
         // --- VERIFICAÇÃO DE ESTADO DE AUTENTICAÇÃO E URL ---
         supabase.auth.onAuthStateChange((event, session) => {
@@ -3576,6 +3889,7 @@
                     loadUserProfile(session.user);
                     loadUserPreferences();
                     toggleUI(true); // Esta chamada agora é segura dentro do bloco condicional
+                    fetchAndRenderApps(session.user.id);
 
                     // --- Configura todas as subscrições em tempo real ---
                     if (customAppsSubscription) supabase.removeChannel(customAppsSubscription);
@@ -3601,6 +3915,13 @@
                     if (recipeImagesSubscription) supabase.removeChannel(recipeImagesSubscription);
                     recipeImagesSubscription = supabase.channel('public:recipe_images')
                         .on('postgres_changes', { event: '*', schema: 'public', table: 'recipe_images' }, payload => fetchRecipes())
+                        .subscribe();
+
+                    // NOVO: Subscrição para a Lista de Compras
+                    const shoppingListChannel = supabase.channel('public:shopping_list')
+                        .on('postgres_changes', { event: '*', schema: 'public', table: 'shopping_list' }, payload => {
+                            fetchShoppingList();
+                        })
                         .subscribe();
 
                     // --- Busca inicial de dados ---
