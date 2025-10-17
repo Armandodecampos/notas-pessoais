@@ -8,7 +8,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Adiciona Font Awesome para os ícones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
         :root {
@@ -176,42 +175,57 @@
     <div id="main-container" class="flex items-center justify-center min-h-screen p-4">
         <!-- Conteúdo do Login -->
         <div id="app" class="w-full max-w-md">
-             <!-- Formulário de Login -->
-            <div id="login-form-container" class="space-y-6 bg-white p-8 rounded-xl shadow-lg">
-                <h2 class="text-3xl font-bold text-center text-gray-800">Login</h2>
-
-                <!-- Campo de Email -->
-                <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                    <input type="email" id="email" autocomplete="email" class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-lg">
-                </div>
-
-                <!-- Campo da Senha -->
-                <div>
-                    <label for="password" class="block text-sm font-medium text-gray-700">Senha</label>
-                    <input type="password" id="password" autocomplete="current-password" class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-lg">
-                </div>
-
-                <!-- Opções (Lembrar Senha e Redefinir) -->
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center">
-                        <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
-                        <label for="remember-me" class="ml-2 block text-sm text-gray-900">Lembrar senha</label>
-                    </div>
-                    <div class="text-sm">
-                        <button id="reset-password-button" class="font-medium text-indigo-600 hover:text-indigo-500 hover:underline">
-                            Esqueceu a senha?
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Botão de Entrar -->
-                <button id="login-button" class="w-full px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-md shadow-lg hover:shadow-xl focus:outline-none transition-all text-lg">
-                    Entrar
+            <div id="initial-login-view" class="text-center">
+                 <button id="show-profiles-button" class="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-2xl rounded-md shadow-lg hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transform transition-all duration-300 ease-in-out">
+                    Acessar
                 </button>
+            </div>
 
-                <!-- Mensagem de erro de login -->
-                <p id="login-error-message" class="text-red-500 text-sm text-center hidden pt-2"></p>
+            <!-- Lista de Usuários (inicialmente escondida) -->
+            <div id="user-list-container" class="hidden fixed inset-0 bg-gray-100 flex flex-col items-center justify-center gap-8 p-4">
+                <div id="user-cards-wrapper" class="flex flex-col items-center gap-8 w-full max-w-sm">
+                    <!-- Usuários serão injetados aqui via JavaScript -->
+                </div>
+                <button id="back-to-initial-button" class="absolute top-6 left-6 px-4 py-2 bg-white text-gray-800 font-semibold rounded-md shadow-sm hover:bg-gray-200 focus:outline-none transition-all flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                    Voltar
+                </button>
+            </div>
+
+            <!-- Formulário de Login (inicialmente escondido) -->
+            <div id="login-form-container" class="hidden fixed inset-0 bg-gray-100 flex flex-col items-center justify-center p-4">
+                <div class="w-full max-w-xs space-y-4">
+                    <!-- Display do usuário selecionado -->
+                    <div class="flex flex-col items-center mb-2">
+                        <p id="selected-user-name" class="text-xl font-bold text-gray-800"></p>
+                    </div>
+
+                    <!-- Campo da Senha -->
+                    <div class="w-full">
+                        <label for="password" class="block text-lg font-medium text-gray-700 text-center mb-2">Senha</label>
+                        <input type="password" id="password" autocomplete="current-password" class="block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-center text-lg">
+                    </div>
+
+                    <!-- Botão de Entrar -->
+                    <button id="login-button" class="w-full px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-md shadow-lg hover:shadow-xl focus:outline-none transition-all text-lg">
+                        Entrar
+                    </button>
+
+                    <!-- Botão de redefinir senha (agora como texto) -->
+                    <button id="reset-password-button" class="!mt-2 w-full text-sm text-gray-600 hover:text-indigo-600 hover:underline focus:outline-none transition-colors duration-200">
+                        Redefinir Senha
+                    </button>
+                </div>
+
+                <!-- Botão Voltar -->
+                <button id="back-button" class="absolute top-6 left-6 px-4 py-2 bg-white text-gray-800 font-semibold rounded-md shadow-sm hover:bg-gray-200 focus:outline-none transition-all flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                    Voltar
+                </button>
             </div>
 
             <!-- Formulário de Nova Senha (inicialmente escondido) -->
@@ -854,67 +868,8 @@
         </div>
     </div>
 
-    <!-- NOVO: Modal do App de Senhas -->
-    <div id="passwords-modal" class="fixed inset-0 bg-gray-100 hidden flex-col z-50">
-        <header class="p-4 bg-white shadow-md">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-2xl font-bold text-theme">Senhas</h2>
-                <button id="close-passwords-modal" class="text-gray-500 hover:text-gray-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-        </header>
-        <div id="passwords-container" class="flex-grow overflow-y-auto p-4 space-y-3 pb-20">
-            <!-- Entradas de senha serão inseridas aqui -->
-        </div>
-        <footer class="p-4 bg-white shadow-lg fixed bottom-0 left-0 right-0">
-            <button id="show-add-password-modal-button" class="w-full px-4 py-3 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 transition-colors">
-                Adicionar Nova Senha
-            </button>
-        </footer>
-    </div>
 
-    <!-- NOVO: Modal para Adicionar/Editar Senha -->
-    <div id="edit-password-modal" class="fixed inset-0 bg-gray-100 hidden flex-col z-[60]">
-        <header class="flex items-center justify-between p-4 bg-white shadow-md">
-            <h2 id="password-modal-title" class="text-2xl font-bold text-theme"></h2>
-            <button id="close-edit-password-modal" class="text-gray-500 hover:text-gray-700">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-        </header>
-        <div class="flex flex-col p-4 bg-gray-100 flex-grow space-y-4 overflow-y-auto">
-            <div class="relative">
-                <label for="edit-password-name" class="block text-sm font-medium text-left text-theme">Nome</label>
-                <input type="text" id="edit-password-name" placeholder="Ex: Conta Google" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-            </div>
-            <div class="relative">
-                <label for="edit-password-login" class="block text-sm font-medium text-left text-theme">Login</label>
-                <input type="text" id="edit-password-login" placeholder="Ex: usuario@email.com" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-            </div>
-            <div class="relative">
-                <label for="edit-password-value" class="block text-sm font-medium text-left text-theme">Senha</label>
-                <div class="relative mt-1">
-                    <input type="password" id="edit-password-value" placeholder="Digite a senha" class="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 pr-10">
-                    <button class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500 hover:text-gray-700 toggle-password-visibility">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </div>
-            </div>
-            <p id="password-error-message" class="text-red-500 text-sm text-center hidden"></p>
-            <div class="flex justify-end space-x-4 pt-2">
-                <button id="cancel-password-edit-button" class="px-6 py-2 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300">Cancelar</button>
-                <button id="save-password-edit-button" class="px-6 py-2 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600">Salvar</button>
-            </div>
-        </div>
-    </div>
-
-
-</body>
-    <script>
+    <script type="module">
         // --- CORREÇÃO IMPORTANTE PARA O ERRO "INVALID API KEY" ---
         // O erro que está a receber ("Invalid API key") significa que os valores abaixo
         // não correspondem ao seu projeto Supabase. É necessário substituí-los.
@@ -932,8 +887,10 @@
 
 
 
-        const { createClient } = supabase;
-        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+        // Configura o cliente do Supabase para não persistir a sessão no navegador
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
             auth: {
                 persistSession: false
             }
@@ -1145,22 +1102,8 @@
         const viewRecipeContent = document.getElementById('view-recipe-content');
         const recipeSearchInput = document.getElementById('recipe-search-input');
 
-        // NOVO: Referências do App de Senhas
-        const passwordsModal = document.getElementById('passwords-modal');
-        const closePasswordsModal = document.getElementById('close-passwords-modal');
-        const passwordsContainer = document.getElementById('passwords-container');
-        const showAddPasswordModalButton = document.getElementById('show-add-password-modal-button');
-        const editPasswordModal = document.getElementById('edit-password-modal');
-        const passwordModalTitle = document.getElementById('password-modal-title');
-        const closeEditPasswordModal = document.getElementById('close-edit-password-modal');
-        const editPasswordNameInput = document.getElementById('edit-password-name');
-        const editPasswordLoginInput = document.getElementById('edit-password-login');
-        const editPasswordValueInput = document.getElementById('edit-password-value');
-        const passwordErrorMessage = document.getElementById('password-error-message');
-        const cancelPasswordEditButton = document.getElementById('cancel-password-edit-button');
-        const savePasswordEditButton = document.getElementById('save-password-edit-button');
 
-
+        let selectedEmail = '';
         let editingItemId = null;
         let editingNoteId = null;
         let currentFilter = 'to-buy';
@@ -1182,8 +1125,6 @@
         let recipesSubscription = null;
         let recipeImagesSubscription = null;
         let isAppInitialized = false;
-        let editingPasswordId = null;
-        let passwordsSubscription = null;
 
         const availableIcons = [
             // Web & Interface
@@ -1229,15 +1170,44 @@
         const fixedAppsMasterList = [
             { id: 'shopping-list', title: 'Compras', iconClass: 'fas fa-shopping-cart', isFixed: true },
             { id: 'notes-app', title: 'Notas', iconClass: 'fas fa-sticky-note', isFixed: true },
-            { id: 'recipes-app', title: 'Receitas', iconClass: 'fas fa-utensils', isFixed: true },
-            { id: 'passwords-app', title: 'Senhas', iconClass: 'fas fa-key', isFixed: true }
+            { id: 'recipes-app', title: 'Receitas', iconClass: 'fas fa-utensils', isFixed: true } // NOVO
         ];
 
         // --- FUNÇÕES DE INICIALIZAÇÃO E UI ---
 
+        // Função para buscar os emails do Supabase e popular o dropdown
+        async function fetchUsers() {
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('username, avatar_url, profile_name');
+
+            if (error) {
+                console.error('Erro ao buscar usuários:', error);
+            } else if (data.length === 0) {
+                 userCardsWrapper.innerHTML = '<p class="text-center text-gray-500">Nenhum usuário encontrado. Adicione usuários na tabela `profiles` do Supabase.</p>';
+            } else {
+                // NOVO: Ordena os usuários em ordem alfabética pelo nome do perfil ou, na falta deste, pelo nome de usuário.
+                data.sort((a, b) => {
+                    const nameA = (a.profile_name || a.username).toLowerCase();
+                    const nameB = (b.profile_name || b.username).toLowerCase();
+                    return nameA.localeCompare(nameB);
+                });
+
+                userCardsWrapper.innerHTML = '';
+                data.forEach(user => {
+                    const userCard = document.createElement('button');
+                    // Apply Tailwind classes directly to make the user card look like a button
+                    userCard.className = 'w-full px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-2xl rounded-md shadow-lg hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transform transition-all duration-300 ease-in-out';
+                    userCard.dataset.email = user.username;
+                    userCard.textContent = user.profile_name || user.username;
+                    userCardsWrapper.appendChild(userCard);
+                });
+            }
+        }
+
         // Função para carregar os dados do perfil logado
         async function loadUserProfile(user) {
-            const { data: profileData, error } = await supabaseClient
+            const { data: profileData, error } = await supabase
                 .from('profiles')
                 .select('avatar_url, profile_name')
                 .eq('id', user.id)
@@ -1279,9 +1249,6 @@
             recipesModal.classList.add('hidden');
             editRecipeModal.classList.add('hidden');
             viewRecipeModal.classList.add('hidden');
-            // NOVO: Esconder modais de senhas
-            passwordsModal.classList.add('hidden');
-            editPasswordModal.classList.add('hidden');
 
 
             if (isLoggedIn) {
@@ -1300,15 +1267,38 @@
                 mainContainer.classList.remove('hidden');
                 loggedInAppContainer.classList.add('hidden');
 
+                // Just hide the bar, don't worry about grid position as it's hidden
+                appActionBar.classList.add('hidden');
+                appActionBar.classList.remove('flex');
+
                 // Restaura o estilo do body para o login
                 document.body.classList.add('bg-gray-100');
 
-                if (view === 'new-password') {
-                    loginFormContainer.classList.add('hidden');
-                    newPasswordContainer.classList.remove('hidden');
+                // Lógica para posicionar o container
+                if (view === 'login') {
+                    mainContainer.classList.remove('items-center');
+                    mainContainer.classList.add('items-start', 'pt-20');
                 } else {
+                    mainContainer.classList.add('items-center');
+                    mainContainer.classList.remove('items-start', 'pt-20');
+                }
+
+                // Esconde todas as vistas dentro do ecrã de login
+                initialLoginView.classList.add('hidden');
+                userListContainer.classList.add('hidden');
+                loginFormContainer.classList.add('hidden');
+                newPasswordContainer.classList.add('hidden');
+
+                // Mostra a vista de login correta
+                if (view === 'user-list') {
+                    userListContainer.classList.remove('hidden');
+                    userListContainer.classList.add('flex');
+                } else if (view === 'login') {
                     loginFormContainer.classList.remove('hidden');
-                    newPasswordContainer.classList.add('hidden');
+                } else if (view === 'new-password') {
+                    newPasswordContainer.classList.remove('hidden');
+                } else { // A vista padrão é a inicial com o botão de login
+                    initialLoginView.classList.remove('hidden');
                 }
             }
         }
@@ -1373,10 +1363,10 @@
 
         // Salva as preferências do usuário no Supabase
         async function saveUserPreferences(preferences) {
-            const { data: { user } } = await supabaseClient.auth.getUser();
+            const { data: { user } } = await supabase.auth.getUser();
             if (!user) return;
 
-            const { error } = await supabaseClient
+            const { error } = await supabase
                 .from('profiles')
                 .update({ preferences: preferences })
                 .eq('id', user.id);
@@ -1388,10 +1378,10 @@
 
         // Carrega as preferências do usuário ao logar
         async function loadUserPreferences() {
-            const { data: { user } } = await supabaseClient.auth.getUser();
+            const { data: { user } } = await supabase.auth.getUser();
             if (!user) return;
 
-            const { data, error } = await supabaseClient
+            const { data, error } = await supabase
                 .from('profiles')
                 .select('preferences')
                 .eq('id', user.id)
@@ -1463,10 +1453,10 @@
 
         // Busca e renderiza as notas do usuário
         async function fetchNotes() {
-            const { data: { user } = {} } = await supabaseClient.auth.getUser();
+            const { data: { user } = {} } = await supabase.auth.getUser();
             if (!user) return;
 
-            let query = supabaseClient
+            let query = supabase
                 .from('notes')
                 .select('id, title, content, start_date, end_date, is_fixed')
                 .eq('user_id', user.id);
@@ -1529,10 +1519,10 @@
 
         // Adiciona uma nova nota
         async function addNote(title, content, startDate, endDate, isFixed) {
-            const { data: { user } } = await supabaseClient.auth.getUser();
+            const { data: { user } } = await supabase.auth.getUser();
             if (!user) return;
 
-            const { error } = await supabaseClient
+            const { error } = await supabase
                 .from('notes')
                 .insert({ title, content, user_id: user.id, start_date: startDate, end_date: endDate, is_fixed: isFixed });
 
@@ -1543,7 +1533,7 @@
 
         // Apaga uma nota
         async function deleteNote(noteId) {
-            const { error } = await supabaseClient
+            const { error } = await supabase
                 .from('notes')
                 .delete()
                 .eq('id', noteId);
@@ -1555,7 +1545,7 @@
 
         // Atualiza uma nota
         async function updateNote(noteId, title, content, startDate, endDate, isFixed) {
-            const { error } = await supabaseClient
+            const { error } = await supabase
                 .from('notes')
                 .update({ title, content, start_date: startDate, end_date: endDate, is_fixed: isFixed })
                 .eq('id', noteId);
@@ -1636,13 +1626,13 @@
 
         // Função para buscar e renderizar a lista de compras
         async function fetchShoppingList() {
-            const { data: { user } } = await supabaseClient.auth.getUser();
+            const { data: { user } } = await supabase.auth.getUser();
             if (!user) {
                 console.error('Usuário não autenticado.');
                 return;
             }
 
-            let query = supabaseClient.from('shopping_list').select('*');
+            let query = supabase.from('shopping_list').select('*');
 
             if (currentFilter === 'to-buy') {
                 query = query.eq('is_checked', false);
@@ -1751,7 +1741,7 @@
         }
 
         async function updateItem(itemId, newItemName, newQuantity, newUnit) {
-            const { error } = await supabaseClient
+            const { error } = await supabase
                 .from('shopping_list')
                 .update({ item_name: newItemName, quantity: newQuantity, unit: newUnit })
                 .eq('id', itemId);
@@ -1762,7 +1752,7 @@
         }
 
         async function toggleItemChecked(itemId, newStatus) {
-            const { error } = await supabaseClient
+            const { error } = await supabase
                 .from('shopping_list')
                 .update({ is_checked: newStatus })
                 .eq('id', itemId);
@@ -1776,13 +1766,13 @@
             const newItemName = addItemNameInput.value.trim();
             const newQuantity = parseFloat(addItemQuantityInput.value) || null;
             const newUnit = addItemUnitInput.value;
-            const { data: { user } } = await supabaseClient.auth.getUser();
+            const { data: { user } } = await supabase.auth.getUser();
 
             if (!newItemName || !user) {
                 return;
             }
 
-            const { error } = await supabaseClient
+            const { error } = await supabase
                 .from('shopping_list')
                 .insert([{ item_name: newItemName, quantity: newQuantity, unit: newUnit }]);
 
@@ -1797,7 +1787,7 @@
         }
 
         async function deleteItem(itemId) {
-            const { error } = await supabaseClient
+            const { error } = await supabase
                 .from('shopping_list')
                 .delete()
                 .eq('id', itemId);
@@ -1806,6 +1796,19 @@
                 console.error('Erro ao deletar item:', error);
             }
         }
+
+        const shoppingListChannel = supabase.channel('public:shopping_list')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'shopping_list' }, payload => {
+                fetchShoppingList();
+            })
+            .subscribe((status, err) => {
+                if (status === 'SUBSCRIBED') {
+                    console.log('Real-time subscription to shopping_list successful!');
+                }
+                if (err) {
+                    console.error('Real-time subscription error:', err);
+                }
+            });
 
         function setActiveFilter(filter) {
             filterAllButton.classList.remove('bg-indigo-600', 'text-white');
@@ -1832,7 +1835,7 @@
         // --- FUNÇÕES DE COMPARAÇÃO DE PREÇOS ---
         async function fetchItemPrices(itemId) {
             if (!itemId) return;
-            const { data, error } = await supabaseClient
+            const { data, error } = await supabase
                 .from('item_prices')
                 .select('*')
                 .eq('item_id', itemId);
@@ -1882,14 +1885,14 @@
         async function addPrice() {
             const location = priceLocationInput.value.trim();
             const price = parseFloat(priceValueInput.value);
-            const { data: { user } } = await supabaseClient.auth.getUser();
+            const { data: { user } } = await supabase.auth.getUser();
 
             if (!location || isNaN(price) || !user || !currentComparisonItemId) {
                 // Adicionar feedback ao usuário aqui, se desejar
                 return;
             }
 
-            const { error } = await supabaseClient
+            const { error } = await supabase
                 .from('item_prices')
                 .insert({
                     item_id: currentComparisonItemId,
@@ -1907,7 +1910,7 @@
         }
 
         async function updatePrice(priceId, newLocation, newPrice) {
-             const { error } = await supabaseClient
+             const { error } = await supabase
                 .from('item_prices')
                 .update({ location: newLocation, price: newPrice })
                 .eq('id', priceId);
@@ -1917,7 +1920,7 @@
         }
 
         async function deletePrice(priceId) {
-             const { error } = await supabaseClient
+             const { error } = await supabase
                 .from('item_prices')
                 .delete()
                 .eq('id', priceId);
@@ -2019,7 +2022,7 @@
 
         // Busca e renderiza as receitas
         async function fetchRecipes() {
-            const { data, error } = await supabaseClient
+            const { data, error } = await supabase
                 .from('recipes')
                 .select(`*, recipe_images(image_url)`)
                 .order('title', { ascending: true });
@@ -2165,142 +2168,11 @@
             viewRecipeModal.classList.remove('flex');
         }
 
-        // --- NOVO: FUNÇÕES DO APP DE SENHAS ---
-
-        // Busca e renderiza as senhas
-        async function fetchPasswords() {
-            const { data, error } = await supabaseClient
-                .from('passwords')
-                .select('*')
-                .order('name', { ascending: true });
-
-            if (error) {
-                console.error('Erro ao buscar senhas:', error);
-                passwordsContainer.innerHTML = '<p class="text-red-500">Não foi possível carregar as senhas.</p>';
-            } else {
-                renderPasswords(data);
-            }
-        }
-
-        // Renderiza as senhas na UI
-        function renderPasswords(passwords) {
-            passwordsContainer.innerHTML = '';
-            if (passwords.length === 0) {
-                passwordsContainer.innerHTML = '<p class="text-center text-gray-500">Nenhuma senha salva. Adicione uma nova!</p>';
-                return;
-            }
-
-            passwords.forEach(pw => {
-                const pwEl = document.createElement('div');
-                pwEl.className = 'p-4 bg-white rounded-lg shadow-sm flex flex-col space-y-2';
-                pwEl.dataset.id = pw.id;
-                pwEl.dataset.name = pw.name;
-                pwEl.dataset.login = pw.login;
-                pwEl.dataset.password = pw.password;
-
-                pwEl.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h3 class="font-bold text-lg text-theme">${pw.name}</h3>
-                            <p class="text-sm text-gray-600">${pw.login}</p>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <button class="password-edit-button p-2 text-gray-500 hover:text-indigo-600"><i class="fas fa-edit"></i></button>
-                            <button class="password-delete-button p-2 text-gray-500 hover:text-red-600"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </div>
-                    <div class="relative">
-                        <input type="password" readonly value="${pw.password}" class="w-full bg-gray-100 border-none rounded-md p-2 pr-10">
-                        <button class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500 hover:text-gray-700 toggle-password-visibility">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                `;
-                passwordsContainer.appendChild(pwEl);
-            });
-        }
-
-        // Mostra o modal para adicionar/editar senha
-        function showEditPasswordModal(password = null) {
-            passwordErrorMessage.classList.add('hidden');
-            if (password) {
-                editingPasswordId = password.id;
-                passwordModalTitle.textContent = 'Editar Senha';
-                editPasswordNameInput.value = password.name;
-                editPasswordLoginInput.value = password.login;
-                editPasswordValueInput.value = password.password;
-            } else {
-                editingPasswordId = null;
-                passwordModalTitle.textContent = 'Adicionar Nova Senha';
-                editPasswordNameInput.value = '';
-                editPasswordLoginInput.value = '';
-                editPasswordValueInput.value = '';
-            }
-            editPasswordModal.classList.remove('hidden');
-            editPasswordModal.classList.add('flex');
-            editPasswordNameInput.focus();
-        }
-
-        // Esconde o modal de adicionar/editar senha
-        function hideEditPasswordModal() {
-            editPasswordModal.classList.add('hidden');
-            editPasswordModal.classList.remove('flex');
-            editingPasswordId = null;
-        }
-
-        // Salva a senha (cria ou atualiza)
-        async function savePassword() {
-            const name = editPasswordNameInput.value.trim();
-            const login = editPasswordLoginInput.value.trim();
-            const password = editPasswordValueInput.value.trim();
-            const user = (await supabaseClient.auth.getUser()).data.user;
-
-            if (!name || !login || !password || !user) {
-                passwordErrorMessage.textContent = 'Todos os campos são obrigatórios.';
-                passwordErrorMessage.classList.remove('hidden');
-                return;
-            }
-
-            const passwordData = { user_id: user.id, name, login, password };
-
-            let error;
-            if (editingPasswordId) {
-                // Atualiza
-                const { error: updateError } = await supabaseClient
-                    .from('passwords')
-                    .update(passwordData)
-                    .eq('id', editingPasswordId);
-                error = updateError;
-            } else {
-                // Insere
-                const { error: insertError } = await supabaseClient
-                    .from('passwords')
-                    .insert(passwordData);
-                error = insertError;
-            }
-
-            if (error) {
-                console.error("Erro ao salvar senha:", error);
-                passwordErrorMessage.textContent = 'Ocorreu um erro ao salvar.';
-                passwordErrorMessage.classList.remove('hidden');
-            } else {
-                hideEditPasswordModal();
-            }
-        }
-
-        // Deleta uma senha
-        async function deletePassword(passwordId) {
-            const { error } = await supabaseClient.from('passwords').delete().eq('id', passwordId);
-            if (error) {
-                console.error("Erro ao deletar senha:", error);
-            }
-        }
-
         // Salva a receita (cria ou atualiza)
         async function saveRecipe() {
             const title = editRecipeTitle.value.trim();
             const content = editRecipeContent.value.trim();
-            const user = (await supabaseClient.auth.getUser()).data.user;
+            const user = (await supabase.auth.getUser()).data.user;
 
             if (!title || !user) {
                 recipeErrorMessage.textContent = 'O título é obrigatório.';
@@ -2315,12 +2187,12 @@
             const uploadedUrls = [];
             for (const file of recipeFilesToUpload) {
                 const filePath = `${user.id}/${Date.now()}-${file.name}`;
-                const { error } = await supabaseClient.storage.from('recipes').upload(filePath, file);
+                const { error } = await supabase.storage.from('recipes').upload(filePath, file);
                 if (error) {
                     console.error('Erro no upload da imagem:', error);
                     continue;
                 }
-                const { data } = supabaseClient.storage.from('recipes').getPublicUrl(filePath);
+                const { data } = supabase.storage.from('recipes').getPublicUrl(filePath);
                 uploadedUrls.push(data.publicUrl);
             }
 
@@ -2331,12 +2203,12 @@
                     return parts.slice(parts.indexOf(user.id)).join('/');
                 });
 
-                await supabaseClient.storage.from('recipes').remove(filePaths);
+                await supabase.storage.from('recipes').remove(filePaths);
             }
 
             // 3. Salvar/Atualizar a receita
             if (editingRecipeId) { // Atualizando
-                const { error } = await supabaseClient
+                const { error } = await supabase
                     .from('recipes')
                     .update({ title, content })
                     .eq('id', editingRecipeId);
@@ -2344,7 +2216,7 @@
                 if (error) console.error("Erro ao atualizar receita:", error);
 
             } else { // Criando
-                const { data, error } = await supabaseClient
+                const { data, error } = await supabase
                     .from('recipes')
                     .insert({ title, content, user_id: user.id })
                     .select()
@@ -2363,7 +2235,7 @@
                     recipe_id: editingRecipeId,
                     image_url: url
                 }));
-                await supabaseClient.from('recipe_images').insert(imagesToInsert);
+                await supabase.from('recipe_images').insert(imagesToInsert);
             }
 
             saveRecipeEditButton.disabled = false;
@@ -2372,7 +2244,7 @@
         }
 
         async function deleteRecipe(recipeId) {
-             const { data: images, error: imagesError } = await supabaseClient
+             const { data: images, error: imagesError } = await supabase
                 .from('recipe_images')
                 .select('image_url')
                 .eq('recipe_id', recipeId);
@@ -2384,57 +2256,42 @@
 
             // Deleta imagens do Storage
             if (images && images.length > 0) {
-                const user = (await supabaseClient.auth.getUser()).data.user;
+                const user = (await supabase.auth.getUser()).data.user;
                 const filePaths = images.map(img => {
                     const parts = img.image_url.split('/');
                     return parts.slice(parts.indexOf(user.id)).join('/');
                 });
-                await supabaseClient.storage.from('recipes').remove(filePaths);
+                await supabase.storage.from('recipes').remove(filePaths);
             }
 
             // Deleta a receita do banco de dados (o cascade cuidará das imagens)
-            await supabaseClient.from('recipes').delete().eq('id', recipeId);
+            await supabase.from('recipes').delete().eq('id', recipeId);
         }
 
 
         // --- EVENT LISTENERS ---
-        const emailInput = document.getElementById('email');
-        const rememberMeCheckbox = document.getElementById('remember-me');
-        const loginErrorMessage = document.getElementById('login-error-message');
+        userListContainer.addEventListener('click', (e) => {
+            const userCard = e.target.closest('button[data-email]');
+            if (userCard) {
+                selectedEmail = userCard.dataset.email;
 
-        // Carregar email salvo no localStorage
-        document.addEventListener('DOMContentLoaded', () => {
-            const savedEmail = localStorage.getItem('rememberedEmail');
-            if (savedEmail) {
-                emailInput.value = savedEmail;
-                rememberMeCheckbox.checked = true;
+                // Preenche os dados do usuário no formulário de login
+                const userName = userCard.textContent;
+                selectedUserName.textContent = userName;
+
+                toggleUI(false, 'login');
+                passwordInput.focus();
             }
         });
 
         loginButton.addEventListener('click', async () => {
-            loginButton.textContent = 'Entrando...';
-            loginButton.disabled = true;
-
-            const email = emailInput.value;
+            const email = selectedEmail;
             const password = passwordInput.value;
-            const rememberMe = rememberMeCheckbox.checked;
 
-            loginErrorMessage.classList.add('hidden'); // Esconde a mensagem de erro ao tentar logar
-
-            if (rememberMe) {
-                localStorage.setItem('rememberedEmail', email);
-            } else {
-                localStorage.removeItem('rememberedEmail');
-            }
-
-            const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            const { error } = await supabase.auth.signInWithPassword({ email, password });
 
             if (error) {
                 console.error(error);
-                loginErrorMessage.textContent = error.message;
-                loginErrorMessage.classList.remove('hidden');
-                loginButton.textContent = 'Entrar';
-                loginButton.disabled = false;
             }
         });
 
@@ -2447,15 +2304,10 @@
         });
 
         resetPasswordButton.addEventListener('click', async () => {
-            const email = emailInput.value;
-            if (!email) {
-                // Idealmente, mostre uma mensagem de erro para o usuário aqui
-                console.error("O campo de e-mail está vazio.");
-                return;
-            }
+            const email = selectedEmail;
             const redirectToUrl = `${window.location.origin}${window.location.pathname}`;
 
-            const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+            const { error } = await supabase.auth.resetPasswordForEmail(email, {
                 redirectTo: redirectToUrl
             });
 
@@ -2473,6 +2325,20 @@
             }
         });
 
+        backButton.addEventListener('click', () => {
+            toggleUI(false, 'user-list');
+            passwordInput.value = '';
+        });
+
+        backToInitialButton.addEventListener('click', () => {
+            toggleUI(false, 'initial');
+        });
+
+        backButtonNewPassword.addEventListener('click', () => {
+            toggleUI(false, 'initial');
+            newPasswordInput.value = '';
+            confirmPasswordInput.value = '';
+        });
 
 
         updatePasswordButton.addEventListener('click', async () => {
@@ -2486,7 +2352,7 @@
                 return;
             }
 
-            const { error } = await supabaseClient.auth.updateUser({ password: newPassword });
+            const { error } = await supabase.auth.updateUser({ password: newPassword });
 
             if (error) {
                 console.error(error);
@@ -2512,7 +2378,7 @@
         // --- NOVOS EVENTOS PARA O MODAL DO PERFIL ---
 
         profileButton.addEventListener('click', async () => {
-            const { data: { session } } = await supabaseClient.auth.getSession();
+            const { data: { session } } = await supabase.auth.getSession();
             if (session) {
                 profileModal.classList.remove('hidden');
                 profileModal.classList.add('flex');
@@ -2529,7 +2395,7 @@
             profileModal.classList.remove('flex');
             editProfileModal.classList.remove('hidden');
             editProfileModal.classList.add('flex');
-            const { data, error } = await supabaseClient.from('profiles').select('profile_name').eq('id', (await supabaseClient.auth.getSession()).data.session.user.id).single();
+            const { data, error } = await supabase.from('profiles').select('profile_name').eq('id', (await supabase.auth.getSession()).data.session.user.id).single();
             if (!error && data?.profile_name) {
                 profileNameInput.value = data.profile_name;
             }
@@ -2546,14 +2412,14 @@
         changePasswordButton.addEventListener('click', async () => {
             profileModal.classList.add('hidden');
             profileModal.classList.remove('flex');
-            const { data: { session } } = await supabaseClient.auth.getSession();
+            const { data: { session } } = await supabase.auth.getSession();
             const user = session?.user;
 
             if (user && user.email) {
                 const redirectToUrl = `${window.location.origin}${window.location.pathname}`;
 
                 try {
-                    const { error } = await supabaseClient.auth.resetPasswordForEmail(user.email, { redirectTo: redirectToUrl });
+                    const { error } = await supabase.auth.resetPasswordForEmail(user.email, { redirectTo: redirectToUrl });
 
                     if (error) {
                          if (error.status === 429) {
@@ -2574,7 +2440,7 @@
         });
 
         logoutButtonModal.addEventListener('click', async () => {
-            const { error } = await supabaseClient.auth.signOut();
+            const { error } = await supabase.auth.signOut();
             if (error) {
                 console.error('Erro ao sair:', error);
             } else {
@@ -2584,7 +2450,7 @@
         });
 
         uploadAvatarButton.addEventListener('click', async () => {
-            const { data: { session } = {} } = await supabaseClient.auth.getSession();
+            const { data: { session } = {} } = await supabase.auth.getSession();
             const user = session?.user;
 
             if (!user) {
@@ -2606,7 +2472,7 @@
             uploadMessage.classList.add('text-gray-700');
 
             const filePath = `${user.id}/${file.name}`;
-            const { error: uploadError } = await supabaseClient.storage
+            const { error: uploadError } = await supabase.storage
                 .from('avatars')
                 .upload(filePath, file, {
                     cacheControl: '3600',
@@ -2618,7 +2484,7 @@
                 uploadMessage.textContent = `Erro ao fazer upload: ${uploadError.message}`;
                 uploadMessage.classList.add('text-red-700');
             } else {
-                const { data: { publicUrl }, error: urlError } = supabaseClient.storage
+                const { data: { publicUrl }, error: urlError } = supabase.storage
                     .from('avatars')
                     .getPublicUrl(filePath);
 
@@ -2629,7 +2495,7 @@
                     return;
                 }
 
-                const { error: updateError } = await supabaseClient
+                const { error: updateError } = await supabase
                     .from('profiles')
                     .update({ avatar_url: publicUrl })
                     .eq('id', user.id);
@@ -2649,7 +2515,7 @@
         });
 
         updateProfileButton.addEventListener('click', async () => {
-            const { data: { session } = {} } = await supabaseClient.auth.getSession();
+            const { data: { session } = {} } = await supabase.auth.getSession();
             const user = session?.user;
             if (!user) {
                 uploadMessage.textContent = 'Erro: Nenhum usuário logado.';
@@ -2668,7 +2534,7 @@
             uploadMessage.classList.remove('text-red-700', 'text-green-700');
             uploadMessage.classList.add('text-gray-700');
 
-            const { error: updateError } = await supabaseClient
+            const { error: updateError } = await supabase
                 .from('profiles')
                 .update({ profile_name: newProfileName })
                 .eq('id', user.id);
@@ -2853,10 +2719,10 @@
 
         // Opens the modal and prepares the temporary state for editing
         settingsButton.addEventListener('click', async () => {
-            const { data: { user } } = await supabaseClient.auth.getUser();
+            const { data: { user } } = await supabase.auth.getUser();
             if (!user) return;
 
-            const { data, error } = await supabaseClient.from('profiles').select('preferences').eq('id', user.id).single();
+            const { data, error } = await supabase.from('profiles').select('preferences').eq('id', user.id).single();
 
             // Store a deep copy of current preferences to edit and potentially save later
             tempPreferences = JSON.parse(JSON.stringify((error || !data) ? {} : data.preferences || {}));
@@ -2917,7 +2783,7 @@
             const file = e.target.files[0];
             if (!file) return;
 
-            const { data: { user } } = await supabaseClient.auth.getUser();
+            const { data: { user } } = await supabase.auth.getUser();
             if (!user) {
                 wallpaperUploadMessage.textContent = 'Usuário não encontrado.';
                 wallpaperUploadMessage.style.display = 'block';
@@ -2930,7 +2796,7 @@
 
             const filePath = `${user.id}/${file.name}`;
 
-            const { error: uploadError } = await supabaseClient.storage
+            const { error: uploadError } = await supabase.storage
                 .from('wallpapers')
                 .upload(filePath, file, { cacheControl: '3600', upsert: true });
 
@@ -2941,7 +2807,7 @@
                 return;
             }
 
-            const { data } = supabaseClient.storage.from('wallpapers').getPublicUrl(filePath);
+            const { data } = supabase.storage.from('wallpapers').getPublicUrl(filePath);
             const publicUrl = `${data.publicUrl}?t=${new Date().getTime()}`;
 
             // Update temp state with new image wallpaper
@@ -3150,8 +3016,8 @@
             if (!userId) return;
 
             const [profileResponse, appOrderResponse] = await Promise.all([
-                supabaseClient.from('profiles').select('preferences').eq('id', userId).single(),
-                supabaseClient.from('user_app_order').select('app_ids').eq('user_id', userId).single()
+                supabase.from('profiles').select('preferences').eq('id', userId).single(),
+                supabase.from('user_app_order').select('app_ids').eq('user_id', userId).single()
             ]);
 
             const { data: profile, error: profileError } = profileResponse;
@@ -3192,7 +3058,7 @@
             if (!userId) return;
             const appIds = [...buttonGridContainer.children].map(appContainer => appContainer.dataset.id);
 
-            const { error } = await supabaseClient
+            const { error } = await supabase
                 .from('user_app_order')
                 .upsert({ user_id: userId, app_ids: appIds }, { onConflict: 'user_id' });
 
@@ -3295,7 +3161,7 @@
         }
 
         async function saveAppDetails() {
-            const user = (await supabaseClient.auth.getUser()).data.user;
+            const user = (await supabase.auth.getUser()).data.user;
             if (!user) return;
 
             const appId = addAppModal.dataset.editId;
@@ -3351,10 +3217,10 @@
         }
 
         async function deleteCustomApp(appId) {
-            const user = (await supabaseClient.auth.getUser()).data.user;
+            const user = (await supabase.auth.getUser()).data.user;
             if (!user) return;
 
-            const { error } = await supabaseClient.from('custom_apps').delete().match({ id: appId, user_id: user.id });
+            const { error } = await supabase.from('custom_apps').delete().match({ id: appId, user_id: user.id });
 
             if (error) {
                 console.error('Erro ao deletar aplicativo:', error);
@@ -3377,13 +3243,13 @@
         }
 
         async function renderTrashList() {
-            const user = (await supabaseClient.auth.getUser()).data.user;
+            const user = (await supabase.auth.getUser()).data.user;
             if (!user) return;
 
             // Fetch preferences and custom apps in parallel
             const [profileResponse, customAppsResponse] = await Promise.all([
-                supabaseClient.from('profiles').select('preferences').eq('id', user.id).single(),
-                supabaseClient.from('custom_apps').select('*').eq('user_id', user.id)
+                supabase.from('profiles').select('preferences').eq('id', user.id).single(),
+                supabase.from('custom_apps').select('*').eq('user_id', user.id)
             ]);
 
             const { data: profileData, error: profileError } = profileResponse;
@@ -3537,10 +3403,6 @@
                 recipesModal.classList.remove('hidden');
                 recipesModal.classList.add('flex');
                 fetchRecipes();
-            } else if (appId === 'passwords-app') {
-                passwordsModal.classList.remove('hidden');
-                passwordsModal.classList.add('flex');
-                fetchPasswords();
             } else if (appUrl) {
                 window.open(appUrl, '_blank');
             }
@@ -3613,12 +3475,12 @@
             const restoreButton = e.target.closest('.restore-app-button');
             const deletePermanentlyButton = e.target.closest('.delete-app-permanently-button');
 
-            const user = (await supabaseClient.auth.getUser()).data.user;
+            const user = (await supabase.auth.getUser()).data.user;
             if (!user) return;
 
             if (restoreButton) {
                 const appId = restoreButton.dataset.id;
-                const { data } = await supabaseClient.from('profiles').select('preferences').eq('id', user.id).single();
+                const { data } = await supabase.from('profiles').select('preferences').eq('id', user.id).single();
                 const prefs = data?.preferences || {};
                 let removed = prefs.removed_apps || [];
                 prefs.removed_apps = removed.filter(id => id !== appId);
@@ -3702,121 +3564,9 @@
             }
         });
 
-        // --- NOVO: EVENTOS DO APP DE SENHAS ---
-        closePasswordsModal.addEventListener('click', () => {
-            passwordsModal.classList.add('hidden');
-            passwordsModal.classList.remove('flex');
-        });
-
-        showAddPasswordModalButton.addEventListener('click', () => showEditPasswordModal());
-        closeEditPasswordModal.addEventListener('click', hideEditPasswordModal);
-        cancelPasswordEditButton.addEventListener('click', hideEditPasswordModal);
-        savePasswordEditButton.addEventListener('click', savePassword);
-
-        passwordsContainer.addEventListener('click', (e) => {
-            const editButton = e.target.closest('.password-edit-button');
-            const deleteButton = e.target.closest('.password-delete-button');
-
-            if (editButton) {
-                const pwEl = editButton.closest('[data-id]');
-                const passwordData = {
-                    id: pwEl.dataset.id,
-                    name: pwEl.dataset.name,
-                    login: pwEl.dataset.login,
-                    password: pwEl.dataset.password
-                };
-                showEditPasswordModal(passwordData);
-            } else if (deleteButton) {
-                const pwEl = deleteButton.closest('[data-id]');
-                showDeleteConfirmationModal(pwEl.dataset.id, 'password');
-            }
-        });
-
-        // Listener de evento para o toggle de visibilidade (delegado para ambos os modais)
-        document.addEventListener('click', (e) => {
-            const toggleButton = e.target.closest('.toggle-password-visibility');
-            if (toggleButton) {
-                const icon = toggleButton.querySelector('i');
-                const input = toggleButton.previousElementSibling;
-                if (input.type === 'password') {
-                    input.type = 'text';
-                    icon.classList.remove('fa-eye');
-                    icon.classList.add('fa-eye-slash');
-                } else {
-                    input.type = 'password';
-                    icon.classList.remove('fa-eye-slash');
-                    icon.classList.add('fa-eye');
-                }
-            }
-        });
-
-        // Atualiza a função de confirmação de exclusão para lidar com senhas
-        function showDeleteConfirmationModal(id, type, name = '') {
-            itemToDeleteInfo = { id, type };
-            const messageEl = document.getElementById('delete-confirm-message');
-
-            if (type === 'note') {
-                messageEl.textContent = 'Tem a certeza que quer apagar esta nota?';
-            } else if (type === 'custom_app_permanent') {
-                messageEl.innerHTML = `Tem certeza que deseja excluir permanentemente o aplicativo "<strong>${name}</strong>"? <br>Esta ação não pode ser desfeita.`;
-            } else if (type === 'price') {
-                messageEl.textContent = 'Tem certeza que deseja excluir este preço?';
-            } else if (type === 'recipe') {
-                messageEl.textContent = 'Tem a certeza que quer apagar esta receita? Esta ação não pode ser desfeita.';
-            } else if (type === 'password') {
-                messageEl.textContent = 'Tem certeza que deseja excluir esta senha?';
-            }
-            else { // Default for shopping list item
-                messageEl.textContent = 'Tem certeza que deseja excluir este item da lista?';
-            }
-            deleteConfirmModal.classList.remove('hidden');
-            deleteConfirmModal.classList.add('flex');
-        }
-
-        confirmDeleteButton.addEventListener('click', async () => {
-            if (!itemToDeleteInfo) return;
-
-            const { id, type } = itemToDeleteInfo;
-            const user = (await supabase.auth.getUser()).data.user;
-
-            if (type === 'note') {
-                await deleteNote(id);
-                fetchNotes();
-            } else if (type === 'price') {
-                await deletePrice(id);
-                if (currentComparisonItemId) {
-                    fetchItemPrices(currentComparisonItemId);
-                }
-            } else if (type === 'recipe') {
-                await deleteRecipe(id);
-            } else if (type === 'password') {
-                await deletePassword(id);
-            } else if (type === 'custom_app_permanent') {
-                if (user) {
-                    // 1. Delete from the database table
-                    await supabase.from('custom_apps').delete().match({ id: id, user_id: user.id });
-
-                    // 2. Remove from the 'removed_apps' list in preferences
-                    const { data } = await supabase.from('profiles').select('preferences').eq('id', user.id).single();
-                    const prefs = data?.preferences || {};
-                    if (prefs.removed_apps) {
-                        prefs.removed_apps = prefs.removed_apps.filter(appId => appId !== id);
-                        await saveUserPreferences(prefs);
-                    }
-
-                    // 3. Refresh the trash list
-                    await renderTrashList();
-                }
-            } else { // Default case for shopping list item
-                await deleteItem(id);
-            }
-
-            hideDeleteConfirmationModal();
-        });
-
 
         // --- VERIFICAÇÃO DE ESTADO DE AUTENTICAÇÃO E URL ---
-        supabaseClient.auth.onAuthStateChange((event, session) => {
+        supabase.auth.onAuthStateChange((event, session) => {
             if (session) {
                 // Só inicializa a app por completo se ainda não tiver sido feito para esta sessão.
                 // Isto evita que a UI seja recarregada ao trocar de abas.
@@ -3826,39 +3576,31 @@
                     loadUserProfile(session.user);
                     loadUserPreferences();
                     toggleUI(true); // Esta chamada agora é segura dentro do bloco condicional
-                    fetchAndRenderApps(session.user.id);
 
                     // --- Configura todas as subscrições em tempo real ---
-                    if (customAppsSubscription) supabaseClient.removeChannel(customAppsSubscription);
-                    customAppsSubscription = supabaseClient.channel('public:custom_apps')
+                    if (customAppsSubscription) supabase.removeChannel(customAppsSubscription);
+                    customAppsSubscription = supabase.channel('public:custom_apps')
                         .on('postgres_changes', { event: '*', schema: 'public', table: 'custom_apps', filter: `user_id=eq.${session.user.id}` }, payload => {
                             fetchAndRenderApps(session.user.id);
                         })
                         .subscribe();
 
-                    if (notesSubscription) supabaseClient.removeChannel(notesSubscription);
-                    notesSubscription = supabaseClient.channel('public:notes')
+                    if (notesSubscription) supabase.removeChannel(notesSubscription);
+                    notesSubscription = supabase.channel('public:notes')
                         .on('postgres_changes', { event: '*', schema: 'public', table: 'notes', filter: `user_id=eq.${session.user.id}` }, payload => {
                             fetchNotes();
                         })
                         .subscribe();
 
                     // Subscrições para Receitas
-                    if (recipesSubscription) supabaseClient.removeChannel(recipesSubscription);
-                    recipesSubscription = supabaseClient.channel('public:recipes')
+                    if (recipesSubscription) supabase.removeChannel(recipesSubscription);
+                    recipesSubscription = supabase.channel('public:recipes')
                         .on('postgres_changes', { event: '*', schema: 'public', table: 'recipes' }, payload => fetchRecipes())
                         .subscribe();
 
-                    if (recipeImagesSubscription) supabaseClient.removeChannel(recipeImagesSubscription);
-                    recipeImagesSubscription = supabaseClient.channel('public:recipe_images')
+                    if (recipeImagesSubscription) supabase.removeChannel(recipeImagesSubscription);
+                    recipeImagesSubscription = supabase.channel('public:recipe_images')
                         .on('postgres_changes', { event: '*', schema: 'public', table: 'recipe_images' }, payload => fetchRecipes())
-                        .subscribe();
-
-                    // NOVO: Subscrição para a Lista de Compras
-                    const shoppingListChannel = supabaseClient.channel('public:shopping_list')
-                        .on('postgres_changes', { event: '*', schema: 'public', table: 'shopping_list' }, payload => {
-                            fetchShoppingList();
-                        })
                         .subscribe();
 
                     // --- Busca inicial de dados ---
@@ -3869,11 +3611,11 @@
                 isAppInitialized = false; // Reinicia a flag
 
                 // Limpa todas as subscrições para evitar vazamentos de memória
-                if (notesSubscription) supabaseClient.removeChannel(notesSubscription);
-                if (customAppsSubscription) supabaseClient.removeChannel(customAppsSubscription);
-                if (priceSubscription) supabaseClient.removeChannel(priceSubscription);
-                if (recipesSubscription) supabaseClient.removeChannel(recipesSubscription);
-                if (recipeImagesSubscription) supabaseClient.removeChannel(recipeImagesSubscription);
+                if (notesSubscription) supabase.removeChannel(notesSubscription);
+                if (customAppsSubscription) supabase.removeChannel(customAppsSubscription);
+                if (priceSubscription) supabase.removeChannel(priceSubscription);
+                if (recipesSubscription) supabase.removeChannel(recipesSubscription);
+                if (recipeImagesSubscription) supabase.removeChannel(recipeImagesSubscription);
                 notesSubscription = null;
                 customAppsSubscription = null;
                 priceSubscription = null;
@@ -3885,10 +3627,12 @@
                 if (params.get('type') === 'recovery') {
                     toggleUI(false, 'new-password');
                 } else {
-                    toggleUI(false, 'login');
+                    toggleUI(false, 'initial');
                 }
             }
         });
+
+        fetchUsers();
 
         // Adiciona um listener para o evento beforeunload para pedir confirmação antes de atualizar a página
         window.addEventListener('beforeunload', function (e) {
@@ -3898,5 +3642,9 @@
             e.returnValue = '';
         });
 
+        showProfilesButton.addEventListener('click', () => {
+            toggleUI(false, 'user-list');
+        });
     </script>
+</body>
 </html>
