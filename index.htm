@@ -1677,7 +1677,7 @@
                 }
 
                 const itemNameSpan = document.createElement('span');
-                itemNameSpan.className = 'text-lg cursor-pointer truncate flex-grow text-theme';
+                itemNameSpan.className = 'text-lg cursor-pointer whitespace-normal break-words flex-grow text-theme';
                 itemNameSpan.textContent = item.item_name;
                 itemNameSpan.addEventListener('click', () => {
                     showMoveItemConfirmationModal(item.id, !item.is_checked);
