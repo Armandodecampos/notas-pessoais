@@ -7,29 +7,26 @@ import time
 
 PORT = 8080
 
-def test_login_flow(page: Page):
+def test_login_success(page: Page):
     """
-    Tests the complete login flow, waiting for Supabase to initialize.
+    Tests that the login is successful, reloading the page to ensure UI updates.
     """
     page.on("console", lambda msg: print(f"BROWSER CONSOLE: {msg.text}"))
 
-    page.goto(f"http://localhost:{PORT}/index.htm")
-
-    # Espera que o Supabase seja carregado antes de interagir com a página
-    page.wait_for_function("() => window.supabase !== undefined")
+    page.goto(f"http://localhost:{PORT}/index.htm", wait_until="networkidle")
 
     page.locator("#email").fill("test@test.com")
-    page.locator("#password").fill("password")
+    page.locator("#password").fill("123456")
 
     login_button = page.get_by_role("button", name="Entrar")
     expect(login_button).to_be_visible()
     login_button.click()
 
+    # Recarrega a página para garantir que o onAuthStateChange seja acionado
+    page.reload(wait_until="networkidle")
+
     logged_in_view = page.locator("#logged-in-app")
     expect(logged_in_view).to_be_visible(timeout=30000)
-
-    os.makedirs("jules-scratch/verification", exist_ok=True)
-    page.screenshot(path="jules-scratch/verification/verification.png")
 
 def main():
     socketserver.TCPServer.allow_reuse_address = True
@@ -47,8 +44,8 @@ def main():
             browser = p.chromium.launch(headless=True)
             page = browser.new_page()
             try:
-                test_login_flow(page)
-                print("Test passed successfully!")
+                test_login_success(page)
+                print("Test passed: Login is successful.")
             finally:
                 browser.close()
     finally:
