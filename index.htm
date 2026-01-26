@@ -175,37 +175,20 @@
     <div id="main-container" class="flex items-center justify-center min-h-screen p-4">
         <!-- Conteúdo do Login -->
         <div id="app" class="w-full max-w-md">
-            <div id="initial-login-view" class="text-center">
-                 <button id="show-profiles-button" class="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-2xl rounded-md shadow-lg hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transform transition-all duration-300 ease-in-out">
-                    Acessar
-                </button>
-            </div>
+            <div id="login-view" class="p-4">
+                <div class="w-full max-w-xs mx-auto space-y-4">
+                    <h2 class="text-2xl font-bold text-center text-gray-800">Login</h2>
 
-            <!-- Lista de Usuários (inicialmente escondida) -->
-            <div id="user-list-container" class="hidden fixed inset-0 bg-gray-100 flex flex-col items-center justify-center gap-8 p-4">
-                <div id="user-cards-wrapper" class="flex flex-col items-center gap-8 w-full max-w-sm">
-                    <!-- Usuários serão injetados aqui via JavaScript -->
-                </div>
-                <button id="back-to-initial-button" class="absolute top-6 left-6 px-4 py-2 bg-white text-gray-800 font-semibold rounded-md shadow-sm hover:bg-gray-200 focus:outline-none transition-all flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-                    </svg>
-                    Voltar
-                </button>
-            </div>
-
-            <!-- Formulário de Login (inicialmente escondido) -->
-            <div id="login-form-container" class="hidden fixed inset-0 bg-gray-100 flex flex-col items-center justify-center p-4">
-                <div class="w-full max-w-xs space-y-4">
-                    <!-- Display do usuário selecionado -->
-                    <div class="flex flex-col items-center mb-2">
-                        <p id="selected-user-name" class="text-xl font-bold text-gray-800"></p>
+                    <!-- Campo de Email -->
+                    <div class="w-full">
+                        <label for="email" class="block text-lg font-medium text-gray-700">Email</label>
+                        <input type="email" id="email" autocomplete="email" class="block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-lg">
                     </div>
 
                     <!-- Campo da Senha -->
                     <div class="w-full">
-                        <label for="password" class="block text-lg font-medium text-gray-700 text-center mb-2">Senha</label>
-                        <input type="password" id="password" autocomplete="current-password" class="block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-center text-lg">
+                        <label for="password" class="block text-lg font-medium text-gray-700">Senha</label>
+                        <input type="password" id="password" autocomplete="current-password" class="block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-lg">
                     </div>
 
                     <!-- Botão de Entrar -->
@@ -215,17 +198,9 @@
 
                     <!-- Botão de redefinir senha (agora como texto) -->
                     <button id="reset-password-button" class="!mt-2 w-full text-sm text-gray-600 hover:text-indigo-600 hover:underline focus:outline-none transition-colors duration-200">
-                        Redefinir Senha
+                        Esqueceu a senha?
                     </button>
                 </div>
-
-                <!-- Botão Voltar -->
-                <button id="back-button" class="absolute top-6 left-6 px-4 py-2 bg-white text-gray-800 font-semibold rounded-md shadow-sm hover:bg-gray-200 focus:outline-none transition-all flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-                    </svg>
-                    Voltar
-                </button>
             </div>
 
             <!-- Formulário de Nova Senha (inicialmente escondido) -->
@@ -889,10 +864,9 @@
 
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-        // Configura o cliente do Supabase para não persistir a sessão no navegador
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
             auth: {
-                persistSession: false
+                persistSession: true
             }
         });
 
@@ -900,17 +874,11 @@
         const mainContainer = document.getElementById('main-container');
         const app = document.getElementById('app');
         const loggedInAppContainer = document.getElementById('logged-in-app');
-        const userListContainer = document.getElementById('user-list-container');
-        const userCardsWrapper = document.getElementById('user-cards-wrapper');
-        const loginFormContainer = document.getElementById('login-form-container');
-        const selectedUserAvatar = document.getElementById('selected-user-avatar');
-        const selectedUserName = document.getElementById('selected-user-name');
+        const emailInput = document.getElementById('email');
         const userEmailDisplay = document.getElementById('user-email-display');
         const passwordInput = document.getElementById('password');
         const loginButton = document.getElementById('login-button');
         const resetPasswordButton = document.getElementById('reset-password-button');
-        const backButton = document.getElementById('back-button');
-        const backToInitialButton = document.getElementById('back-to-initial-button');
         const resetPasswordModal = document.getElementById('reset-password-modal');
         const resetEmailDisplay = document.getElementById('reset-email-display');
         const closeModalButton = document.getElementById('close-modal-button');
@@ -1175,36 +1143,6 @@
 
         // --- FUNÇÕES DE INICIALIZAÇÃO E UI ---
 
-        // Função para buscar os emails do Supabase e popular o dropdown
-        async function fetchUsers() {
-            const { data, error } = await supabase
-                .from('profiles')
-                .select('username, avatar_url, profile_name');
-
-            if (error) {
-                console.error('Erro ao buscar usuários:', error);
-            } else if (data.length === 0) {
-                 userCardsWrapper.innerHTML = '<p class="text-center text-gray-500">Nenhum usuário encontrado. Adicione usuários na tabela `profiles` do Supabase.</p>';
-            } else {
-                // NOVO: Ordena os usuários em ordem alfabética pelo nome do perfil ou, na falta deste, pelo nome de usuário.
-                data.sort((a, b) => {
-                    const nameA = (a.profile_name || a.username).toLowerCase();
-                    const nameB = (b.profile_name || b.username).toLowerCase();
-                    return nameA.localeCompare(nameB);
-                });
-
-                userCardsWrapper.innerHTML = '';
-                data.forEach(user => {
-                    const userCard = document.createElement('button');
-                    // Apply Tailwind classes directly to make the user card look like a button
-                    userCard.className = 'w-full px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-2xl rounded-md shadow-lg hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transform transition-all duration-300 ease-in-out';
-                    userCard.dataset.email = user.username;
-                    userCard.textContent = user.profile_name || user.username;
-                    userCardsWrapper.appendChild(userCard);
-                });
-            }
-        }
-
         // Função para carregar os dados do perfil logado
         async function loadUserProfile(user) {
             const { data: profileData, error } = await supabase
@@ -1284,21 +1222,15 @@
                 }
 
                 // Esconde todas as vistas dentro do ecrã de login
-                initialLoginView.classList.add('hidden');
-                userListContainer.classList.add('hidden');
-                loginFormContainer.classList.add('hidden');
+                const loginView = document.getElementById('login-view');
+                if (loginView) loginView.classList.add('hidden');
                 newPasswordContainer.classList.add('hidden');
 
                 // Mostra a vista de login correta
-                if (view === 'user-list') {
-                    userListContainer.classList.remove('hidden');
-                    userListContainer.classList.add('flex');
-                } else if (view === 'login') {
-                    loginFormContainer.classList.remove('hidden');
-                } else if (view === 'new-password') {
+                if (view === 'new-password') {
                     newPasswordContainer.classList.remove('hidden');
-                } else { // A vista padrão é a inicial com o botão de login
-                    initialLoginView.classList.remove('hidden');
+                } else { // A vista padrão é o formulário de login
+                    if (loginView) loginView.classList.remove('hidden');
                 }
             }
         }
@@ -2270,28 +2202,82 @@
 
 
         // --- EVENT LISTENERS ---
-        userListContainer.addEventListener('click', (e) => {
-            const userCard = e.target.closest('button[data-email]');
-            if (userCard) {
-                selectedEmail = userCard.dataset.email;
-
-                // Preenche os dados do usuário no formulário de login
-                const userName = userCard.textContent;
-                selectedUserName.textContent = userName;
-
-                toggleUI(false, 'login');
-                passwordInput.focus();
-            }
-        });
-
         loginButton.addEventListener('click', async () => {
-            const email = selectedEmail;
+            const email = emailInput.value;
             const password = passwordInput.value;
 
             const { error } = await supabase.auth.signInWithPassword({ email, password });
 
             if (error) {
                 console.error(error);
+                alert("Email ou senha inválidos.");
+            }
+        });
+
+        // --- VERIFICAÇÃO DE ESTADO DE AUTENTICAÇÃO E URL ---
+        supabase.auth.onAuthStateChange((event, session) => {
+            if (session) {
+                // Só inicializa a app por completo se ainda não tiver sido feito para esta sessão.
+                // Isto evita que a UI seja recarregada ao trocar de abas.
+                if (!isAppInitialized) {
+                    isAppInitialized = true;
+
+                    loadUserProfile(session.user);
+                    loadUserPreferences();
+                    toggleUI(true); // Esta chamada agora é segura dentro do bloco condicional
+
+                    // --- Configura todas as subscrições em tempo real ---
+                    if (customAppsSubscription) supabase.removeChannel(customAppsSubscription);
+                    customAppsSubscription = supabase.channel('public:custom_apps')
+                        .on('postgres_changes', { event: '*', schema: 'public', table: 'custom_apps', filter: `user_id=eq.${session.user.id}` }, payload => {
+                            fetchAndRenderApps(session.user.id);
+                        })
+                        .subscribe();
+
+                    if (notesSubscription) supabase.removeChannel(notesSubscription);
+                    notesSubscription = supabase.channel('public:notes')
+                        .on('postgres_changes', { event: '*', schema: 'public', table: 'notes', filter: `user_id=eq.${session.user.id}` }, payload => {
+                            fetchNotes();
+                        })
+                        .subscribe();
+
+                    // Subscrições para Receitas
+                    if (recipesSubscription) supabase.removeChannel(recipesSubscription);
+                    recipesSubscription = supabase.channel('public:recipes')
+                        .on('postgres_changes', { event: '*', schema: 'public', table: 'recipes' }, payload => fetchRecipes())
+                        .subscribe();
+
+                    if (recipeImagesSubscription) supabase.removeChannel(recipeImagesSubscription);
+                    recipeImagesSubscription = supabase.channel('public:recipe_images')
+                        .on('postgres_changes', { event: '*', schema: 'public', table: 'recipe_images' }, payload => fetchRecipes())
+                        .subscribe();
+
+                    // --- Busca inicial de dados ---
+                    fetchAndRenderApps(session.user.id);
+                    fetchShoppingList();
+                }
+            } else { // Sem sessão ou o usuário saiu
+                isAppInitialized = false; // Reinicia a flag
+
+                // Limpa todas as subscrições para evitar vazamentos de memória
+                if (notesSubscription) supabase.removeChannel(notesSubscription);
+                if (customAppsSubscription) supabase.removeChannel(customAppsSubscription);
+                if (priceSubscription) supabase.removeChannel(priceSubscription);
+                if (recipesSubscription) supabase.removeChannel(recipesSubscription);
+                if (recipeImagesSubscription) supabase.removeChannel(recipeImagesSubscription);
+                notesSubscription = null;
+                customAppsSubscription = null;
+                priceSubscription = null;
+                recipesSubscription = null;
+                recipeImagesSubscription = null;
+
+                // Determina qual vista mostrar
+                const params = new URLSearchParams(window.location.hash.substring(1));
+                if (params.get('type') === 'recovery') {
+                    toggleUI(false, 'new-password');
+                } else {
+                    toggleUI(false, 'login');
+                }
             }
         });
 
@@ -2304,7 +2290,11 @@
         });
 
         resetPasswordButton.addEventListener('click', async () => {
-            const email = selectedEmail;
+            const email = emailInput.value;
+            if (!email) {
+                alert("Por favor, insira seu email para redefinir a senha.");
+                return;
+            }
             const redirectToUrl = `${window.location.origin}${window.location.pathname}`;
 
             const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -2325,17 +2315,8 @@
             }
         });
 
-        backButton.addEventListener('click', () => {
-            toggleUI(false, 'user-list');
-            passwordInput.value = '';
-        });
-
-        backToInitialButton.addEventListener('click', () => {
-            toggleUI(false, 'initial');
-        });
-
         backButtonNewPassword.addEventListener('click', () => {
-            toggleUI(false, 'initial');
+            toggleUI(false, 'login');
             newPasswordInput.value = '';
             confirmPasswordInput.value = '';
         });
@@ -3627,12 +3608,10 @@
                 if (params.get('type') === 'recovery') {
                     toggleUI(false, 'new-password');
                 } else {
-                    toggleUI(false, 'initial');
+                    toggleUI(false, 'login');
                 }
             }
         });
-
-        fetchUsers();
 
         // Adiciona um listener para o evento beforeunload para pedir confirmação antes de atualizar a página
         window.addEventListener('beforeunload', function (e) {
@@ -3640,10 +3619,6 @@
             e.preventDefault();
             // O Chrome exige que returnValue seja definido
             e.returnValue = '';
-        });
-
-        showProfilesButton.addEventListener('click', () => {
-            toggleUI(false, 'user-list');
         });
     </script>
 </body>
