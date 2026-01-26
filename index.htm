@@ -869,6 +869,7 @@
                 persistSession: true
             }
         });
+        window.supabase = supabase;
 
         // --- REFERÊNCIAS DE ELEMENTOS HTML ---
         const mainContainer = document.getElementById('main-container');
@@ -926,7 +927,7 @@
         const addItemQuantityInput = document.getElementById('add-item-quantity-input');
         const addItemUnitInput = document.getElementById('add-item-unit-input');
         const addItemConfirmButton = document.getElementById('add-item-confirm-button');
-        const addItemCancelButton = document.getElementById('cancel-add-app-button');
+        const addItemCancelButton = document.getElementById('add-item-cancel-button');
 
         // Referências do novo modal de edição
         const editItemModal = document.getElementById('edit-item-modal');
@@ -2209,7 +2210,7 @@
             const { error } = await supabase.auth.signInWithPassword({ email, password });
 
             if (error) {
-                console.error(error);
+                console.error("Supabase login error:", error);
                 alert("Email ou senha inválidos.");
             }
         });
@@ -3545,73 +3546,6 @@
             }
         });
 
-
-        // --- VERIFICAÇÃO DE ESTADO DE AUTENTICAÇÃO E URL ---
-        supabase.auth.onAuthStateChange((event, session) => {
-            if (session) {
-                // Só inicializa a app por completo se ainda não tiver sido feito para esta sessão.
-                // Isto evita que a UI seja recarregada ao trocar de abas.
-                if (!isAppInitialized) {
-                    isAppInitialized = true;
-
-                    loadUserProfile(session.user);
-                    loadUserPreferences();
-                    toggleUI(true); // Esta chamada agora é segura dentro do bloco condicional
-
-                    // --- Configura todas as subscrições em tempo real ---
-                    if (customAppsSubscription) supabase.removeChannel(customAppsSubscription);
-                    customAppsSubscription = supabase.channel('public:custom_apps')
-                        .on('postgres_changes', { event: '*', schema: 'public', table: 'custom_apps', filter: `user_id=eq.${session.user.id}` }, payload => {
-                            fetchAndRenderApps(session.user.id);
-                        })
-                        .subscribe();
-
-                    if (notesSubscription) supabase.removeChannel(notesSubscription);
-                    notesSubscription = supabase.channel('public:notes')
-                        .on('postgres_changes', { event: '*', schema: 'public', table: 'notes', filter: `user_id=eq.${session.user.id}` }, payload => {
-                            fetchNotes();
-                        })
-                        .subscribe();
-
-                    // Subscrições para Receitas
-                    if (recipesSubscription) supabase.removeChannel(recipesSubscription);
-                    recipesSubscription = supabase.channel('public:recipes')
-                        .on('postgres_changes', { event: '*', schema: 'public', table: 'recipes' }, payload => fetchRecipes())
-                        .subscribe();
-
-                    if (recipeImagesSubscription) supabase.removeChannel(recipeImagesSubscription);
-                    recipeImagesSubscription = supabase.channel('public:recipe_images')
-                        .on('postgres_changes', { event: '*', schema: 'public', table: 'recipe_images' }, payload => fetchRecipes())
-                        .subscribe();
-
-                    // --- Busca inicial de dados ---
-                    fetchAndRenderApps(session.user.id);
-                    fetchShoppingList();
-                }
-            } else { // Sem sessão ou o usuário saiu
-                isAppInitialized = false; // Reinicia a flag
-
-                // Limpa todas as subscrições para evitar vazamentos de memória
-                if (notesSubscription) supabase.removeChannel(notesSubscription);
-                if (customAppsSubscription) supabase.removeChannel(customAppsSubscription);
-                if (priceSubscription) supabase.removeChannel(priceSubscription);
-                if (recipesSubscription) supabase.removeChannel(recipesSubscription);
-                if (recipeImagesSubscription) supabase.removeChannel(recipeImagesSubscription);
-                notesSubscription = null;
-                customAppsSubscription = null;
-                priceSubscription = null;
-                recipesSubscription = null;
-                recipeImagesSubscription = null;
-
-                // Determina qual vista mostrar
-                const params = new URLSearchParams(window.location.hash.substring(1));
-                if (params.get('type') === 'recovery') {
-                    toggleUI(false, 'new-password');
-                } else {
-                    toggleUI(false, 'login');
-                }
-            }
-        });
 
         // Adiciona um listener para o evento beforeunload para pedir confirmação antes de atualizar a página
         window.addEventListener('beforeunload', function (e) {
