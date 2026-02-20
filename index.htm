@@ -401,22 +401,6 @@
                 <label for="add-item-name-input" class="block text-sm font-medium text-left text-theme">Nome do Item</label>
                 <input type="text" id="add-item-name-input" placeholder="Ex: Maçãs" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
             </div>
-            <div class="flex space-x-2">
-                <div class="relative flex-grow">
-                    <label for="add-item-quantity-input" class="block text-sm font-medium text-left text-theme">Quantidade</label>
-                    <input type="number" id="add-item-quantity-input" placeholder="Qtd" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                </div>
-                <div class="relative">
-                    <label for="add-item-unit-input" class="block text-sm font-medium text-left text-theme">Unidade</label>
-                    <select id="add-item-unit-input" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                        <option value="uni">un</option>
-                        <option value="kg">kg</option>
-                        <option value="g">g</option>
-                        <option value="litro">litro</option>
-                        <option value="ml">ml</option>
-                    </select>
-                </div>
-            </div>
             <div class="flex justify-between space-x-4">
                 <button id="add-item-confirm-button" class="w-full px-4 py-3 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 transition-colors">
                     Adicionar
@@ -442,22 +426,6 @@
             <div class="relative">
                 <label for="edit-item-input" class="block text-sm font-medium text-left text-theme">Nome do Item</label>
                 <input type="text" id="edit-item-input" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-            </div>
-            <div class="flex space-x-2">
-                <div class="relative flex-grow">
-                    <label for="edit-item-quantity" class="block text-sm font-medium text-left text-theme">Quantidade</label>
-                    <input type="number" id="edit-item-quantity" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                </div>
-                <div class="relative">
-                    <label for="edit-item-unit" class="block text-sm font-medium text-left text-theme">Unidade</label>
-                    <select id="edit-item-unit" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                        <option value="uni">un</option>
-                        <option value="kg">kg</option>
-                        <option value="g">g</option>
-                        <option value="litro">litro</option>
-                        <option value="ml">ml</option>
-                    </select>
-                </div>
             </div>
             <div class="flex justify-between space-x-4">
                 <button id="save-edit-button" class="w-full px-4 py-3 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 transition-colors">
@@ -691,62 +659,6 @@
         </div>
     </div>
 
-    <!-- Modal de Comparação de Preços -->
-    <div id="price-comparison-modal" class="fixed inset-0 bg-gray-100 hidden flex-col z-50">
-        <!-- Cabeçalho do Modal -->
-        <header class="flex items-center justify-between p-4 bg-white shadow-md">
-            <div>
-                <h2 class="text-2xl font-bold text-theme">Comparar Preços</h2>
-                <p id="comparison-item-name" class="text-lg text-theme"></p>
-            </div>
-            <button id="close-price-comparison-modal" class="text-gray-500 hover:text-gray-700">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-        </header>
-
-        <!-- Formulário para Adicionar Preço -->
-        <div class="p-4 bg-white border-b">
-            <div class="flex flex-col sm:flex-row gap-2">
-                <input type="text" id="price-location-input" placeholder="Nome do Local" class="flex-grow px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                <input type="number" id="price-value-input" placeholder="Preço (ex: 12.99)" step="0.01" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                <button id="add-price-button" class="px-4 py-2 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 transition-colors">Adicionar</button>
-            </div>
-        </div>
-
-        <!-- Lista de Preços -->
-        <div id="price-list-container" class="flex-grow overflow-y-auto p-4 space-y-2">
-            <!-- Preços serão injetados aqui -->
-        </div>
-    </div>
-
-    <!-- Modal para Editar Preço -->
-    <div id="edit-price-modal" class="fixed inset-0 bg-gray-100 hidden flex-col z-[60]">
-        <header class="flex items-center justify-between p-4 bg-white shadow-md">
-            <h2 class="text-2xl font-bold text-theme">Editar Preço</h2>
-            <button id="close-edit-price-modal-x-button" class="text-gray-500 hover:text-gray-700">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-        </header>
-        <div class="flex flex-col p-4 bg-gray-100 flex-grow space-y-4">
-            <div class="relative">
-                <label for="edit-price-location-input" class="block text-sm font-medium text-left text-theme">Local</label>
-                <input type="text" id="edit-price-location-input" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-            </div>
-            <div class="relative">
-                <label for="edit-price-value-input" class="block text-sm font-medium text-left text-theme">Preço</label>
-                <input type="number" id="edit-price-value-input" step="0.01" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-            </div>
-            <div class="flex justify-between space-x-4 pt-2">
-                <button id="save-edit-price-button" class="w-full px-4 py-3 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700">Salvar</button>
-                <button id="cancel-edit-price-button" class="w-full px-4 py-3 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300">Cancelar</button>
-            </div>
-        </div>
-    </div>
-
     <!-- NOVO: Modal do App de Receitas -->
     <div id="recipes-modal" class="fixed inset-0 bg-gray-100 hidden flex-col z-50">
         <header class="p-4 bg-white shadow-md">
@@ -901,8 +813,6 @@
         const addItemModal = document.getElementById('add-item-modal');
         const closeAddItemModalButton = document.getElementById('close-add-item-modal');
         const addItemNameInput = document.getElementById('add-item-name-input');
-        const addItemQuantityInput = document.getElementById('add-item-quantity-input');
-        const addItemUnitInput = document.getElementById('add-item-unit-input');
         const addItemConfirmButton = document.getElementById('add-item-confirm-button');
         const addItemCancelButton = document.getElementById('add-item-cancel-button');
 
@@ -910,8 +820,6 @@
         const editItemModal = document.getElementById('edit-item-modal');
         const closeEditItemModalButton = document.getElementById('close-edit-item-modal');
         const editItemInput = document.getElementById('edit-item-input');
-        const editItemQuantity = document.getElementById('edit-item-quantity');
-        const editItemUnit = document.getElementById('edit-item-unit');
         const saveEditButton = document.getElementById('save-edit-button');
         const cancelEditButton = document.getElementById('cancel-edit-button');
 
@@ -1006,21 +914,6 @@
         const initialLoginView = document.getElementById('initial-login-view');
         const showProfilesButton = document.getElementById('show-profiles-button');
 
-        // Referências da Comparação de Preços
-        const priceComparisonModal = document.getElementById('price-comparison-modal');
-        const closePriceComparisonModalButton = document.getElementById('close-price-comparison-modal');
-        const comparisonItemName = document.getElementById('comparison-item-name');
-        const priceLocationInput = document.getElementById('price-location-input');
-        const priceValueInput = document.getElementById('price-value-input');
-        const addPriceButton = document.getElementById('add-price-button');
-        const priceListContainer = document.getElementById('price-list-container');
-        const editPriceModal = document.getElementById('edit-price-modal');
-        const editPriceLocationInput = document.getElementById('edit-price-location-input');
-        const editPriceValueInput = document.getElementById('edit-price-value-input');
-        const saveEditPriceButton = document.getElementById('save-edit-price-button');
-        const cancelEditPriceButton = document.getElementById('cancel-edit-price-button');
-        const closeEditPriceModalXButton = document.getElementById('close-edit-price-modal-x-button');
-
         // NOVO: Referências do App de Receitas
         const recipesModal = document.getElementById('recipes-modal');
         const closeRecipesModal = document.getElementById('close-recipes-modal');
@@ -1053,9 +946,6 @@
         let customAppsSubscription = null;
         let isDragging = false;
         let tempPreferences = {}; // State for settings modal
-        let currentComparisonItemId = null;
-        let priceSubscription = null;
-        let editingPriceId = null;
         // NOVO: Variáveis de estado para Receitas
         let allRecipes = [];
         let editingRecipeId = null;
@@ -1151,8 +1041,6 @@
             addAppModal.classList.add('hidden');
             editFixedAppModal.classList.add('hidden');
             trashBinModal.classList.add('hidden');
-            priceComparisonModal.classList.add('hidden');
-            editPriceModal.classList.add('hidden');
             // NOVO: Esconder modais de receitas
             recipesModal.classList.add('hidden');
             editRecipeModal.classList.add('hidden');
@@ -1573,12 +1461,6 @@
                 const mainContent = document.createElement('div');
                 mainContent.className = 'flex items-center flex-grow space-x-2';
 
-                const quantitySpan = document.createElement('span');
-                quantitySpan.className = 'font-medium whitespace-nowrap text-theme';
-                if (item.quantity || item.unit) {
-                    quantitySpan.textContent = `${item.quantity || ''} ${item.unit || ''}`;
-                }
-
                 const itemNameSpan = document.createElement('span');
                 itemNameSpan.className = 'text-lg cursor-pointer whitespace-normal break-all flex-grow text-theme';
                 itemNameSpan.textContent = item.item_name;
@@ -1607,16 +1489,9 @@
                       <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                     </svg>
                 `;
-                editButton.addEventListener('click', () => showEditItemModal(item.id, item.item_name, item.quantity, item.unit));
+                editButton.addEventListener('click', () => showEditItemModal(item.id, item.item_name));
 
-                const compareButton = document.createElement('button');
-                compareButton.className = 'compare-prices-button w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-blue-500 hover:text-blue-700 transition-colors';
-                compareButton.innerHTML = `<i class="fas fa-dollar-sign text-lg"></i>`;
-                compareButton.addEventListener('click', () => showPriceComparisonModal(item.id, item.item_name));
-
-                mainContent.appendChild(quantitySpan);
                 mainContent.appendChild(itemNameSpan);
-                actionButtons.appendChild(compareButton);
                 actionButtons.appendChild(editButton);
                 actionButtons.appendChild(deleteButton);
 
@@ -1627,11 +1502,9 @@
             });
         }
 
-        function showEditItemModal(itemId, itemName, itemQuantity, itemUnit) {
+        function showEditItemModal(itemId, itemName) {
             editingItemId = itemId;
             editItemInput.value = itemName;
-            editItemQuantity.value = itemQuantity || '';
-            editItemUnit.value = itemUnit || 'uni';
             editItemModal.classList.remove('hidden');
             editItemModal.classList.add('flex');
             editItemInput.focus();
@@ -1640,16 +1513,14 @@
         function closeEditItemModal() {
             editingItemId = null;
             editItemInput.value = '';
-            editItemQuantity.value = '';
-            editItemUnit.value = 'uni';
             editItemModal.classList.add('hidden');
             editItemModal.classList.remove('flex');
         }
 
-        async function updateItem(itemId, newItemName, newQuantity, newUnit) {
+        async function updateItem(itemId, newItemName) {
             const { error } = await supabase
                 .from('shopping_list')
-                .update({ item_name: newItemName, quantity: newQuantity, unit: newUnit })
+                .update({ item_name: newItemName })
                 .eq('id', itemId);
 
             if (error) {
@@ -1670,8 +1541,6 @@
 
         async function addItem() {
             const newItemName = addItemNameInput.value.trim();
-            const newQuantity = parseFloat(addItemQuantityInput.value) || null;
-            const newUnit = addItemUnitInput.value;
             const { data: { user } } = await supabase.auth.getUser();
 
             if (!newItemName || !user) {
@@ -1696,14 +1565,12 @@
 
             const { error } = await supabase
                 .from('shopping_list')
-                .insert([{ item_name: newItemName, quantity: newQuantity, unit: newUnit }]);
+                .insert([{ item_name: newItemName }]);
 
             if (error) {
                 console.error('Erro ao adicionar item:', error);
             } else {
                 addItemNameInput.value = '';
-                addItemQuantityInput.value = '';
-                addItemUnitInput.value = 'uni';
                 hideAddItemModal();
             }
         }
@@ -1733,156 +1600,6 @@
             });
 
 
-        // --- FUNÇÕES DE COMPARAÇÃO DE PREÇOS ---
-        async function fetchItemPrices(itemId) {
-            if (!itemId) return;
-            const { data, error } = await supabase
-                .from('item_prices')
-                .select('*')
-                .eq('item_id', itemId);
-
-            if (error) {
-                console.error('Erro ao buscar preços:', error);
-            } else {
-                renderItemPrices(data);
-            }
-        }
-
-        function renderItemPrices(prices) {
-            priceListContainer.innerHTML = '';
-            if (!prices || prices.length === 0) {
-                priceListContainer.innerHTML = '<p class="text-center text-gray-500">Nenhum preço adicionado ainda.</p>';
-                return;
-            }
-
-            // Ordena por preço, do menor para o maior
-            prices.sort((a, b) => a.price - b.price);
-
-            prices.forEach((price, index) => {
-                const priceDiv = document.createElement('div');
-                const isBestPrice = index === 0;
-                priceDiv.className = `flex items-center justify-between p-3 rounded-lg shadow-sm border ${isBestPrice ? 'bg-green-100 border-green-400' : 'bg-white border-gray-200'}`;
-
-                const formattedPrice = `R$ ${price.price.toFixed(2).replace('.', ',')}`;
-
-                priceDiv.innerHTML = `
-                    <div class="flex-grow">
-                        <p class="font-bold text-lg text-theme">${price.location}</p>
-                        <p class="font-semibold text-xl ${isBestPrice ? 'text-green-700' : 'text-gray-600'}">${formattedPrice}</p>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <button class="edit-price-button p-2 text-gray-500 hover:text-gray-800" data-price-id="${price.id}" data-location="${price.location}" data-price="${price.price}">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="delete-price-button p-2 text-red-500 hover:text-red-700" data-price-id="${price.id}">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                `;
-                priceListContainer.appendChild(priceDiv);
-            });
-        }
-
-        async function addPrice() {
-            const location = priceLocationInput.value.trim();
-            const price = parseFloat(priceValueInput.value);
-            const { data: { user } } = await supabase.auth.getUser();
-
-            if (!location || isNaN(price) || !user || !currentComparisonItemId) {
-                // Adicionar feedback ao usuário aqui, se desejar
-                return;
-            }
-
-            const { error } = await supabase
-                .from('item_prices')
-                .insert({
-                    item_id: currentComparisonItemId,
-                    user_id: user.id,
-                    location,
-                    price
-                });
-
-            if (error) {
-                console.error("Erro ao adicionar preço:", error);
-            } else {
-                priceLocationInput.value = '';
-                priceValueInput.value = '';
-            }
-        }
-
-        async function updatePrice(priceId, newLocation, newPrice) {
-             const { error } = await supabase
-                .from('item_prices')
-                .update({ location: newLocation, price: newPrice })
-                .eq('id', priceId);
-            if (error) {
-                console.error("Erro ao atualizar preço:", error);
-            }
-        }
-
-        async function deletePrice(priceId) {
-             const { error } = await supabase
-                .from('item_prices')
-                .delete()
-                .eq('id', priceId);
-            if (error) {
-                console.error("Erro ao deletar preço:", error);
-            }
-        }
-
-        function showPriceComparisonModal(itemId, itemName) {
-            currentComparisonItemId = itemId;
-            comparisonItemName.textContent = itemName;
-            priceComparisonModal.classList.remove('hidden');
-            priceComparisonModal.classList.add('flex');
-
-            fetchItemPrices(itemId); // Busca inicial
-
-            // Inicia a subscrição em tempo real
-            if (priceSubscription) {
-                supabase.removeChannel(priceSubscription);
-            }
-            priceSubscription = supabase
-                .channel(`item_prices_${itemId}`)
-                .on('postgres_changes', {
-                    event: '*',
-                    schema: 'public',
-                    table: 'item_prices',
-                    filter: `item_id=eq.${itemId}`
-                }, payload => {
-                    fetchItemPrices(itemId);
-                })
-                .subscribe();
-        }
-
-        function hidePriceComparisonModal() {
-            priceComparisonModal.classList.add('hidden');
-            priceComparisonModal.classList.remove('flex');
-            currentComparisonItemId = null;
-            comparisonItemName.textContent = '';
-            priceLocationInput.value = '';
-            priceValueInput.value = '';
-
-            // Remove a subscrição para evitar escutas desnecessárias
-            if (priceSubscription) {
-                supabase.removeChannel(priceSubscription);
-                priceSubscription = null;
-            }
-        }
-
-        function showEditPriceModal(priceId, location, price) {
-            editingPriceId = priceId;
-            editPriceLocationInput.value = location;
-            editPriceValueInput.value = price;
-            editPriceModal.classList.remove('hidden');
-            editPriceModal.classList.add('flex');
-        }
-
-        function hideEditPriceModal() {
-            editingPriceId = null;
-            editPriceModal.classList.add('hidden');
-            editPriceModal.classList.remove('flex');
-        }
 
         // --- NOVO: FUNÇÕES DO APP DE RECEITAS ---
 
@@ -2231,12 +1948,10 @@
                 // Limpa todas as subscrições para evitar vazamentos de memória
                 if (notesSubscription) supabase.removeChannel(notesSubscription);
                 if (customAppsSubscription) supabase.removeChannel(customAppsSubscription);
-                if (priceSubscription) supabase.removeChannel(priceSubscription);
                 if (recipesSubscription) supabase.removeChannel(recipesSubscription);
                 if (recipeImagesSubscription) supabase.removeChannel(recipeImagesSubscription);
                 notesSubscription = null;
                 customAppsSubscription = null;
-                priceSubscription = null;
                 recipesSubscription = null;
                 recipeImagesSubscription = null;
 
@@ -2517,7 +2232,7 @@
 
         saveEditButton.addEventListener('click', async () => {
             if (editingItemId) {
-                await updateItem(editingItemId, editItemInput.value.trim(), parseFloat(editItemQuantity.value), editItemUnit.value);
+                await updateItem(editingItemId, editItemInput.value.trim());
                 closeEditItemModal();
             }
         });
@@ -2550,8 +2265,6 @@
                 messageEl.textContent = 'Tem a certeza que quer apagar esta nota?';
             } else if (type === 'custom_app_permanent') {
                 messageEl.innerHTML = `Tem certeza que deseja excluir permanentemente o aplicativo "<strong>${name}</strong>"? <br>Esta ação não pode ser desfeita.`;
-            } else if (type === 'price') {
-                messageEl.textContent = 'Tem certeza que deseja excluir este preço?';
             } else if (type === 'recipe') {
                 messageEl.textContent = 'Tem a certeza que quer apagar esta receita? Esta ação não pode ser desfeita.';
             }
@@ -2577,11 +2290,6 @@
             if (type === 'note') {
                 await deleteNote(id);
                 fetchNotes();
-            } else if (type === 'price') {
-                await deletePrice(id);
-                if (currentComparisonItemId) {
-                    fetchItemPrices(currentComparisonItemId);
-                }
             } else if (type === 'recipe') {
                 await deleteRecipe(id);
             } else if (type === 'custom_app_permanent') {
@@ -3395,37 +3103,6 @@
                 const appId = deletePermanentlyButton.dataset.id;
                 const appTitle = deletePermanentlyButton.dataset.title;
                 showDeleteConfirmationModal(appId, 'custom_app_permanent', appTitle);
-            }
-        });
-
-        // Event Listeners para Comparação de Preços
-        closePriceComparisonModalButton.addEventListener('click', hidePriceComparisonModal);
-        addPriceButton.addEventListener('click', addPrice);
-        cancelEditPriceButton.addEventListener('click', hideEditPriceModal);
-        closeEditPriceModalXButton.addEventListener('click', hideEditPriceModal);
-
-        priceListContainer.addEventListener('click', (e) => {
-            const editButton = e.target.closest('.edit-price-button');
-            if (editButton) {
-                const priceId = editButton.dataset.priceId;
-                const location = editButton.dataset.location;
-                const price = editButton.dataset.price;
-                showEditPriceModal(priceId, location, price);
-            }
-
-            const deleteButton = e.target.closest('.delete-price-button');
-            if (deleteButton) {
-                const priceId = deleteButton.dataset.priceId;
-                showDeleteConfirmationModal(priceId, 'price');
-            }
-        });
-
-        saveEditPriceButton.addEventListener('click', async () => {
-            const newLocation = editPriceLocationInput.value.trim();
-            const newPrice = parseFloat(editPriceValueInput.value);
-            if(editingPriceId && newLocation && !isNaN(newPrice)) {
-                await updatePrice(editingPriceId, newLocation, newPrice);
-                hideEditPriceModal();
             }
         });
 
