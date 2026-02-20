@@ -1557,7 +1557,7 @@
 
             const { error } = await supabase
                 .from('shopping_list')
-                .insert([{ item_name: newItemName }]);
+                .insert([{ item_name: newItemName, is_checked: true }]);
 
             if (error) {
                 console.error('Erro ao adicionar item:', error);
