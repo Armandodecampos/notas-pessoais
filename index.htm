@@ -1526,6 +1526,11 @@
 
         // --- FUNÇÕES DA LISTA DE COMPRAS ---
 
+        // Função para normalizar texto (remover acentos e converter para minúsculas)
+        function normalizeText(text) {
+            return text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+        }
+
         // Função para buscar e renderizar a lista de compras
         async function fetchShoppingList() {
             const { data: { user } } = await supabase.auth.getUser();
@@ -1671,6 +1676,22 @@
 
             if (!newItemName || !user) {
                 return;
+            }
+
+            // Verificação de nomes parecidos
+            const { data: existingItems, error: fetchError } = await supabase
+                .from('shopping_list')
+                .select('item_name');
+
+            if (!fetchError && existingItems) {
+                const normalizedNewName = normalizeText(newItemName);
+                const similarItems = existingItems.filter(item => normalizeText(item.item_name) === normalizedNewName);
+
+                if (similarItems.length > 0) {
+                    const similarNames = similarItems.map(item => `"${item.item_name}"`).join(', ');
+                    alert(`Não foi possível adicionar. Já existe(m) item(ns) com nome(s) parecido(s): ${similarNames}`);
+                    return;
+                }
             }
 
             const { error } = await supabase
