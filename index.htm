@@ -363,9 +363,10 @@
             <!-- Itens da lista serão injetados aqui -->
         </div>
 
-        <!-- Botão fixo para adicionar novo item -->
-        <footer class="p-4 bg-white shadow-lg fixed bottom-0 left-0 right-0">
-            <button id="show-add-item-modal-button" class="w-full px-4 py-3 bg-orange-500 text-white font-semibold rounded-md hover:bg-orange-600 transition-colors">
+        <!-- Campo de entrada e botão para adicionar item -->
+        <footer class="p-4 bg-white shadow-lg fixed bottom-0 left-0 right-0 flex space-x-2">
+            <input type="text" id="inline-add-item-input" placeholder="Adicionar ou pesquisar item..." class="flex-grow px-4 py-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500 outline-none">
+            <button id="inline-add-item-button" class="px-6 py-2 bg-orange-500 text-white font-semibold rounded-md hover:bg-orange-600 transition-colors whitespace-nowrap">
                 Adicionar Item
             </button>
         </footer>
@@ -386,31 +387,6 @@
         </div>
     </div>
 
-    <!-- Novo Modal para Adicionar Itens -->
-    <div id="add-item-modal" class="fixed inset-0 bg-gray-100 hidden flex-col z-50">
-        <header class="flex items-center justify-between p-4 bg-white shadow-md">
-            <h2 class="text-2xl font-bold text-theme">Adicionar Item</h2>
-            <button id="close-add-item-modal" class="text-gray-500 hover:text-gray-700">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-        </header>
-        <div class="flex flex-col p-4 bg-gray-100 flex-grow space-y-4">
-            <div class="relative">
-                <label for="add-item-name-input" class="block text-sm font-medium text-left text-theme">Nome do Item</label>
-                <input type="text" id="add-item-name-input" placeholder="Ex: Maçãs" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-            </div>
-            <div class="flex justify-between space-x-4">
-                <button id="add-item-confirm-button" class="w-full px-4 py-3 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 transition-colors">
-                    Adicionar
-                </button>
-                 <button id="add-item-cancel-button" class="w-full px-4 py-3 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300 transition-colors">
-                    Cancelar
-                </button>
-            </div>
-        </div>
-    </div>
 
     <!-- Modal para editar itens da lista de compras (AGORA EM TELA CHEIA) -->
     <div id="edit-item-modal" class="fixed inset-0 bg-gray-100 hidden flex-col z-50">
@@ -808,13 +784,9 @@
         const closeShoppingListButton = document.getElementById('close-shopping-list-button');
         const shoppingListContainer = document.getElementById('shopping-list-container');
 
-        // Referências do novo modal de adicionar item
-        const showAddItemModalButton = document.getElementById('show-add-item-modal-button');
-        const addItemModal = document.getElementById('add-item-modal');
-        const closeAddItemModalButton = document.getElementById('close-add-item-modal');
-        const addItemNameInput = document.getElementById('add-item-name-input');
-        const addItemConfirmButton = document.getElementById('add-item-confirm-button');
-        const addItemCancelButton = document.getElementById('add-item-cancel-button');
+        // Referências do campo de adicionar item inline
+        const inlineAddItemInput = document.getElementById('inline-add-item-input');
+        const inlineAddItemButton = document.getElementById('inline-add-item-button');
 
         // Referências do novo modal de edição
         const editItemModal = document.getElementById('edit-item-modal');
@@ -939,6 +911,7 @@
 
         let selectedEmail = '';
         let editingItemId = null;
+        let allShoppingListItems = [];
         let editingNoteId = null;
         let itemToDeleteInfo = null;
         let notesSubscription = null;
@@ -1033,7 +1006,6 @@
             settingsModal.classList.add('hidden');
             shoppingListModal.classList.add('hidden');
             deleteConfirmModal.classList.add('hidden');
-            addItemModal.classList.add('hidden');
             notesModal.classList.add('hidden');
             editNoteModal.classList.add('hidden');
             viewNoteModal.classList.add('hidden');
@@ -1437,8 +1409,17 @@
                 console.error('Erro ao buscar a lista de compras:', error);
                 shoppingListContainer.innerHTML = '<p class="text-center text-red-500">Erro ao carregar a lista.</p>';
             } else {
-                renderShoppingList(data);
+                allShoppingListItems = data || [];
+                filterAndRenderShoppingList();
             }
+        }
+
+        function filterAndRenderShoppingList() {
+            const filterText = normalizeText(inlineAddItemInput.value);
+            const filteredItems = allShoppingListItems.filter(item =>
+                normalizeText(item.item_name).includes(filterText)
+            );
+            renderShoppingList(filteredItems);
         }
 
         // Função para renderizar os itens na UI
@@ -1540,7 +1521,7 @@
         }
 
         async function addItem() {
-            const newItemName = addItemNameInput.value.trim();
+            const newItemName = inlineAddItemInput.value.trim();
             const { data: { user } } = await supabase.auth.getUser();
 
             if (!newItemName || !user) {
@@ -1570,8 +1551,8 @@
             if (error) {
                 console.error('Erro ao adicionar item:', error);
             } else {
-                addItemNameInput.value = '';
-                hideAddItemModal();
+                inlineAddItemInput.value = '';
+                fetchShoppingList();
             }
         }
 
@@ -2241,21 +2222,6 @@
         closeEditItemModalButton.addEventListener('click', closeEditItemModal);
 
 
-        function showAddItemModal() {
-            addItemModal.classList.remove('hidden');
-            addItemModal.classList.add('flex');
-            addItemNameInput.focus();
-        }
-
-        function hideAddItemModal() {
-            addItemModal.classList.add('hidden');
-            addItemModal.classList.remove('flex');
-        }
-
-        showAddItemModalButton.addEventListener('click', showAddItemModal);
-        closeAddItemModalButton.addEventListener('click', hideAddItemModal);
-        addItemCancelButton.addEventListener('click', hideAddItemModal);
-        addItemConfirmButton.addEventListener('click', addItem);
 
         function showDeleteConfirmationModal(id, type, name = '') {
             itemToDeleteInfo = { id, type };
@@ -3055,6 +3021,15 @@
         });
 
         closeAppModalButton.addEventListener('click', hideAppActionBar);
+
+        inlineAddItemInput.addEventListener('input', filterAndRenderShoppingList);
+        inlineAddItemInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addItem();
+            }
+        });
+        inlineAddItemButton.addEventListener('click', addItem);
 
         saveEditFixedAppButton.addEventListener('click', async () => {
             const appId = editFixedAppModal.dataset.id;
