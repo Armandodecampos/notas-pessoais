@@ -356,20 +356,19 @@
                     </svg>
                 </button>
             </div>
+            <!-- Campo de entrada e botão para adicionar item moved to top -->
+            <div class="flex space-x-2">
+                <input type="text" id="inline-add-item-input" placeholder="Adicionar ou pesquisar item..." class="flex-grow px-4 py-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500 outline-none">
+                <button id="inline-add-item-button" class="w-10 h-10 flex items-center justify-center bg-orange-500 text-white font-bold rounded-md hover:bg-orange-600 transition-colors text-2xl">
+                    +
+                </button>
+            </div>
         </header>
 
         <!-- Corpo da Lista de Itens -->
-        <div id="shopping-list-container" class="flex-grow overflow-y-auto p-4 space-y-2 pb-20">
+        <div id="shopping-list-container" class="flex-grow overflow-y-auto p-4 space-y-2">
             <!-- Itens da lista serão injetados aqui -->
         </div>
-
-        <!-- Campo de entrada e botão para adicionar item -->
-        <footer class="p-4 bg-white shadow-lg fixed bottom-0 left-0 right-0 flex space-x-2">
-            <input type="text" id="inline-add-item-input" placeholder="Adicionar ou pesquisar item..." class="flex-grow px-4 py-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500 outline-none">
-            <button id="inline-add-item-button" class="px-6 py-2 bg-orange-500 text-white font-semibold rounded-md hover:bg-orange-600 transition-colors whitespace-nowrap">
-                Adicionar Item
-            </button>
-        </footer>
     </div>
 
     <!-- Modal para Seleção de Filtro de Notas -->
