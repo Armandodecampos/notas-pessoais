@@ -1560,7 +1560,7 @@
                 itemDiv.dataset.id = item.id;
 
                 if (item.is_checked) {
-                    itemDiv.className = 'shopping-list-item flex items-center justify-between p-3 border-b border-gray-200 bg-gray-200 rounded-lg shadow-sm transition-colors duration-200';
+                    itemDiv.className = 'shopping-list-item flex items-center justify-between p-3 border-b border-gray-200 bg-orange-200 rounded-lg shadow-sm transition-colors duration-200';
                 } else {
                     itemDiv.className = 'shopping-list-item flex items-center justify-between p-3 border-b border-gray-200 bg-white rounded-lg shadow-sm transition-colors duration-200';
                 }
@@ -1578,7 +1578,10 @@
                 itemNameSpan.className = 'text-lg cursor-pointer whitespace-normal break-all flex-grow text-theme';
                 itemNameSpan.textContent = item.item_name;
                 itemNameSpan.addEventListener('click', () => {
-                    toggleItemChecked(item.id, !item.is_checked);
+                    const action = item.is_checked ? 'desmarcar' : 'marcar';
+                    if (confirm(`Deseja ${action} o item "${item.item_name}"?`)) {
+                        toggleItemChecked(item.id, !item.is_checked);
+                    }
                 });
 
                 const actionButtons = document.createElement('div');
