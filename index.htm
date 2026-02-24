@@ -237,6 +237,13 @@
             </button>
             <!-- Botões de Ação -->
             <div class="absolute right-4 top-1/2 -translate-y-1/2 flex items-center space-x-2">
+                <!-- Barra de Pesquisa de Aplicativos -->
+                <div class="relative">
+                    <input type="text" id="app-search-input" placeholder="Pesquisar..." class="w-28 md:w-48 pl-3 pr-8 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                    <button id="clear-app-search" class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none">
+                        <i class="fas fa-times-circle"></i>
+                    </button>
+                </div>
                  <button id="trash-bin-button" class="w-12 h-12 flex items-center justify-center rounded-full text-white bg-gray-500 hover:bg-gray-600 shadow-xl hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transform transition-all duration-300 ease-in-out">
                     <i class="fas fa-archive"></i>
                 </button>
@@ -912,6 +919,8 @@
         const viewRecipeImagesContainer = document.getElementById('view-recipe-images-container');
         const viewRecipeContent = document.getElementById('view-recipe-content');
         const recipeSearchInput = document.getElementById('recipe-search-input');
+        const appSearchInput = document.getElementById('app-search-input');
+        const clearAppSearchButton = document.getElementById('clear-app-search');
 
 
         let selectedEmail = '';
@@ -926,6 +935,8 @@
         let tempPreferences = {}; // State for settings modal
         // NOVO: Variáveis de estado para Receitas
         let allRecipes = [];
+        let allVisibleApps = [];
+        let currentAppOrder = [];
         let editingRecipeId = null;
         let recipeFilesToUpload = [];
         let recipeImagesToDelete = [];
@@ -2639,9 +2650,24 @@
             }
 
             const allAvailableApps = [...fixedApps, ...(customApps || [])];
-            const visibleApps = allAvailableApps.filter(app => !removedApps.includes(app.id));
+            allVisibleApps = allAvailableApps.filter(app => !removedApps.includes(app.id));
+            currentAppOrder = appOrder;
 
-            renderApps(visibleApps, appOrder);
+            filterAndRenderApps();
+        }
+
+        function filterAndRenderApps() {
+            const val = appSearchInput.value;
+            if (val) {
+                clearAppSearchButton.classList.remove('hidden');
+            } else {
+                clearAppSearchButton.classList.add('hidden');
+            }
+            const filterText = normalizeText(val);
+            const filteredApps = allVisibleApps.filter(app =>
+                app.title && normalizeText(app.title).includes(filterText)
+            );
+            renderApps(filteredApps, currentAppOrder);
         }
 
         async function saveAppOrder(userId) {
@@ -3039,6 +3065,13 @@
             inlineAddItemInput.value = '';
             filterAndRenderShoppingList();
             inlineAddItemInput.focus();
+        });
+
+        appSearchInput.addEventListener('input', filterAndRenderApps);
+        clearAppSearchButton.addEventListener('click', () => {
+            appSearchInput.value = '';
+            filterAndRenderApps();
+            appSearchInput.focus();
         });
         inlineAddItemInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
